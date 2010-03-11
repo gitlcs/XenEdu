@@ -1,0 +1,6 @@
+debian-xenedu-keyring (1.0-3) stable; urgency=low
+
+  [ Simon Cavey ]
+  * Initial release CRDP xenedu-keyrings
+
+ -- Simon CAVEY <simon.cavey@crdp.ac-caen.fr>  Fri, 12 Sep 2008 00:46:38 +0200

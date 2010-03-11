@@ -1,0 +1,47 @@
+#!/usr/bin/make -f
+# -*- makefile -*-
+# Sample debian/rules that uses debhelper.
+# This file was originally written by Joey Hess and Craig Small.
+# As a special exception, when this file is copied by dh-make into a
+# dh-make output file, you may use that output file without restriction.
+# This special exception was added by Craig Small in version 0.37 of dh-make.
+
+# Uncomment this to turn on verbose mode.
+export DH_VERBOSE=1
+INSTALL_DIR=install -d -m 755
+INSTALL_FILE=install -m 644
+
+VERSION := $(shell dpkg-parsechangelog | grep ^Version: | cut -d' ' -f2)
+
+clean :
+	dh_clean
+
+build :
+	
+install:
+	dh_testdir
+	dh_testroot
+	dh_clean
+	dh_installdirs
+	# Add here commands to install the package into debian/debian-lcs-keyring.
+	$(MAKE) DESTDIR=$(CURDIR)/debian/debian-lcs-keyring install
+
+binary-indep: install 
+	dh_testdir
+	dh_testroot
+	dh_installchangelogs
+	dh_installdocs
+	dh_compress
+	dh_fixperms
+	dh_installdeb
+	dh_gencontrol
+	dh_md5sums
+	dh_builddeb
+
+binary-arch:
+
+# Below here is fairly generic really
+
+binary: binary-indep binary-arch
+
+.PHONY: clean build binary-indep binary-arch
