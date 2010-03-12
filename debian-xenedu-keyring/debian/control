@@ -7,7 +7,7 @@ Standards-Version: 3.7.3
 Homepage: http://www.crdp.ac-caen.fr
 
 Package: debian-xenedu-keyring
-Architecture: any
+Architecture: all
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: GPG Lcs debian keys
  GPG XenEdu debian keys form CRDP repository
