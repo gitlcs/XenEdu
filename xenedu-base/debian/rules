@@ -55,8 +55,8 @@ install: build
 	dh_clean -k 
 	dh_installdirs
 
-	# Add here commands to install the package into debian/lcs-openvpn.
-	$(MAKE) DESTDIR=$(CURDIR)/debian/lcs-openvpn install
+	# Add here commands to install the package into debian/xenedu-base.
+	$(MAKE) DESTDIR=$(CURDIR)/debian/xenedu-base install
 
 
 # Build architecture-independent files here.
