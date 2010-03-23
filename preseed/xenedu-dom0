@@ -1,7 +1,7 @@
 #
-#   XenEdu preseed file - revision 5 de 23/03/2010
+#   	XenEdu preseed file - revision 5 du 23/03/2010
 #	Simon Cavey - simon.cavey@crdp.ac-caen.fr
-#	Projet XenEdu - CRDP de Basse-Normandie
+#	Projet XenEdu - Equipe TICE - CRDP du Basse-Normandie
 #
 d-i debian-installer/locale string fr_FR
 d-i console-data-at/keymap select fr
