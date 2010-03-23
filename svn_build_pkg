@@ -1,0 +1,77 @@
+#!/bin/bash
+# Original : Jean-Luc Chretien Projet LCS <jean-luc.chretien@tice.ac-caen.fr>
+# This version : Simon CAVEY
+# Version du : 04/09/2009
+# $1 : repertoire source du paquet
+# $2 : Num de version
+# $3 : Distribution : sarge ou etch
+# $4 : Branche
+# $5 : Nom du mainteneur du paquet
+# $6 : Mail du mainteneur
+# $7 : Verification lintian
+if [ "$1" = "--help" -o "$1" = "-h" ] || [ -z "$1" ] || [ -z "$2" ] || [ -z "$3" ] || [ -z "$4" ] || [ -z "$5" ] || [ -z "$6" ]; then
+        echo "Script destin? ? fabriquer un paquet Debian simc-*"
+        echo ""
+        echo "Usage : build_pkg <repertoire source du paquet> <Num de Version> <distribution> <branche de destination> <\"Nom mainteneur\"> <\"Mail mainteneur\"> <lintian>"
+        echo "La distribution est sarge ou etch"
+        echo "Les branches possibles sont : stable testing experimentale (ou xp)"
+        echo "Le parametre lintian (optionnel) permet de valider le paquet avec l'outil Debian lintian"
+        exit
+fi
+
+if [ "$3" != "etch" -a "$3" != "sid" -a "$3" != "squeeze" -a "$3" != "lenny" ]; then
+    echo "Les distributions possibles sont : etch lenny  squeeze sid"
+    exit
+fi
+
+if [ "$4" != "stable" -a "$4" != "testing" -a "$4" != "experimentale" -a "$4" != "xp" ]; then
+    echo "Les branches possibles sont : stable testing experimentale (ou xp)"
+    exit
+fi
+
+if [ "$4" = "stable" ];then
+    BRANCHE="stable"
+    INCOMING="stable"
+elif [ "$4" = "testing" ];then
+    BRANCHE="testing"
+    INCOMING="testing"
+elif [ "$4" = "unstable" -o "$4" = "xp" ];then
+    BRANCHE="unstable"
+    INCOMING="unstable"
+fi
+
+
+echo "Nom de l'applicatif : $1"
+echo "Tag de version : $2"
+echo "Distribution : $3"
+echo "Branche de destination : $4"
+NAMEPAQ="$1_$2_all.deb"
+echo "Nom du paquet : $NAMEPAQ"
+echo "Mainteneur : $5 <$6>"
+export DEBFULLNAME="$5"
+export DEBEMAIL="$6"
+
+if [ -d $1 ]; then
+  cd $1
+  if [ "$7" = "lintian" ]; then
+    VALIDATE="--svn-lintian"
+  fi
+  svn-buildpackage $VALIDATE -rfakeroot -e$6
+    if [ -e ../build-area/$1_$2_all.deb ]; then
+        echo "Tansfert du paquet $1_$2_all.deb sur le depot local $3 $BRANCHE"
+        if [ -d /home/ftp/debian/dists/$3 ] && [ -d /home/ftp/debian/dists/$3/$BRANCHE/binary-i386 ] ;then
+            cp  ../build-area/$1_$2_all.* /home/ftp/debian/dists/$3/$BRANCHE/binary-i386/
+            #
+            # Mise ? jour du depot local de paquets
+            #
+            echo "Mise ? jour du depot local de paquets $3 $BRANCHE"
+            CHEMIN=`pwd`
+            cd /home/ftp/debian/
+            dpkg-scanpackages dists/$3/$BRANCHE/binary-i386 /dev/null | gzip -f9 > dists/$3/$BRANCHE/binary-i386/Packages.gz 
+        else
+            echo "Le repertoire /home/ftp/debian/dists/$3/$BRANCHE n'existe pas."
+            echo "le paquet n'a pas ete depose !"
+        fi
+     fi
+fi
+
