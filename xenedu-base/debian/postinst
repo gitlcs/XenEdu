@@ -21,11 +21,11 @@ set -e
 case "$1" in
     configure)
 	
-	# ecriture de /etc/xen/script/network-custom-bridge
-	echo "#!/bin/bash" > /etc/xen/script/network-custom-bridge
+	# ecriture de /etc/xen/scripts/network-custom-bridge
+	echo "#!/bin/bash" > /etc/xen/scripts/network-custom-bridge
 	for i in `ifconfig -a |grep eth |grep -v peth | cut -f 1 -d " "`
 	do 
-	    echo "/etc/xen/scripts/network-bridge \"\$@\" netdev=$i" >> /etc/xen/script/network-custom-bridge
+	    echo "/etc/xen/scripts/network-bridge \"\$@\" netdev=$i" >> /etc/xen/scripts/network-custom-bridge
 	done
 	
 	# ecriture du fichier de config xen
