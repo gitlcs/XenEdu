@@ -11,7 +11,6 @@ install:
 	install -d $(DESTDIR)/etc/xen
 	install -d $(DESTDIR)/etc/xen/scripts
 	cp -a etc/* $(DESTDIR)/etc/
-	chmod +x $(DESTDIR)/etc/xen/scripts/network-custom-bridge
 	
 	# install lib exemple
 	install -d $(DESTDIR)/var/lib/xenedu
