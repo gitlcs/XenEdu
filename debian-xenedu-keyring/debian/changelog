@@ -1,4 +1,4 @@
-debian-xenedu-keyring (1.1) stable; urgency=low
+debian-xenedu-keyring (1.1-1) stable; urgency=low
 
   [ Simon Cavey ]
   * Initial release CRDP xenedu-keyrings
