@@ -27,6 +27,7 @@ case "$1" in
 	do 
 	    echo "/etc/xen/scripts/network-bridge \"\$@\" netdev=$i" >> /etc/xen/scripts/network-custom-bridge
 	done
+	chmod +x /etc/xen/scripts/network-custom-bridge
 	
 	# ecriture du fichier de config xen
 	if [ ! -e /etc/xen/xend-config.sxp.noxenedu ] ; then 
