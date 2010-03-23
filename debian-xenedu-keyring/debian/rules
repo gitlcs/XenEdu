@@ -23,8 +23,8 @@ install:
 	dh_testroot
 	dh_clean
 	dh_installdirs
-	# Add here commands to install the package into debian/debian-lcs-keyring.
-	$(MAKE) DESTDIR=$(CURDIR)/debian/debian-lcs-keyring install
+	# Add here commands to install the package into debian/debian-xenedu-keyring.
+	$(MAKE) DESTDIR=$(CURDIR)/debian/debian-xenedu-keyring install
 
 binary-indep: install 
 	dh_testdir
