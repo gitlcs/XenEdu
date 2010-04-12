@@ -1,0 +1,63 @@
+#!/bin/bash
+
+source /etc/xenedu/xenedu-storage-status
+
+echo "indiquez le mot de passe administrateur windows : "
+read ADMINPASS
+
+echo "Indiquez le numero de serie de windows : "
+read SERIALWIN
+
+echo "Induquez le nom complet de l'ordinateur : "
+read WINFULLNAME
+
+echo "Induquez le nom de l'organisation : "
+read ORGNAME	
+
+echo "Induquez le nom de court l'ordinateur : "
+read COMPUNAME
+
+echo "Induquez l'adresse IP de l'ordinateur : "
+read WINIP
+
+
+echo "Induquez le masque de sous-réseau :"
+read WINMASQUE
+
+echo "Induquez l'adresse ip de la passerelle : "
+read WINGATEWAY
+
+echo "Induquez l'adresse ip du serveur DNS : "
+read WINDNS
+
+echo "generation du fichier de réponses"
+
+sed -e "s|@@ADMINPASS@@|$ADMINPASS|g" \
+-e "s|@@SERIALWIN@@|"$SERIALWIN"|g" \
+-e "s|@@WINFULLNAME@@|"$WINFULLNAME"|g" \
+-e "s|@@ORGNAME@@|"$ORGNAME"|g" \
+-e "s|@@COMPUNAME@@|"$COMPUNAME"|g" \
+-e "s|@@WINIP@@|"$WINIP"|g" \
+-e "s|@@WINMASQUE@@|"$WINMASQUE"|g" \
+-e "s|@@WINGATEWAY@@|"$WINGATEWAY"|g" \
+-e "s|@@WINDNS@@|"$WINDNS"|g" \
+/var/lib/xenedu/base/windows-xp-unattend.in > /var/lib/xenedu/active/windows-xp-unattend
+
+
+echo "Inserez le CD de windows XP et validez"
+read
+
+mount /cdrom
+echo "copie de fichier pour la generation de l'iso"
+mkdir -p /iso/tmp
+cp -a /cdrom /iso/tmp
+echo "copie terminée"
+echo "création de l'iso"
+
+SKYPOCTET=`isoinfo -d -i /dev/cdrom | grep "Bootoff" |awk {'print $3'} `
+dd if=/dev/cdrom of=/isotmp/boot.img bs=2048 count=1 skip=$SKYPOCTET
+cd /iso/tmp
+cp /var/lib/xenedu/active/windows-xp-unattend /iso/tmp/I386/WINNT.SIF
+mkisofs -b boot.img -no-emul-boot -boot-load-seg 1984 -boot-load-size 4 -iso-level 2 -J -joliet-long -l -D -relaxed-filenames -N -V WinXP -v -o /root/WinXP.iso .
+
+echo "iso terminée"
