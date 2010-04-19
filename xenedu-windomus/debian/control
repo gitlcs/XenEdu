@@ -1,5 +1,5 @@
 Source: xenedu-windomus
-Section: unknown
+Section: misc
 Priority: extra
 Maintainer: root <simon.cavey@crdp.ac-caen.fr>
 Build-Depends: debhelper (>= 7)
