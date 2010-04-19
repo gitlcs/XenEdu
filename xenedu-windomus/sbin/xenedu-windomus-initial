@@ -1,0 +1,14 @@
+#!/bin/bash
+#
+# XenEdu
+# Creation d'une partition /iso - 5 go par defaut
+#
+
+source /etc/xenedu/xenedu.conf
+### creation d'une partition pour les iso
+lvcreate -L "$ISOSIZE"G -n iso $XENEDUDISK
+
+mkfs.ext3 -m 2 "$XENEDUDISK"/iso
+mkdir /iso
+echo  ""$XENEDUDISK"/iso	/iso	 ext3    defaults        0       2" >> /etc/fstab
+mount -a
