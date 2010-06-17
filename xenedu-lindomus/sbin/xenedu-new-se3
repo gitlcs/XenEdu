@@ -1,0 +1,29 @@
+#!/bin/bash
+# creation d'une VM se3
+# XenEdu - Simon Cavey - 17/06/2010
+
+source /etc/xenedu/xenedu.conf
+xenedu-freespace
+
+echo "indiquez l'espace pour /home les donnees utilisateurs"
+echo "entrez simplement le nombre de Go souhaite"
+read SE3HOMESIZE
+
+xenedu-freespace
+echo "indiquez l'espace pour /var/se3 les donnees communes"
+echo "entrez simplement le nombre de Go souhaite"
+read SE3VARSE3SIZE
+
+lvcreate -L"$SE3HOMESIZE"G -n xenedu-se3pdc-home $XENEDUDISK
+lvcreate -L"$SE3VARSE3SIZE"G -n xenedu-se3pdc-varse3 $XENEDUDISK
+
+lvcreate -L5G -n xenedu-se3pdc-root $XENEDUDISK
+lvcreate -L5G -n xenedu-se3pdc-var $XENEDUDISK
+lvcreate -L512M -n xenedu-se3pdc-swp $XENEDUDISK
+
+mkfs.xfs -q "$XENEDUDISK"/xenedu-se3pdc-home
+mkfs.xfs -q "$XENEDUDISK"/xenedu-se3pdc-varse3
+
+
+
+xenedu-new-se3.pl

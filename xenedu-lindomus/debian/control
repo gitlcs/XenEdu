@@ -1,0 +1,17 @@
+Source: xenedu-lindomus
+Section: misc
+Priority: extra
+Maintainer: Simon Cavey <simon.cavey@crdp.ac-caen.fr>
+Build-Depends: debhelper (>= 5)
+Standards-Version: 3.8.4
+Homepage: http://xenedu.crdp.ac-caen.fr
+
+Package: xenedu-lindomus
+Architecture: all
+Depends: ${misc:Depends}, ipcalc
+Description: XenEdu tools for installing Linux Dom U
+ XenEdu tools for installing Linux Dom U
+ New LCS install
+ New SE3 install
+ LCS migration
+ SE3 migration

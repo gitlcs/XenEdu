@@ -1,0 +1,27 @@
+#!/bin/bash
+#
+# script de migration LCS pour XenEdu
+# Simon Cavey 01/06/2010
+#
+source /etc/xenedu/xenedu.conf
+source /usr/sbin/xenedu-migre-linux-common
+
+echo -n "Entrez l'adresse IP du LCS reference : "
+read lcsip
+export lcsip
+
+# creation des partitions
+lvcreate -L5G -n xenedu-lcs-root $XENEDUDISK
+lvcreate -L10G -n xenedu-lcs-var $XENEDUDISK
+lvcreate -L10G -n xenedu-lcs-varlog $XENEDUDISK
+lvcreate -L10G -n xenedu-lcs-varspoolsquid $XENEDUDISK
+lvcreate -L10G -n xenedu-lcs-usrlcs $XENEDUDISK
+lvcreate -L10G -n xenedu-lcs-www $XENEDUDISK
+
+# Question sur /home
+lvcreate -L10G -n xenedu-lcs-home $XENEDUDISK
+
+
+# formatage des partitions : 
+for i in  $XENEDUDISK/xenedu-lcs-*; do
+mkfs.ext3 -m4 $i
