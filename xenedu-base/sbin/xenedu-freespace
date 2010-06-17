@@ -1,0 +1,6 @@
+#!/bin/bash
+# Affiche l'espace libre pour les disques virtuels 
+# 
+source /etc/xenedu/xenedu.conf
+FREESPACE=`vgs --noheadings -o vg_free`
+echo "Vous avez $FREESPACE de libre  pour vos VM"

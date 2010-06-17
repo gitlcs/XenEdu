@@ -20,7 +20,7 @@ set -e
 
 case "$1" in
     configure)
- 	xenedu-windomu-initial
+ 	xenedu-windomus-initial
 	   ;;
 
     abort-upgrade|abort-remove|abort-deconfigure)

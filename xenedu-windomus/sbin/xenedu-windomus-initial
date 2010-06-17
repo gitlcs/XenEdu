@@ -5,10 +5,18 @@
 #
 
 source /etc/xenedu/xenedu.conf
+
+if [ -z $ISOSIZE ]; then
+        ISOSIZE=5
+fi
+if [ -z $XENEDUDISK ]; then
+        XENEDUDISK="/dev/vol0"
+fi
+
 ### creation d'une partition pour les iso
 lvcreate -L "$ISOSIZE"G -n iso $XENEDUDISK
 
 mkfs.ext3 -m 2 "$XENEDUDISK"/iso
-mkdir /iso
+mkdir -p /iso
 echo  ""$XENEDUDISK"/iso	/iso	 ext3    defaults        0       2" >> /etc/fstab
 mount -a
