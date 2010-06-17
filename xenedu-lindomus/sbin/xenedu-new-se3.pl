@@ -26,7 +26,7 @@ use Getopt::Long;
 #
 # Options set on the command line.
 #
-my $HOSTNAME;   # Mandatory.
+my $HOSTNAME="se3pdc";   # Mandatory.
 my $DIR;        # Mandatory.
 
 
@@ -40,7 +40,8 @@ my $GATEWAY;                   # set with '--gateway=dd.dd.dd.dd'
 my $NETMASK="255.255.255.0";   # set with '--mask=dd.dd.dd.dd'
 my $BROADCAST="192.168.1.255"; # set with '--broadcase=ddd.dd.dd.d'
 my $NETWORK="192.168.1.0";     # set with '--network=dd.dd.dd.dd'
-my $xname="test";              # set with '--name=test'
+my $xname="se3pdc";              # set with '--name=test'
+my $xmemory="512";
 my $DHCP=0;                    # This setting overides the other options
 
 #
@@ -65,8 +66,6 @@ my $DHCP=0;                    # This setting overides the other options
         chomp($xmemory = <STDIN>);
         print "\n";
 
-my $xname="se3pdc";
-my $HOSTNAME="se3pdc";
 
 #
 #  Check that the arguments the user has supplied are both 
@@ -210,8 +209,9 @@ my @hostModules = "/lib/modules/2.6.26-2-xen-amd64";
                                                                                           
 foreach my $file ( @hostModules )
 {
-File::Copy::Recursive::cp( $file, $dir . "/lib/modules" );
+File::Copy::cp( $file, $dir . "/lib/modules" );
 }
+`cp -a /lib/modules/2.6.26-2-xen-amd64  $dir/lib/modules`;
 
 #
 #  Disable TLS
