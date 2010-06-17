@@ -14,7 +14,7 @@ if [ -z $XENEDUDISK ]; then
 fi
 
 ### creation d'une partition pour les iso
-lvcreate -L "$ISOSIZE"G -n iso $XENEDUDISK
+lvcreate -L"$ISOSIZE"G -n iso $XENEDUDISK
 
 mkfs.ext3 -m 2 "$XENEDUDISK"/iso
 mkdir -p /iso
