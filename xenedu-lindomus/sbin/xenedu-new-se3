@@ -8,13 +8,13 @@ xenedu-freespace
 echo "indiquez l'espace pour /home les donnees utilisateurs"
 echo "entrez simplement le nombre de Go souhaite"
 read SE3HOMESIZE
+lvcreate -L"$SE3HOMESIZE"G -n xenedu-se3pdc-home $XENEDUDISK
 
 xenedu-freespace
 echo "indiquez l'espace pour /var/se3 les donnees communes"
 echo "entrez simplement le nombre de Go souhaite"
 read SE3VARSE3SIZE
 
-lvcreate -L"$SE3HOMESIZE"G -n xenedu-se3pdc-home $XENEDUDISK
 lvcreate -L"$SE3VARSE3SIZE"G -n xenedu-se3pdc-varse3 $XENEDUDISK
 
 lvcreate -L5G -n xenedu-se3pdc-root $XENEDUDISK

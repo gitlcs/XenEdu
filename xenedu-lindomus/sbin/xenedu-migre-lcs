@@ -6,22 +6,69 @@
 source /etc/xenedu/xenedu.conf
 source /usr/sbin/xenedu-migre-linux-common
 
+
+check-espace-disque lcs
+
 echo -n "Entrez l'adresse IP du LCS reference : "
-read lcsip
-export lcsip
+read $serveurip
+export $serveurip
+
+installkey
+installkeyrev
 
 # creation des partitions
 lvcreate -L5G -n xenedu-lcs-root $XENEDUDISK
 lvcreate -L10G -n xenedu-lcs-var $XENEDUDISK
 lvcreate -L10G -n xenedu-lcs-varlog $XENEDUDISK
 lvcreate -L10G -n xenedu-lcs-varspoolsquid $XENEDUDISK
-lvcreate -L10G -n xenedu-lcs-usrlcs $XENEDUDISK
+lvcreate -L10G -n xenedu-lcs-usrsharelcs $XENEDUDISK
 lvcreate -L10G -n xenedu-lcs-www $XENEDUDISK
 
 # Question sur /home
-lvcreate -L10G -n xenedu-lcs-home $XENEDUDISK
+oldhomeseize=ssh root@$serveurip "df -h /home |grep home | awk {'print $2'}"
+oldhomeoqp=ssh root@$serveurip "df -h /home |grep home | awk {'print $5'}"
+oldhomepc=ssh root@$serveurip "df -h /home |grep home | awk {'print $3'}"
 
+echo "Sur votre LCS la partition /home fait $oldhomeseize"
+echo "elle est utilisée à $oldhomeseize soit $oldhomeoqp"
+echo "quelle taille souhaitez-vous pour la partion /home du nouveau lcs"
+echo "indiquez l'espace pour /home les donnees utilisateurs"
+echo "entrez simplement le nombre de Go souhaite"
+read LCSHOMESIZE
+lvcreate -L"$LCSHOMESIZE"G -n xenedu-lcs-home $XENEDUDISK
 
 # formatage des partitions : 
 for i in  $XENEDUDISK/xenedu-lcs-*; do
 mkfs.ext3 -m4 $i
+
+mkdir -p /mnt/xenedutmp/migrelcs
+mkdir -p /mnt/xenedutmp/migrelcs/var/log
+mkdir -p /mnt/xenedutmp/migrelcs/var/www
+mkdir -p /mnt/xenedutmp/migrelcs/home
+mkdir -p /mnt/xenedutmp/migrelcs/usr/share/lcs
+mkdir -p /mnt/xenedutmp/migrelcs/var/spool/squid
+
+mount $XENEDUDISK/xenedu-lcs-root /mnt/xenedutmp/migrelcs
+mount $XENEDUDISK/xenedu-lcs-var /mnt/xenedutmp/migrelcs/var
+mount $XENEDUDISK/xenedu-lcs-varlog /mnt/xenedutmp/migrelcs/var/log
+mount $XENEDUDISK/xenedu-lcs-www /mnt/xenedutmp/migrelcs/var/www
+mount $XENEDUDISK/xenedu-lcs-varspoolsquid /mnt/xenedutmp/migrelcs/var/spool/squid
+mount $XENEDUDISK/xenedu-lcs-usrsharelcs /mnt/xenedutmp/migrelcs/usr/share/lcs
+mount $XENEDUDISK/xenedu-lcs-home /mnt/xenedutmp/migrelcs/home
+
+# copie des données : 
+ssh root@$serveurip "tar  --one-file-system -cf - /" |tar xf - -C /mnt/xenedutmp/migrelcs
+ssh root@$serveurip "tar  --one-file-system -cf - /var" |tar xf - -C /mnt/xenedutmp/migrelcs
+ssh root@$serveurip "tar  --one-file-system -cf - /var/log" |tar xf - -C /mnt/xenedutmp/migrelcs
+ssh root@$serveurip "tar  --one-file-system -cf - /usr/share/lcs" |tar xf - -C /mnt/xenedutmp/migrelcs
+ssh root@$serveurip "tar  --one-file-system -cf - /home" |tar xf - -C /mnt/xenedutmp/migrelcs
+
+# correction des droits squid : 
+proxyuid=cat /mnt/xenedutmp/migrelcs/etc/passwd | grep "^proxy:" | cut -f 3 -d ":"
+proxygid=cat /mnt/xenedutmp/migrelcs/etc/passwd | grep "^proxy:" | cut -f 4 -d ":"
+chown $proxyuid:$proxygid /mnt/xenedutmp/migrelcs/var/spool/squid
+
+# Remplacement des modules
+rm -rf /mnt/xenedutmp/migrelcs/lib/modules/*
+cp -a /lib/modules/*xen* /mnt/xenedutmp/migrelcs/lib/modules
+

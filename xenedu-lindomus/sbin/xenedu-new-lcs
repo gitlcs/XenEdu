@@ -1,0 +1,57 @@
+#!/bin/bash
+# creation d'une VM se3
+# XenEdu - Simon Cavey - 17/06/2010
+
+source /etc/xenedu/xenedu.conf
+
+
+xenedu-freespace
+echo "indiquez l'espace pour /home les donnees utilisateurs"
+echo "entrez simplement le nombre de Go souhaite"
+read LCSHOMESIZE
+lvcreate -L"$LCSHOMESIZE"G -n xenedu-lcs-home $XENEDUDISK
+xenedu-freespace
+
+echo "indiquez l'espace pour /usr/share/lcs les application LCS"
+echo "entrez simplement le nombre de Go souhaite"
+read LCSVARSQUID
+lvcreate -L"$LCSVARSQUIDSIZE"G -n xenedu-lcs-usrsharelcs $XENEDUDISK
+
+
+echo "indiquez l'espace pour /var/spoolsquid le cache Web"
+echo "entrez simplement le nombre de Go souhaite"
+read LCSVARSQUID
+lvcreate -L"$LCSVARSQUIDSIZE"G -n xenedu-lcs-squid $XENEDUDISK
+
+echo "Souaitez vous une partition dédiée pour les log"
+echo "(O/n)"
+read $WANTLOG
+
+if [ $WANTLOG = O ]; then
+	echo "indiquez l'espace pour /var/log les log"
+	echo "entrez simplement le nombre de Go souhaite"
+	read LOGSIZE	
+	lvcreate -L"$LOGSIZE"G -n xenedu-lcs-log $XENEDUDISK
+fi
+
+echo "Souaitez vous une partition dédiée pour les rapport squid"
+echo "(O/n)"
+read $WANTREPORTS
+
+if [ $WANTREPORTS = O ]; then
+	echo "indiquez l'espace pour /var/www/squid-reports les informations de la consultation web"
+	echo "entrez simplement le nombre de Go souhaite"
+	read REPORTSIZE	
+	lvcreate -L"$REPORTSIZE"G -n xenedu-lcs-squidreports $XENEDUDISK
+fi
+
+lvcreate -L5G -n xenedu-lcs-root $XENEDUDISK
+lvcreate -L5G -n xenedu-lcs-var $XENEDUDISK
+lvcreate -L512M -n xenedu-lcs-swp $XENEDUDISK
+lvcreate -L"$LCSVARSQUIDSIZE"G -n xenedu-lcs-squid $XENEDUDISK
+
+
+mkfs.ext3 -q "$XENEDUDISK"/xenedu-lcs-home
+mkfs.ext3 -q "$XENEDUDISK"/xenedu-lcs-squid
+
+xenedu-new-lcs.pl
