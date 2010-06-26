@@ -98,7 +98,7 @@ my $image = "/dev/vol0/xenedu-".$xname."-root" ;
 my $swap  = "/dev/vol0/xenedu-".$xname."-swp" ;
 my $imgvar  = "/dev/vol0/xenedu-".$xname."-var" ;
 my $imghome = "/dev/vol0/xenedu-".$xname."-home";
-my $imgvarse3 = "/dev/vol0/xenedu-".$xname."-varse3";
+my $imglcs = "/dev/vol0/xenedu-".$xname."-usrsharelcs";
 #
 #  Create swapfile and initialise it.
 #
@@ -146,7 +146,7 @@ if ( ! -d $dir . "/lost+found" )
 #  Install the base system.
 #
 print "Running debootstrap to install the system.   This will take a while!\n";
-`debootstrap --arch i386 etch $dir http://archive.debian.org/debian`;
+`debootstrap --arch i386 lenny $dir ftp://ftp2.fr.debian.org/debian`;
 print "Done\n";
 
 #
@@ -168,17 +168,17 @@ print APT<<E_O_APT;
 
 
 # Stable
-deb http://ftp2.fr.debian.org/debian     etch main contrib non-free
-deb-src http://ftp2.fr.debian.org/debian etch main contrib non-free
+deb http://ftp2.fr.debian.org/debian     lenny main contrib non-free
+deb-src http://ftp2.fr.debian.org/debian lenny main contrib non-free
 
 # 
 #  Security updates
 #
-deb     http://security.debian.org/ etch/updates  main contrib non-free
-deb-src http://security.debian.org/ etch/updates  main contrib non-free
+deb     http://security.debian.org/ lenny/updates  main contrib non-free
+deb-src http://security.debian.org/ lenny/updates  main contrib non-free
 
 # sources pour se3
-deb ftp://wawadeb.crdp.ac-caen.fr/debian etch se3
+deb http://lcs.crdp.ac-caen.fr/lenny main
 
 E_O_APT
 close( APT );
