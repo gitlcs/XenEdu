@@ -1,3 +1,9 @@
+xenedu-lindomus (0.4~3) unstable; urgency=low
+
+  * update etch to archive
+
+ -- Simon Cavey <simc@UltraMeuh.simc.be>  Wed, 30 Jun 2010 11:46:42 +0200
+
 xenedu-lindomus (0.4~1) unstable; urgency=low
 
   * Initial release 
