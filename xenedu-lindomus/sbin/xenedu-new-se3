@@ -26,4 +26,4 @@ mkfs.xfs -q "$XENEDUDISK"/xenedu-se3pdc-varse3
 
 
 
-xenedu-new-se3.pl
+xenedu-new-se3-etch.pl
