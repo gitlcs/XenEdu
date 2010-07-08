@@ -20,7 +20,8 @@ set -e
 
 case "$1" in
     configure)
-	
+	if [ "$2" = "" ] || [ "$2" = "$VER" ]; then
+		
 	# ecriture de /etc/xen/scripts/network-custom-bridge
 	echo "#!/bin/bash" > /etc/xen/scripts/network-custom-bridge
 	for i in `ifconfig -a |grep eth |grep -v peth | cut -f 1 -d " "`
@@ -77,6 +78,17 @@ else
 fi
 
 
+        else
+        ### mise a jour de lcs-openvpn
+        if dpkg --compare-versions $preversion lt 0.4 ; then
+        fi
+                        
+#
+# Fin de la mise a jour
+#
+echo "Termine."
+fi
+               
     ;;
 
     abort-upgrade|abort-remove|abort-deconfigure)

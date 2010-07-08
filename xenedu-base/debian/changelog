@@ -1,3 +1,9 @@
+xenedu-base (0.4~3) stable; urgency=low
+
+  * don't run config when upgrade
+
+ -- simon cavey <simon.cavey@crdp.ac-caen.fr>  Wed, 30 Jun 2010 17:06:34 +0200
+
 xenedu-base (0.4~2) stable; urgency=low
 
   * add update script
