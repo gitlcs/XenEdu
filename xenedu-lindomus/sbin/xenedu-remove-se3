@@ -11,17 +11,13 @@ read SE3REMOVE
 
 case $SE3REMOVE in
 	o) echo "DESTRUCTION DU SE3"
-		destructionse3()
-	;;
+		destructionse3()	;;
 	y) echo "DESTRUCTION DU SE3"
-	destructionse3()
-	;;
+		destructionse3() ;;
 	O) echo "DESTRUCTION DU SE3"
-	destructionse3()
-	;;
+		destructionse3();;
 	Y) echo "DESTRUCTION DU SE3"
-	destructionse3()
-	;;
+		destructionse3();;
 	*) exit;;
 esac 
 
