@@ -81,6 +81,7 @@ fi
         else
         ### mise a jour de lcs-openvpn
         if dpkg --compare-versions $preversion lt 0.4 ; then
+        	echo "mise a jour"
         fi
                         
 #
