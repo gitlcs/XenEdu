@@ -79,7 +79,7 @@ fi
 
 
         else
-        ### mise a jour de lcs-openvpn
+        ### mise a jour de xenedu-base
         if dpkg --compare-versions $preversion lt 0.4 ; then
         	echo "mise a jour"
         fi
