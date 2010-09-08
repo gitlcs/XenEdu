@@ -1,8 +1,9 @@
-xenedu-base (0.5~2) stable; urgency=low
+xenedu-base (0.5+nmu1) stable; urgency=low
 
+  * Correct xendomains for halting VM's
   * don't run config when upgrade
-
- -- simon cavey <simon.cavey@crdp.ac-caen.fr>  Wed, 30 Jun 2010 17:06:34 +0200
+  
+ -- simon cavey <simon.cavey@crdp.ac-caen.fr>  Wed, 08 Sep 2010 10:48:47 +0200
 
 xenedu-base (0.4~2) stable; urgency=low
 

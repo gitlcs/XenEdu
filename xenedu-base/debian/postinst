@@ -69,7 +69,7 @@ cp /etc/issue /etc/issue.net
 
 
 sed -i'.noxenedu' 's@#Banner /etc/issue.net@Banner /etc/issue.net@g'  /etc/ssh/sshd_config 
-
+sed -i'.noxenedu' 's/XENDOMAINS_RESTORE=true/XENDOMAINS_RESTORE=false/g' /etc/default/xendomains
 
 if [ -x /usr/sbin/invoke-rc.d ]; then
 	invoke-rc.d xend restart
@@ -82,6 +82,7 @@ fi
         ### mise a jour de xenedu-base
         if dpkg --compare-versions $preversion lt 0.4 ; then
         	echo "mise a jour"
+        	sed -i'.noxenedu' 's/XENDOMAINS_RESTORE=true/XENDOMAINS_RESTORE=false/g' /etc/default/xendomains
         fi
                         
 #
