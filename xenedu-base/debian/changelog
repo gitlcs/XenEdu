@@ -1,4 +1,4 @@
-xenedu-base (0.5+nmu1) stable; urgency=low
+xenedu-base (0.5) stable; urgency=low
 
   * Correct xendomains for halting VM's
   * don't run config when upgrade
