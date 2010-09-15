@@ -1,0 +1,11 @@
+
+kernel = "/boot/vmlinuz-2.6.26-2-xen-amd64"
+ramdisk = "/boot/initrd.img-2.6.26-2-xen-amd64"
+memory = @@MEMORY@@
+name   = "@@LINUXNAME@@"
+vif = [ 'bridge=@@BRIDGEINT@@' ]
+disk   = [ 'phy:@@XENEDUDISK@@/xenedu-@@LINUXNAME@@-root,sda1,w','phy:@@XENEDUDISK@@/xenedu-@@LINUXNAME@@-var,sda2,w','phy:@@XENEDUDISK@@/xenedu-@@LINUXNAME@@-swp,sda3,w','phy:/dev/VirtualsCows/webwww,sdb1,w','phy:/dev/VirtualsCows/webhomes,sdb2,w' ]
+root   = "/dev/sda1 ro"
+extra = "4 xencons=tty"
+#dhcp="dhcp"
+
