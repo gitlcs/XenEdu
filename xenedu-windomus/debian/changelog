@@ -1,3 +1,9 @@
+xenedu-windomus (0.5~1) unstable; urgency=low
+
+  * fix win xp iso generator tools
+
+ -- Simon Cavey <simon.cavey@crdp.ac-caen.fr>  Wed, 15 Sep 2010 19:40:48 +0200
+
 xenedu-windomus (0.4~1) unstable; urgency=low
 
   * adding /iso partition

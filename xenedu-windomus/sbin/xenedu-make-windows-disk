@@ -1,5 +1,5 @@
 source /etc/xenedu/xenedu.conf
-xenedu-lvmstats
+xenedu-freespace
 echo "Quelle est la taille du disque souhaiter pour cette installation de windows (entrez le nombre de Go) :"
 read NEWWINSIZE
 echo "Quel est le nom de cette nouvelle machine : "

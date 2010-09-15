@@ -2,7 +2,7 @@ source /etc/xenedu/xenedu.conf
 xenedu-make-windows-disk
 
 if -e /iso/xendu-windowsxp.iso; then
-	echo "Un fichier ISO de windows XP a deja ete realise souhaitez vous l'utiliser de nouveau (O/n) :"
+	echo "Un fichier ISO de windows XP a deja ete realise souhaitez vous l utiliser de nouveau (O/n) :"
 	read ALREDYISO
 else
 	echo "Avez vous deja un CDROM d'installation automatique de windows (o/N) : 
@@ -14,7 +14,7 @@ if [ -z $ALREDYISO ]; then
 fi
 
 if [ $ALREDYISO="n" ]; then
-	echo "Avez vous deja un CDROM d'installation automatique de windows (o/N) :
+	echo "Avez vous deja un CDROM d installation automatique de windows (o/N) : "
         read HAVEUNATTENDED
 	if [ -z $HAVEUNATTENDED ]; then
         	HAVEUNATTENDED=N
@@ -25,7 +25,7 @@ if [ $ALREDYISO="n" ]; then
 		echo "inserez le CDROM de Windows et tapez sur une touche"
 		read
 		mount /cdrom
-		echo "création de l' iso"
+		echo "creation de l iso"
 		dd if=/dev/cdrom of=/iso/xendu-windowsxp.iso
 		umount /cdrom
 		eject /cdrom
