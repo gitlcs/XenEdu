@@ -6,7 +6,6 @@
 source /etc/xenedu/xenedu.conf
 source /usr/sbin/xenedu-migre-linux-common
 
-
 check-espace-disque lcs
 
 echo -n "Entrez l'adresse IP du LCS reference : "
@@ -25,9 +24,9 @@ lvcreate -L10G -n xenedu-lcs-usrsharelcs $XENEDUDISK
 lvcreate -L10G -n xenedu-lcs-www $XENEDUDISK
 
 # Question sur /home
-oldhomeseize=`ssh root@$serveurip "df -h /home |grep home | awk {'print $2'}"`
-oldhomeoqp=`ssh root@$serveurip "df -h /home |grep home | awk {'print $5'}"`
-oldhomepc=`ssh root@$serveurip "df -h /home |grep home | awk {'print $3'}"`
+oldhomeseize=`ssh -q root@$serveurip "df -h /home" |grep home | awk {'print $2'}`
+oldhomeoqp=`ssh -q root@$serveurip "df -h /home" |grep home | awk {'print $5'}`
+oldhomepc=`ssh -q root@$serveurip "df -h /home" |grep home | awk {'print $3'}`
 
 echo "Sur votre LCS la partition /home fait $oldhomeseize"
 echo "elle est utilisée à $oldhomeseize soit $oldhomeoqp"
@@ -45,14 +44,15 @@ mkfs.ext3 -m4 $i
 done
 
 mkdir -p /mnt/xenedutmp/migrelcs
+
+mount $XENEDUDISK/xenedu-lcs-root /mnt/xenedutmp/migrelcs
+mkdir -p /mnt/xenedutmp/migrelcs/var
+mount $XENEDUDISK/xenedu-lcs-var /mnt/xenedutmp/migrelcs/var
 mkdir -p /mnt/xenedutmp/migrelcs/var/log
 mkdir -p /mnt/xenedutmp/migrelcs/var/www
 mkdir -p /mnt/xenedutmp/migrelcs/home
 mkdir -p /mnt/xenedutmp/migrelcs/usr/share/lcs
 mkdir -p /mnt/xenedutmp/migrelcs/var/spool/squid
-
-mount $XENEDUDISK/xenedu-lcs-root /mnt/xenedutmp/migrelcs
-mount $XENEDUDISK/xenedu-lcs-var /mnt/xenedutmp/migrelcs/var
 mount $XENEDUDISK/xenedu-lcs-varlog /mnt/xenedutmp/migrelcs/var/log
 mount $XENEDUDISK/xenedu-lcs-www /mnt/xenedutmp/migrelcs/var/www
 mount $XENEDUDISK/xenedu-lcs-varspoolsquid /mnt/xenedutmp/migrelcs/var/spool/squid
@@ -74,4 +74,13 @@ chown $proxyuid:$proxygid /mnt/xenedutmp/migrelcs/var/spool/squid
 # Remplacement des modules
 rm -rf /mnt/xenedutmp/migrelcs/lib/modules/*
 cp -a /lib/modules/*xen* /mnt/xenedutmp/migrelcs/lib/modules
+
+# Supression de config reseau udev
+rm -rf /mnt/xenedutmp/migrelcs/etc/udev/rules.d/*-net*
+
+# ecriture du nouveau Fstab
+
+
+
+# ecriture du fichier de config xen
 
