@@ -1,4 +1,10 @@
-xenedu-base (0.5) stable; urgency=low
+xenedu-base (0.5.1) stable; urgency=low
+
+  * fix postinst
+
+ -- simon cavey <simon.cavey@crdp.ac-caen.fr>  Thu, 16 Sep 2010 08:07:50 +0200
+
+xenedu-base (0.5.1) stable; urgency=low
 
   * Correct xendomains for halting VM's
   * don't run config when upgrade
