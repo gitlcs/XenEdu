@@ -38,3 +38,13 @@ function installkeyrev {
 	cat /root/.ssh/cletmp >> /root/.ssh/authorized_keys2.migr
     fi
 }
+
+function check-espace-disque {
+	if [ $1 = "lcs" ]; then
+	echo "verification de l'epace disque pour lcs"
+	fi
+	if [ $1 = "se3" ]; then
+	echo "verification de l'epace disque pour se3"
+	fi
+	
+}
