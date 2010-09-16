@@ -1,3 +1,9 @@
+xenedu-lindomus (0.4~5+nmu1) unstable; urgency=low
+
+  * linux add model
+
+ -- Simon Cavey <simon.cavey@crdp.ac-caen.Fr>   Thu, 16 Sep 2010 08:09:40 +0200
+
 xenedu-lindomus (0.4~5) unstable; urgency=low
 
   * update etch to archive
