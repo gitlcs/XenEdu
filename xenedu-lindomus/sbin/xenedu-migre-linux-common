@@ -7,8 +7,8 @@ function installkey {
  echo "********* Attention *********"
 
 ## Tentative de copie de la cle pub sur le serveur a migrer : 
-cat /root/.ssh/id_rsa.pub | ssh -o StrictHostKeyChecking=no -q root@$serveurip "cat - >>/root/.ssh/authorized_keys2"
 
+cat /root/.ssh/id_rsa.pub | ssh -o StrictHostKeyChecking=no -q root@$serveurip "cat - >>/root/.ssh/authorized_keys2"
     if [ $? != 0 ]; then
 	echo "Erreur pas de repertoire /root/.ssh sur le serveur physique"
 	echo "le mot de passe va vous etre demande deux fois. "
@@ -24,7 +24,7 @@ cat /root/.ssh/id_rsa.pub | ssh -o StrictHostKeyChecking=no -q root@$serveurip "
     fi
 }
 function installkeyrev {
-    if [ `ssh -o StrictHostKeyChecking=no root@$serveurip ls /root/.ssh/id_rsa.pub` = 1 ]; then
+    if [ `ssh -o StrictHostKeyChecking=no root@$serveurip "ls /root/.ssh/id_rsa.pub"` = 1 ]; then
 	echo "installation communication reverse cas 1"
 	echo "Generation des cles distantes"
 	ssh -o StrictHostKeyChecking=no root@$serveurip "ssh-keygen -t rsa -f /root/.ssh/id_rsa -P '' -q"
