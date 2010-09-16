@@ -36,6 +36,8 @@ case "$1" in
 	if [ ! -e /etc/xen/xend-config.sxp.noxenedu ] ; then 
 	    mv /etc/xen/xend-config.sxp /etc/xen/xend-config.sxp.noxenedu
 	fi
+	# création du rep auto
+	mkdir -p /etc/xen/auto
 
 	cat > /etc/xen/xend-config.sxp <<EOF
 # Xen config for XenEdu
@@ -84,6 +86,7 @@ fi
         if dpkg --compare-versions $preversion lt 0.4 ; then
         	echo "mise a jour"
         	sed -i'.noxenedu' 's/XENDOMAINS_RESTORE=true/XENDOMAINS_RESTORE=false/g' /etc/default/xendomains
+		mkdir -p /etc/xen/auto
         fi
                         
 #
