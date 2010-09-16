@@ -10,11 +10,11 @@ source /usr/sbin/xenedu-migre-linux-common
 check-espace-disque lcs
 
 echo -n "Entrez l'adresse IP du LCS reference : "
-read $serveurip
+read serveurip
 export $serveurip
 
 installkey
-installkeyrev
+#installkeyrev
 
 # creation des partitions
 lvcreate -L5G -n xenedu-lcs-root $XENEDUDISK
@@ -25,9 +25,9 @@ lvcreate -L10G -n xenedu-lcs-usrsharelcs $XENEDUDISK
 lvcreate -L10G -n xenedu-lcs-www $XENEDUDISK
 
 # Question sur /home
-oldhomeseize=ssh root@$serveurip "df -h /home |grep home | awk {'print $2'}"
-oldhomeoqp=ssh root@$serveurip "df -h /home |grep home | awk {'print $5'}"
-oldhomepc=ssh root@$serveurip "df -h /home |grep home | awk {'print $3'}"
+oldhomeseize=`ssh root@$serveurip "df -h /home |grep home | awk {'print $2'}"`
+oldhomeoqp=`ssh root@$serveurip "df -h /home |grep home | awk {'print $5'}"`
+oldhomepc=`ssh root@$serveurip "df -h /home |grep home | awk {'print $3'}"`
 
 echo "Sur votre LCS la partition /home fait $oldhomeseize"
 echo "elle est utilisée à $oldhomeseize soit $oldhomeoqp"
@@ -39,7 +39,10 @@ lvcreate -L"$LCSHOMESIZE"G -n xenedu-lcs-home $XENEDUDISK
 
 # formatage des partitions : 
 for i in  $XENEDUDISK/xenedu-lcs-*; do
+clear
+echo"##### FORMATAGE DES PARTITIONS DU NOUVEAU LCS #####" 
 mkfs.ext3 -m4 $i
+done
 
 mkdir -p /mnt/xenedutmp/migrelcs
 mkdir -p /mnt/xenedutmp/migrelcs/var/log

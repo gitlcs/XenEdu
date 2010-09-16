@@ -21,7 +21,7 @@ set -e
 case "$1" in
     configure)
     if [ ! -f /root/.ssh/id_rsa.pub ]; then
-      	echo "Pas de ssh configure, generation des cle"
+      	echo "Pas de ssh configure, generation des cles"
   	ssh-keygen -t rsa -f  /root/.ssh/id_rsa -P "" -q
     fi
     ;;
