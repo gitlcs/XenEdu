@@ -4,4 +4,49 @@
 # Simon Cavey 01/06/2010
 #
 
+source /etc/xenedu/xenedu.conf
+source /usr/sbin/xenedu-migre-linux-common
 
+check-espace-disque se3
+
+echo -n "Entrez l'adresse IP du SE3 reference : "
+read serveurip
+export $serveurip
+
+installkey
+#installkeyrev
+
+# creation des partitions
+lvcreate -L5G -n xenedu-se3-root $XENEDUDISK
+lvcreate -L5G -n xenedu-se3-var $XENEDUDISK
+
+
+# Question sur /home
+oldhomeseize=`ssh -q root@$serveurip "df -h /home" |grep home | awk {'print $2'}`
+oldhomeoqp=`ssh -q root@$serveurip "df -h /home" |grep home | awk {'print $5'}`
+oldhomepc=`ssh -q root@$serveurip "df -h /home" |grep home | awk {'print $3'}`
+
+clear
+xenedu-freespace
+echo "Sur votre SE3 la partition /home fait $oldhomeseize"
+echo "elle est utilisA(C)e A  $oldhomesepcoit $oldhomeoqp"
+echo "quelle taille souhaitez-vous pour la partion /home du nouveau SE3"
+echo "indiquez l'espace pour /home les donnees utilisateurs"
+echo "entrez simplement le nombre de Go souhaite"
+read SE3HOMESIZE
+lvcreate -L"$SE3HOMESIZE"G -n xenedu-se3-home $XENEDUDISK
+
+# Meme chose sur var se3
+oldvarse3seize=`ssh -q root@$serveurip "df -h /var/se3" |grep se3 | awk {'print $2'}`
+oldvarse3oqp=`ssh -q root@$serveurip "df -h /var/se3" |grep se3 | awk {'print $5'}`
+oldvarse3pc=`ssh -q root@$serveurip "df -h /var/se3" |grep se3 | awk {'print $3'}`
+
+clear
+xenedu-freespace
+echo "Sur votre SE3 la partition /var/se3 fait $oldvarse3seize"
+echo "elle est utilisA(C)e A  $oldvarse3pc coit $oldvarse3oqp"
+echo "quelle taille souhaitez-vous pour la partion /var/se3du nouveau SE3"
+echo "indiquez l'espace pour /var/se3 les donnees communes"
+echo "entrez simplement le nombre de Go souhaite"
+read SE3VARSIZE
+lvcreate -L"$SE3VARSIZE"G -n xenedu-se3-varse3 $XENEDUDISK
