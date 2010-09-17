@@ -70,6 +70,8 @@ ssh -q root@$serveurip "tar  --one-file-system -cf - /var" |tar xf - -C /mnt/xen
 ssh -q root@$serveurip "tar  --one-file-system -cf - /var/log" |tar xf - -C /mnt/xenedutmp/migrelcs
 ssh -q root@$serveurip "tar  --one-file-system -cf - /usr/share/lcs" |tar xf - -C /mnt/xenedutmp/migrelcs
 ssh -q root@$serveurip "tar  --one-file-system -cf - /home" |tar xf - -C /mnt/xenedutmp/migrelcs
+ssh -q root@$serveurip "tar  --one-file-system -cf - /var/www" |tar xf - -C /mnt/xenedutmp/migrelcs
+ssh -q root@$serveurip "tar  --one-file-system -cf - /var/www/squid-report" |tar xf - -C /mnt/xenedutmp/migrelcs
 
 # correction des droits squid : 
 proxyuid=cat /mnt/xenedutmp/migrelcs/etc/passwd | grep "^proxy:" | cut -f 3 -d ":"
@@ -119,6 +121,14 @@ extra = "4 xencons=tty"
 
 E_O_XEN
 
+# demontage du lcs virtuel
+umount /mnt/xenedutmp/migrelcs/var/log
+umount  /mnt/xenedutmp/migrelcs/var/www
+umount  /mnt/xenedutmp/migrelcs/var/spool/squid
+umount  /mnt/xenedutmp/migrelcs/usr/share/lcs
+umount  /mnt/xenedutmp/migrelcs/home
+umount  /mnt/xenedutmp/migrelcs
+
 # Ajout du lcs au boot du dom0
 cd /etc/xen/auto
 ln -snf ../xenedu-lcs.cfg 01-xenedu-lcs.cfg
@@ -138,4 +148,4 @@ else
 	echo "     xm create xenedu-lcs.cfg "
 	echo "pour demarrer le LCS virtuel"
 fi
-                        
+
