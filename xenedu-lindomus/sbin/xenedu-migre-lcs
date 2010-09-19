@@ -39,6 +39,11 @@ echo "entrez simplement le nombre de Go souhaite"
 read LCSHOMESIZE
 lvcreate -L"$LCSHOMESIZE"G -n xenedu-lcs-home $XENEDUDISK
 
+
+clear
+echo "Indiquez le nombre de Mo de ram pour le LCS :"
+read LCSMEMORY
+
 # formatage des partitions : 
 for i in  $XENEDUDISK/xenedu-lcs-*; do
 clear
@@ -109,7 +114,7 @@ E_O_TAB
 cat > /etc/xen/xenedu-lcs.cfg <<E_O_XEN
 kernel = "/boot/vmlinuz-2.6.26-2-xen-amd64"
 ramdisk = "/boot/initrd.img-2.6.26-2-xen-amd64"
-memory = 1024
+memory = $LCSMEMORY
 name   = "xenedu-lcs"
 vif = [ 'bridge=eth0' ]
 disk   = [ 'phy:$XENEDUDISK/xenedu-lcs-root,sda1,w',
@@ -142,7 +147,13 @@ ln -snf ../xenedu-lcs.cfg 01-xenedu-lcs.cfg
 echo "Faut-il arreter le LCS physique et demarrer le virtuel maintenant : (o/N)"
 read reponse
 
-if [ $reponse="o" ]; then
+
+if [ -z $reponse ]; then
+	reponse=n
+fi
+        
+        
+if [ $reponse = "o" ]; then
 	echo "arret du LCS"
 	ssh root@$serveurip "halt"
 	echo "attente de 10 secondes avant demarrage LCS"
