@@ -338,21 +338,6 @@ print <<EOEND;
 
   To finish the setup of your new host $HOSTNAME please run:
 
-    mkdir /mnt/tmp
-    mount -t ext3 $image /mnt/tmp
-
-    chroot /mnt/tmp /bin/bash
-
-    # Get security upgrades.
-    apt-get upgrade
-
-    # setup passwords, etc.
-    passwd root
-
-    # Cleanup.
-    exit
-    umount /mnt/tmp
-
  Once completed you may start your new instance of Xen with:
 
     xm create $HOSTNAME.cfg -c

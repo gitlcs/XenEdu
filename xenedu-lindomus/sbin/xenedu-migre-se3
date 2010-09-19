@@ -19,7 +19,7 @@ installkey
 # creation des partitions
 lvcreate -L5G -n xenedu-se3-root $XENEDUDISK
 lvcreate -L5G -n xenedu-se3-var $XENEDUDISK
-
+lvcreate -L512M -n xenedu-se3-swp $XENEDUDISK
 
 # Question sur /home
 oldhomeseize=`ssh -q root@$serveurip "df -h /home" |grep home | awk {'print $2'}`
@@ -50,3 +50,106 @@ echo "indiquez l'espace pour /var/se3 les donnees communes"
 echo "entrez simplement le nombre de Go souhaite"
 read SE3VARSIZE
 lvcreate -L"$SE3VARSIZE"G -n xenedu-se3-varse3 $XENEDUDISK
+
+clear
+echo "Indiquez le nombre de Mo de ram pour le SE3 :"
+read SE3MEMORY
+
+# formatage des partitions :
+for i in  $XENEDUDISK/xenedu-se3-*; do
+clear
+echo "##### FORMATAGE DES PARTITIONS DU NOUVEAU LCS #####"
+mkfs.ext3 -m4 
+
+mkfs.xfs $XENEDUDISK/xenedu-se3-home
+mkfs.xfs $XENEDUDISK/xenedu-se3-varse3
+
+mkdir -p /mnt/xenedutmp/migrese3
+mount $XENEDUDISK/xenedu-se3-root /mnt/xenedutmp/migrese3
+mkdir -p /mnt/xenedutmp/migrese3/var
+mount $XENEDUDISK/xenedu-se3-var /mnt/xenedutmp/migrese3/var
+mkdir -p /mnt/xenedutmp/migrese3/var/se3
+mount $XENEDUDISK/xenedu-se3-varse3 /mnt/xenedutmp/migrese3/var/se3
+mkdir -p /mnt/xenedutmp/migrese3/home
+mount $XENEDUDISK/xenedu-se3-home /mnt/xenedutmp/migrese3/home
+
+# copie des donnA(C)es :
+clear
+echo "copie des donnees"
+ssh -q root@$serveurip "tar  --one-file-system -cf - /" |tar xf - -C /mnt/xenedutmp/migrese3
+ssh -q root@$serveurip "tar  --one-file-system -cf - /var" |tar xf - -C /mnt/xenedutmp/migrese3
+ssh -q root@$serveurip "tar  --one-file-system -cf - /var/se3" |tar xf - -C /mnt/xenedutmp/migrese3
+ssh -q root@$serveurip "tar  --one-file-system -cf - /home" |tar xf - -C /mnt/xenedutmp/migrese3
+
+# Remplacement des modules
+rm -rf /mnt/xenedutmp/migrelcs/lib/modules/*
+cp -a /lib/modules/*xen* /mnt/xenedutmp/migrese3/lib/modules
+
+
+DEBIAN_FRONTEND=noninteractive
+chroot /mnt/xenedutmp/migrese3  /usr/bin/apt-get --yes --force-yes install udev
+
+
+# ecriture du nouveau Fstab
+
+cat > /mnt/xenedutmp/migrelcs/etc/fstab <<E_O_TAB
+/dev/sda1       /               ext3    defaults,errors=remount-ro 0       1
+/dev/sda2       none            swap    sw              0       0
+/dev/sda3       /home           xfx    defaults        0       2
+/dev/sda4       /var            ext3    defaults        0       2
+/dev/sda5       /var/se3        xfs    defaults        0       2
+proc          /proc    proc     defaults              0     0
+E_O_TAB
+
+
+# ecriture du fichier de config xen
+cat > /etc/xen/xenedu-lcs.cfg <<E_O_XEN
+kernel = "/boot/vmlinuz-2.6.26-2-xen-amd64"
+ramdisk = "/boot/initrd.img-2.6.26-2-xen-amd64"
+memory = $SE3MEMORY
+name   = "xenedu-se3"
+vif = [ 'bridge=eth0' ]
+disk   = [ 'phy:$XENEDUDISK/xenedu-se3-root,sda1,w',
+'phy:$XENEDUDISK/xenedu-se3-swp,sda2,w',
+'phy:$XENEDUDISK/xenedu-se3-home,sda3,w',
+'phy:$XENEDUDISK/xenedu-se3-varse3,sda5,w',
+'phy:$XENEDUDISK/xenedu-lcs-var,sda4,w' ]
+root   = "/dev/sda1 ro"
+extra = "4 xencons=tty"
+#dhcp="dhcp"
+
+E_O_XEN
+
+# demontage du lcs virtuel
+umount /mnt/xenedutmp/migrese3/var/se3
+umount  /mnt/xenedutmp/migrese3/var
+umount  /mnt/xenedutmp/migrese3/home
+umount  /mnt/xenedutmp/migrese3
+
+# Ajout du lcs au boot du dom0
+cd /etc/xen/auto
+ln -snf ../xenedu-se3.cfg 02-xenedu-se3.cfg
+
+# Arret du LCS physque et demarrage du lcs virtuel
+echo "Faut-il arreter le LCS physique et demarrer le virtuel maintenant : (o/N)"
+read reponse
+
+if [ -z $reponse ]; then
+	reponse=n
+fi
+        
+if [ $reponse = "o" ]; then
+        echo "arret du LCS"
+        ssh root@$serveurip "halt"
+        echo "attente de 10 secondes avant demarrage LCS"
+        sleep 10
+        xm create xenedu-se3.cfg
+else
+       echo "vous pouvez eteindre le LCS physique"
+       echo "tapez "
+       echo "     xm create xenedu-lcs.cfg "
+       echo "pour demarrer le LCS virtuel"
+fi
+
+echo "Migration du SE3 complete lancez un restore_droits.sh "
+echo "Sur le nouveau SE3 pour l'utiliser"
