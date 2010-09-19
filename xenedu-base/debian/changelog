@@ -1,4 +1,4 @@
-xenedu-base (0.5.1) stable; urgency=low
+xenedu-base (0.5.2) stable; urgency=low
 
   * fix postinst
 
