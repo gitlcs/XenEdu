@@ -1,6 +1,6 @@
-xenedu-lindomus (0.5.5) unstable; urgency=low
+xenedu-lindomus (0.5.6) stable; urgency=low
 
-  * correct mirgation script
+  * correct mirgation scripts
 
  -- Simon Cavey <simon.cavey@crdp.ac-caen.Fr>  Thu, 16 Sep 2010 22:33:16 +0200
 
