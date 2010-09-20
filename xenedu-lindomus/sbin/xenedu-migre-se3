@@ -103,7 +103,7 @@ E_O_TAB
 
 
 # ecriture du fichier de config xen
-cat > /etc/xen/xenedu-lcs.cfg <<E_O_XEN
+cat > /etc/xen/xenedu-se3.cfg <<E_O_XEN
 kernel = "/boot/vmlinuz-2.6.26-2-xen-amd64"
 ramdisk = "/boot/initrd.img-2.6.26-2-xen-amd64"
 memory = $SE3MEMORY
@@ -113,7 +113,7 @@ disk   = [ 'phy:$XENEDUDISK/xenedu-se3-root,sda1,w',
 'phy:$XENEDUDISK/xenedu-se3-swp,sda2,w',
 'phy:$XENEDUDISK/xenedu-se3-home,sda3,w',
 'phy:$XENEDUDISK/xenedu-se3-varse3,sda5,w',
-'phy:$XENEDUDISK/xenedu-lcs-var,sda4,w' ]
+'phy:$XENEDUDISK/xenedu-se3-var,sda4,w' ]
 root   = "/dev/sda1 ro"
 extra = "4 xencons=tty"
 #dhcp="dhcp"
@@ -139,13 +139,13 @@ if [ -z $reponse ]; then
 fi
         
 if [ $reponse = "o" ]; then
-        echo "arret du LCS"
+        echo "arret du SE3"
         ssh root@$serveurip "halt"
-        echo "attente de 10 secondes avant demarrage LCS"
+        echo "attente de 10 secondes avant demarrage SE3"
         sleep 10
         xm create xenedu-se3.cfg
 else
-       echo "vous pouvez eteindre le LCS physique"
+       echo "vous pouvez eteindre le SE3 physique"
        echo "tapez "
        echo "     xm create xenedu-lcs.cfg "
        echo "pour demarrer le LCS virtuel"
