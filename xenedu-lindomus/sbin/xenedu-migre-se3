@@ -56,10 +56,10 @@ echo "Indiquez le nombre de Mo de ram pour le SE3 :"
 read SE3MEMORY
 
 # formatage des partitions :
-for i in  $XENEDUDISK/xenedu-se3-*; do
 clear
-echo "##### FORMATAGE DES PARTITIONS DU NOUVEAU LCS #####"
-mkfs.ext3 -m4 
+echo "##### FORMATAGE DES PARTITIONS DU NOUVEAU SE3 #####"
+mkfs.ext3 -m4 $XENEDUDISK/xenedu-se3-root
+mkfs.ext3 -m4 $XENEDUDISK/xenedu-se3-var
 
 mkfs.xfs $XENEDUDISK/xenedu-se3-home
 mkfs.xfs $XENEDUDISK/xenedu-se3-varse3
@@ -82,7 +82,7 @@ ssh -q root@$serveurip "tar  --one-file-system -cf - /var/se3" |tar xf - -C /mnt
 ssh -q root@$serveurip "tar  --one-file-system -cf - /home" |tar xf - -C /mnt/xenedutmp/migrese3
 
 # Remplacement des modules
-rm -rf /mnt/xenedutmp/migrelcs/lib/modules/*
+rm -rf /mnt/xenedutmp/migrese3/lib/modules/*
 cp -a /lib/modules/*xen* /mnt/xenedutmp/migrese3/lib/modules
 
 
@@ -152,4 +152,4 @@ else
 fi
 
 echo "Migration du SE3 complete lancez un restore_droits.sh "
-echo "Sur le nouveau SE3 pour l'utiliser"
+echo "Sur le nouveau SE3 pour l utiliser"
