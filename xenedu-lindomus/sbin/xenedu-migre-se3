@@ -61,8 +61,8 @@ echo "##### FORMATAGE DES PARTITIONS DU NOUVEAU SE3 #####"
 mkfs.ext3 -m4 $XENEDUDISK/xenedu-se3-root
 mkfs.ext3 -m4 $XENEDUDISK/xenedu-se3-var
 
-mkfs.xfs $XENEDUDISK/xenedu-se3-home
-mkfs.xfs $XENEDUDISK/xenedu-se3-varse3
+mkfs.xfs -f $XENEDUDISK/xenedu-se3-home
+mkfs.xfs -f $XENEDUDISK/xenedu-se3-varse3
 
 mkdir -p /mnt/xenedutmp/migrese3
 mount $XENEDUDISK/xenedu-se3-root /mnt/xenedutmp/migrese3
@@ -92,12 +92,12 @@ chroot /mnt/xenedutmp/migrese3  /usr/bin/apt-get --yes --force-yes install udev
 
 # ecriture du nouveau Fstab
 
-cat > /mnt/xenedutmp/migrelcs/etc/fstab <<E_O_TAB
-/dev/sda1       /               ext3    defaults,errors=remount-ro 0       1
-/dev/sda2       none            swap    sw              0       0
-/dev/sda3       /home           xfx    defaults        0       2
-/dev/sda4       /var            ext3    defaults        0       2
-/dev/sda5       /var/se3        xfs    defaults        0       2
+cat > /mnt/xenedutmp/migrese3/etc/fstab <<E_O_TAB
+/dev/sda1       /               ext3   defaults,errors=remount-ro 0       1
+/dev/sda2       none            swap   sw              0       0
+/dev/sda3       /home           xfx    defaults,quotas        0       2
+/dev/sda4       /var            ext3   defaults        0       2
+/dev/sda5       /var/se3        xfs    defaults,quotas        0       2
 proc          /proc    proc     defaults              0     0
 E_O_TAB
 
@@ -120,18 +120,18 @@ extra = "4 xencons=tty"
 
 E_O_XEN
 
-# demontage du lcs virtuel
+# demontage du se3 virtuel
 umount /mnt/xenedutmp/migrese3/var/se3
 umount  /mnt/xenedutmp/migrese3/var
 umount  /mnt/xenedutmp/migrese3/home
 umount  /mnt/xenedutmp/migrese3
 
-# Ajout du lcs au boot du dom0
+# Ajout du SE3 au boot du dom0
 cd /etc/xen/auto
 ln -snf ../xenedu-se3.cfg 02-xenedu-se3.cfg
 
-# Arret du LCS physque et demarrage du lcs virtuel
-echo "Faut-il arreter le LCS physique et demarrer le virtuel maintenant : (o/N)"
+# Arret du se3 physque et demarrage du se3 virtuel
+echo "Faut-il arreter le se3 physique et demarrer le virtuel maintenant : (o/N)"
 read reponse
 
 if [ -z $reponse ]; then
@@ -147,8 +147,8 @@ if [ $reponse = "o" ]; then
 else
        echo "vous pouvez eteindre le SE3 physique"
        echo "tapez "
-       echo "     xm create xenedu-lcs.cfg "
-       echo "pour demarrer le LCS virtuel"
+       echo "     xm create xenedu-se3.cfg "
+       echo "pour demarrer le SE3 virtuel"
 fi
 
 echo "Migration du SE3 complete lancez un restore_droits.sh "
