@@ -5,7 +5,7 @@
 #
 
 source /etc/xenedu/xenedu.conf
-source /usr/sbin/xenedu-migre-linux-common
+source /sbin/xenedu-migre-linux-common
 
 check-espace-disque se3
 
