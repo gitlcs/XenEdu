@@ -80,6 +80,14 @@ else
 	/etc/init.d/xend restart
 fi
 
+### installation du compte rssh
+useradd -K UID_MIN=100 -K UID_MAX=999 -K GID_MIN=100 -K GID_MAX=999 rssh
+chown rssh\:rssh /home/rssh
+
+cat >> /etc/inittab <<EOP
+# Action on special keypress SSH inverse de secours XenEdu (ALT-UpArrow).
+kb::kbrequest:/sbin/xenedu-secours-ssh
+EOP
 
         else
         ### mise a jour de xenedu-base
@@ -88,7 +96,14 @@ fi
         	sed -i'.noxenedu' 's/XENDOMAINS_RESTORE=true/XENDOMAINS_RESTORE=false/g' /etc/default/xendomains
 		mkdir -p /etc/xen/auto
         fi
-                        
+        if dpkg --compare-versions $preversion lt 0.6 ; then
+	        useradd -K UID_MIN=100 -K UID_MAX=999 -K GID_MIN=100 -K GID_MAX=999 rssh
+        	chown rssh\:rssh /home/rssh
+        	cat >> /etc/inittab <<EOP
+# Action on special keypress SSH inverse de secours XenEdu (ALT-UpArrow).
+kb::kbrequest:/sbin/xenedu-secours-ssh
+        	EOP
+        fi                
 #
 # Fin de la mise a jour
 #
