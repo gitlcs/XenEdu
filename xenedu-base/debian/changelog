@@ -1,3 +1,16 @@
+xenedu-base (0.5.7) stable; urgency=low
+
+  * Add remote SSH feature
+
+ -- Simon Cavey <simon.cavey@crdp.ac-caen.fr>  Mon, 04 Oct 2010 00:39:53 +0200
+
+xenedu-base (0.5.6) stable; urgency=low
+
+  * Non-maintainer upload.
+  * add mac adresse generator
+
+ -- Simon Cavey <simon.cavey@crdp.ac-caen.fr>  Wed, 29 Sep 2010 16:31:49 +0200
+
 xenedu-base (0.5.5) stable; urgency=low
 
   * fix postinst
