@@ -1,6 +1,7 @@
-xenedu-base (0.5.7) stable; urgency=low
+xenedu-base (0.6~1) stable; urgency=low
 
   * Add remote SSH feature
+  * Stop RSSH after 1 day
 
  -- Simon Cavey <simon.cavey@crdp.ac-caen.fr>  Mon, 04 Oct 2010 00:39:53 +0200
 

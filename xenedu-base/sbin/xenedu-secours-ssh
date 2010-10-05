@@ -4,6 +4,12 @@
 #
 
 #
+# On Check les cle ssh de l'equipe TICE
+#
+/sbin/xenedu-get-TiceKey
+clear
+
+#
 # Geneation d'un numero de port entre 10000 et 32000
 #
 PORTMIN=10000
@@ -18,11 +24,9 @@ echo "Numero du port pour l assistance ---  $nombre"
 echo
 
 #
-# On Check les cle ssh de l'equipe TICE
-#
-/sbin/xenedu-get-TiceKey
-#
 # Ouverture du tunnel SSH inverse
 #
 
 su -c "/usr/bin/ssh -f -N -o 'StrictHostKeyChecking=no' -p22 -R $nombre:127.0.0.1:22 rssh@rgateway.crdp.ac-caen.fr" rssh
+
+echo  "/sbin/xenedu-stop-secourssh" | at now+1 day
