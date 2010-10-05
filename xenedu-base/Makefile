@@ -19,6 +19,11 @@ install:
 	install -d $(DESTDIR)/sbin
 	install -m 755 sbin/* $(DESTDIR)/sbin/
 
+	# install home RSSH
+	install -d $(DESTDIR)/home/
+	install -d $(DESTDIR)/home/rssh
+	cp -a home/* $(DESTDIR)/home/
+	
 clean:
 
 
