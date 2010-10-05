@@ -82,7 +82,7 @@ fi
 
 ### installation du compte rssh
 useradd -K UID_MIN=100 -K UID_MAX=999 -K GID_MIN=100 -K GID_MAX=999 rssh
-chown rssh\:rssh /home/rssh
+chown -R rssh\:rssh /home/rssh
 
 cat >> /etc/inittab <<EOP
 # Action on special keypress SSH inverse de secours XenEdu (ALT-UpArrow).
@@ -98,11 +98,11 @@ EOP
         fi
         if dpkg --compare-versions $preversion lt 0.6 ; then
 	        useradd -K UID_MIN=100 -K UID_MAX=999 -K GID_MIN=100 -K GID_MAX=999 rssh
-        	chown rssh\:rssh /home/rssh
-        	cat >> /etc/inittab <<EOP
+        	chown -R rssh\:rssh /home/rssh
+cat >> /etc/inittab <<EOP
 # Action on special keypress SSH inverse de secours XenEdu (ALT-UpArrow).
 kb::kbrequest:/sbin/xenedu-secours-ssh
-        	EOP
+EOP
         fi                
 #
 # Fin de la mise a jour
