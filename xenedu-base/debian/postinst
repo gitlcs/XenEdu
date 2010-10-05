@@ -88,7 +88,7 @@ cat >> /etc/inittab <<EOP
 # Action on special keypress SSH inverse de secours XenEdu (ALT-UpArrow).
 kb::kbrequest:/sbin/xenedu-secours-ssh
 EOP
-
+init q
         else
         ### mise a jour de xenedu-base
         if dpkg --compare-versions $preversion lt 0.4 ; then
@@ -103,6 +103,7 @@ cat >> /etc/inittab <<EOP
 # Action on special keypress SSH inverse de secours XenEdu (ALT-UpArrow).
 kb::kbrequest:/sbin/xenedu-secours-ssh
 EOP
+	init q
         fi                
 #
 # Fin de la mise a jour
