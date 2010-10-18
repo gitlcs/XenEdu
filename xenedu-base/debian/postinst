@@ -97,13 +97,16 @@ init q
 		mkdir -p /etc/xen/auto
         fi
         if dpkg --compare-versions $preversion lt 0.5.9 ; then
-	        useradd -K UID_MIN=100 -K UID_MAX=999 -K GID_MIN=100 -K GID_MAX=999 rssh
-        	chown -R rssh\:rssh /home/rssh
+	if [ `grep -c rssh /etc/passwd` = 0 ]; then
+		echo "Ajout du compte RSSH"
+	        	useradd -K UID_MIN=100 -K UID_MAX=999 -K GID_MIN=100 -K GID_MAX=999 rssh
+        		chown -R rssh\:rssh /home/rssh
 cat >> /etc/inittab <<EOP
 # Action on special keypress SSH inverse de secours XenEdu (ALT-UpArrow).
 kb::kbrequest:/sbin/xenedu-secours-ssh
 EOP
-	init q
+		init q
+		fi
         fi                
 #
 # Fin de la mise a jour
