@@ -80,15 +80,17 @@ else
 	/etc/init.d/xend restart
 fi
 
-### installation du compte rssh
-useradd -K UID_MIN=100 -K UID_MAX=999 -K GID_MIN=100 -K GID_MAX=999 rssh
-chown -R rssh\:rssh /home/rssh
-
-cat >> /etc/inittab <<EOP
+if [ `grep -c rssh /etc/passwd` = 0 ]; then
+	### installation du compte rssh
+	useradd -K UID_MIN=100 -K UID_MAX=999 -K GID_MIN=100 -K GID_MAX=999 rssh
+	chown -R rssh\:rssh /home/rssh
+	cat >> /etc/inittab <<EOP
 # Action on special keypress SSH inverse de secours XenEdu (ALT-UpArrow).
 kb::kbrequest:/sbin/xenedu-secours-ssh
 EOP
-init q
+	init q
+fi
+
         else
         ### mise a jour de xenedu-base
         if dpkg --compare-versions $preversion lt 0.4 ; then
@@ -97,6 +99,7 @@ init q
 		mkdir -p /etc/xen/auto
         fi
         if dpkg --compare-versions $preversion lt 0.5.9 ; then
+
 	if [ `grep -c rssh /etc/passwd` = 0 ]; then
 		echo "Ajout du compte RSSH"
 	        	useradd -K UID_MIN=100 -K UID_MAX=999 -K GID_MIN=100 -K GID_MAX=999 rssh
