@@ -99,7 +99,7 @@ fi
         	sed -i'.noxenedu' 's/XENDOMAINS_RESTORE=true/XENDOMAINS_RESTORE=false/g' /etc/default/xendomains
 		mkdir -p /etc/xen/auto
         fi
-        if dpkg --compare-versions $preversion lt 0.5.9 ; then
+        if dpkg --compare-versions $preversion lt 0.6 ; then
 
 	if [ `grep -c rssh /etc/passwd` = 0 ]; then
 		echo "Ajout du compte RSSH"
