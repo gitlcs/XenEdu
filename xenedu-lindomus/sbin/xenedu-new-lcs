@@ -1,9 +1,12 @@
 #!/bin/bash
-# creation d'une VM se3
+# creation d'une VM LCS
 # XenEdu - Simon Cavey - 17/06/2010
 
 source /etc/xenedu/xenedu.conf
 
+
+clear
+echo "Pour installer un LCS vous devez vous munir du numero de "
 
 xenedu-freespace
 echo "indiquez l'espace pour /home les donnees utilisateurs"
@@ -49,9 +52,6 @@ lvcreate -L5G -n xenedu-lcs-root $XENEDUDISK
 lvcreate -L5G -n xenedu-lcs-var $XENEDUDISK
 lvcreate -L512M -n xenedu-lcs-swp $XENEDUDISK
 lvcreate -L"$LCSVARSQUIDSIZE"G -n xenedu-lcs-squid $XENEDUDISK
-
-
 mkfs.ext3 -q "$XENEDUDISK"/xenedu-lcs-home
 mkfs.ext3 -q "$XENEDUDISK"/xenedu-lcs-squid
 
-xenedu-new-lcs.pl
