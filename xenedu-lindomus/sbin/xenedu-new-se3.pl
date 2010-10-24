@@ -294,7 +294,10 @@ installUdev();
 #
 fixupInittab();
 
-
+#
+# Install SE3 Packages
+#
+installSE3Packages();
 
 #
 #  Now unmount the image.
@@ -336,24 +339,9 @@ print "Done\n";
 #
 print <<EOEND;
 
-  To finish the setup of your new host $HOSTNAME please run:
 
-    mkdir /mnt/tmp
-    mount -t ext3 $image /mnt/tmp
 
-    chroot /mnt/tmp /bin/bash
-
-    # Get security upgrades.
-    apt-get upgrade
-
-    # setup passwords, etc.
-    passwd root
-
-    # Cleanup.
-    exit
-    umount /mnt/tmp
-
- Once completed you may start your new instance of Xen with:
+ Pre-install completed you can start your new instance of Xen with:
 
     xm create $HOSTNAME.cfg -c
 
@@ -450,6 +438,19 @@ sub installUdev
 	`chroot $dir /usr/bin/apt-get update`;
 	`DEBIAN_FRONTEND=noninteractive chroot $dir /usr/bin/apt-get --yes --force-yes install udev`;
 }
+
+=head2 installSE3Packages
+
+  Pre-Install SE3 upon the virtual instance.
+  
+=cut
+  
+sub installSE3Packages
+{
+	`chroot $dir /usr/bin/apt-get update`;
+	`DEBIAN_FRONTEND=noninteractive chroot $dir /usr/bin/apt-get --yes --force-yes --download-only install se3`;
+}
+      
               
               
 =head2 fixupInittab

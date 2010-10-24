@@ -26,7 +26,7 @@ use Getopt::Long;
 #
 # Options set on the command line.
 #
-my $HOSTNAME="se3pdc";   # Mandatory.
+my $HOSTNAME="lcs";   # Mandatory.
 my $DIR;        # Mandatory.
 
 

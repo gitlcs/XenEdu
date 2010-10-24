@@ -293,7 +293,10 @@ installUdev();
 #  Fixup Inittab file
 #
 fixupInittab();
-
+#
+# Install SE3 Packages
+#
+installSE3Packages();
 
 
 #
@@ -330,6 +333,8 @@ close( XEN );
 
 print "Done\n";
 
+# Ajout du SE3 au boot du dom0
+`ln -snf /etc/xen/xenedu-se3.cfg /etc/xen/auto/02-xenedu-se3.cfg`;
 
 #
 #  Give status message
@@ -436,7 +441,19 @@ sub installUdev
 	`DEBIAN_FRONTEND=noninteractive chroot $dir /usr/bin/apt-get --yes --force-yes install udev`;
 }
               
-              
+=head2 installSE3Packages
+
+  Pre-Install SE3 upon the virtual instance.
+  
+=cut
+  
+sub installSE3Packages
+{
+	`chroot $dir /usr/bin/apt-get update`;
+	`DEBIAN_FRONTEND=noninteractive chroot $dir /usr/bin/apt-get --yes --force-yes --download-only install se3`;
+}
+
+           
 =head2 fixupInittab
 
   Copy the host systems /etc/inittab to the virtual installation 
