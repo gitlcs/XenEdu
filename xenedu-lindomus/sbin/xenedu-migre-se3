@@ -95,9 +95,9 @@ chroot /mnt/xenedutmp/migrese3  /usr/bin/apt-get --yes --force-yes install udev
 cat > /mnt/xenedutmp/migrese3/etc/fstab <<E_O_TAB
 /dev/sda1       /               ext3   defaults,errors=remount-ro 0       1
 /dev/sda2       none            swap   sw              0       0
-/dev/sda3       /home           xfx    defaults,quotas        0       2
+/dev/sda3       /home           xfs    defaults,quota        0       2
 /dev/sda4       /var            ext3   defaults        0       2
-/dev/sda5       /var/se3        xfs    defaults,quotas        0       2
+/dev/sda5       /var/se3        xfs    defaults,quota        0       2
 proc          /proc    proc     defaults              0     0
 E_O_TAB
 
