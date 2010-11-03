@@ -20,6 +20,7 @@ lvcreate -L"$SE3VARSE3SIZE"G -n xenedu-se3pdc-varse3 $XENEDUDISK
 lvcreate -L5G -n xenedu-se3pdc-root $XENEDUDISK
 lvcreate -L5G -n xenedu-se3pdc-var $XENEDUDISK
 lvcreate -L512M -n xenedu-se3pdc-swp $XENEDUDISK
+mkswap $XENEDUDISK/xenedu-se3pdc-swp
 
 mkfs.xfs -q "$XENEDUDISK"/xenedu-se3pdc-home
 mkfs.xfs -q "$XENEDUDISK"/xenedu-se3pdc-varse3
