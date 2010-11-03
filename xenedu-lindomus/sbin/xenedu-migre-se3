@@ -20,6 +20,7 @@ installkey
 lvcreate -L5G -n xenedu-se3-root $XENEDUDISK
 lvcreate -L5G -n xenedu-se3-var $XENEDUDISK
 lvcreate -L512M -n xenedu-se3-swp $XENEDUDISK
+mkswap $XENEDUDISK/xenedu-se3-swp
 
 # Question sur /home
 oldhomeseize=`ssh -q root@$serveurip "df -h /home" |grep home | awk {'print $2'}`

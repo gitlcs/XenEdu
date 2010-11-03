@@ -23,6 +23,7 @@ lvcreate -L10G -n xenedu-lcs-varspoolsquid $XENEDUDISK
 lvcreate -L10G -n xenedu-lcs-usrsharelcs $XENEDUDISK
 lvcreate -L10G -n xenedu-lcs-www $XENEDUDISK
 lvcreate -L512M -n xenedu-lcs-swp $XENEDUDISK
+mkswap $XENEDUDISK/xenedu-lcs-swp
 
 # Question sur /home
 oldhomeseize=`ssh -q root@$serveurip "df -h /home" |grep home | awk {'print $2'}`
