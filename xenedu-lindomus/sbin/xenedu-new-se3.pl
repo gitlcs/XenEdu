@@ -65,7 +65,9 @@ my $DHCP=0;                    # This setting overides the other options
         print "Memoire RAM allouée: ";
         chomp($xmemory = <STDIN>);
         print "\n";
-
+        print "Nom du serveur sur le domaine (se3pdc) ? :";
+        chomp($HOSTNAME = <STDIN>);
+        print "\n";
 
 #
 #  Check that the arguments the user has supplied are both 
