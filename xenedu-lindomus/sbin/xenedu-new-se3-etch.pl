@@ -62,9 +62,10 @@ my $DHCP=0;                    # This setting overides the other options
         print "Nom du serveur sur le domaine (se3pdc) ? :";
         chomp($HOSTNAME = <STDIN>);
         print "\n";
-my $BROADCAST=`ipcalc -n $IP $NETMASK | grep Broadcast| awk {'print $2'}`
-my $NETWORK=`ipcalc -n 10.10.7.30 255.255.255.0 | grep Network | awk {'print $2'}| cut -f 1 -d "/"`
-
+	$BROADCAST=`ipcalc -n $IP $NETMASK | grep Broadcast| awk {'print \$2'}`;
+	chomp($BROADCAST);
+	$NETWORK=`ipcalc -n 10.10.7.30 255.255.255.0 | grep Network | awk {'print \$2'}| awk -F/ {'print \$1'}`;
+	chomp($NETWORK);
 #
 #  Check that the arguments the user has supplied are both 
 # valid, and complete.
