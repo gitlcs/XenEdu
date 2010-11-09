@@ -50,22 +50,20 @@ my $DHCP=0;                    # This setting overides the other options
         print "IP: ";
         chomp($IP = <STDIN>);
         print "\n";
-        print "GATEWAY: ";
-        chomp($GATEWAY = <STDIN>);
-        print "\n";
         print "MASK: ";
         chomp($NETMASK = <STDIN>);
-        print "\n";
-        print "BROADCAST: ";
-        chomp($BROADCAST = <STDIN>);
-        print "\n";
-        print "NETWORK: ";
-        chomp($NETWORK = <STDIN>);
+	print "\n";
+        print "GATEWAY: ";
+        chomp($GATEWAY = <STDIN>);
         print "\n";
         print "Memoire RAM allouée: ";
         chomp($xmemory = <STDIN>);
         print "\n";
-
+        print "Nom du serveur sur le domaine (se3pdc) ? :";
+        chomp($HOSTNAME = <STDIN>);
+        print "\n";
+my $BROADCAST=`ipcalc -n $IP $NETMASK | grep Broadcast| awk {'print $2'}`
+my $NETWORK=`ipcalc -n 10.10.7.30 255.255.255.0 | grep Network | awk {'print $2'}| cut -f 1 -d "/"`
 
 #
 #  Check that the arguments the user has supplied are both 

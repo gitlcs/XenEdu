@@ -345,7 +345,7 @@ print <<EOEND;
 
  Pre-install completed you can start your new instance of Xen with:
 
-    xm create $HOSTNAME.cfg -c
+    xm create xenedu-$HOSTNAME.cfg -c
 
 EOEND
 
