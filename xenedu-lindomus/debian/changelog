@@ -1,8 +1,9 @@
-xenedu-lindomus (0.5.9.2) stable; urgency=low
+xenedu-lindomus (0.5.9.3) stable; urgency=low
 
   * correct mirgation scripts
+  * add hostname question for SE3
 
- -- Simon Cavey <simon.cavey@crdp.ac-caen.Fr>  Thu, 16 Sep 2010 22:33:16 +0200
+ -- Simon Cavey <simon.cavey@crdp.ac-caen.fr>  Tue, 09 Nov 2010 14:43:32 +0100
 
 xenedu-lindomus (0.5) unstable; urgency=low
 
