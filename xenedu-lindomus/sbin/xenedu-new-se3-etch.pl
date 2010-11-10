@@ -43,6 +43,7 @@ my $NETWORK="192.168.1.0";     # set with '--network=dd.dd.dd.dd'
 my $xname="se3pdc";              # set with '--name=test'
 my $xmemory="512";
 my $DHCP=0;                    # This setting overides the other options
+my $XENMAC=`xenedu-mac-generator`;  # Mac Address for SE3
 
 #
 #  Parse options.
@@ -317,7 +318,7 @@ kernel = "/boot/vmlinuz-2.6.26-2-xen-amd64"
 ramdisk = "/boot/initrd.img-2.6.26-2-xen-amd64"
 memory = $xmemory
 name   = "$HOSTNAME"
-vif = [ '' ]
+vif = [ 'mac=$XENMAC' ]
 disk   = [ 'phy:$image,sda1,w','phy:$imgvar,sda2,w','phy:$swap,sda3,w','phy:$imghome,sda4,w','phy:$imgvarse3,sda5,w' ]
 root   = "/dev/sda1 ro"
 extra = "4 xencons=tty"
@@ -335,7 +336,7 @@ close( XEN );
 print "Done\n";
 
 # Ajout du SE3 au boot du dom0
-`ln -snf /etc/xen/xenedu-se3.cfg /etc/xen/auto/02-xenedu-se3.cfg`;
+`ln -snf /etc/xen/xenedu-$HOSTNAME.cfg /etc/xen/auto/02-xenedu-$HOSTNAME.cfg`;
 
 
 #
@@ -348,7 +349,7 @@ print <<EOEND;
 
  Once completed you may start your new instance of Xen with:
 
-    xm create $HOSTNAME.cfg -c
+    xm create xenedu-$HOSTNAME.cfg -c
 
 EOEND
 

@@ -1,4 +1,4 @@
-xenedu-lindomus (0.5.9.5) stable; urgency=low
+xenedu-lindomus (0.5.9.6) stable; urgency=low
 
   * correct mirgation scripts
   * add hostname question for SE3

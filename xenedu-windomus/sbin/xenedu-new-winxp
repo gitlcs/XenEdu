@@ -31,3 +31,6 @@ if [ $ALREDYISO="n" ]; then
 		eject /cdrom
 	fi
 fi
+
+# Generation de l'adresse Mac
+$XENMAC=`xenedu-mac-generator`

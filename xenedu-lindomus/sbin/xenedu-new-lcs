@@ -48,10 +48,12 @@ if [ $WANTREPORTS = O ]; then
 	lvcreate -L"$REPORTSIZE"G -n xenedu-lcs-squidreports $XENEDUDISK
 fi
 
-lvcreate -L5G -n xenedu-lcs-root $XENEDUDISK
+lvcreate -L3500M -n xenedu-lcs-root $XENEDUDISK
 lvcreate -L5G -n xenedu-lcs-var $XENEDUDISK
 lvcreate -L512M -n xenedu-lcs-swp $XENEDUDISK
 lvcreate -L"$LCSVARSQUIDSIZE"G -n xenedu-lcs-squid $XENEDUDISK
 mkfs.ext3 -q "$XENEDUDISK"/xenedu-lcs-home
 mkfs.ext3 -q "$XENEDUDISK"/xenedu-lcs-squid
 
+# Generation de l'adresse Mac
+$XENMAC=`xenedu-mac-generator`
