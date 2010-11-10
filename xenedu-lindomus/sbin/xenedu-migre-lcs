@@ -16,8 +16,8 @@ installkey
 #installkeyrev
 
 # creation des partitions
-lvcreate -L5G -n xenedu-lcs-root $XENEDUDISK
-lvcreate -L10G -n xenedu-lcs-var $XENEDUDISK
+lvcreate -L3500M -n xenedu-lcs-root $XENEDUDISK
+lvcreate -L7G -n xenedu-lcs-var $XENEDUDISK
 lvcreate -L10G -n xenedu-lcs-varlog $XENEDUDISK
 lvcreate -L10G -n xenedu-lcs-varspoolsquid $XENEDUDISK
 lvcreate -L10G -n xenedu-lcs-usrsharelcs $XENEDUDISK
@@ -110,6 +110,8 @@ cat > /mnt/xenedutmp/migrelcs/etc/fstab <<E_O_TAB
 proc          /proc    proc     defaults              0     0
 E_O_TAB
 
+# Generation de l'adresse Mac
+$XENMAC=`xenedu-mac-generator`
 
 # ecriture du fichier de config xen
 cat > /etc/xen/xenedu-lcs.cfg <<E_O_XEN
@@ -117,7 +119,7 @@ kernel = "/boot/vmlinuz-2.6.26-2-xen-amd64"
 ramdisk = "/boot/initrd.img-2.6.26-2-xen-amd64"
 memory = $LCSMEMORY
 name   = "xenedu-lcs"
-vif = [ 'bridge=eth0' ]
+vif = [ 'bridge=eth0,mac=$XENMAC' ]
 disk   = [ 'phy:$XENEDUDISK/xenedu-lcs-root,sda1,w',
 'phy:$XENEDUDISK/xenedu-lcs-swp,sda2,w',
 'phy:$XENEDUDISK/xenedu-lcs-home,sda10,w',

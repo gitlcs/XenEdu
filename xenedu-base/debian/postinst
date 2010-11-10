@@ -73,6 +73,7 @@ cp /etc/issue /etc/issue.net
 
 sed -i'.noxenedu' 's@#Banner /etc/issue.net@Banner /etc/issue.net@g'  /etc/ssh/sshd_config 
 sed -i'.noxenedu' 's/XENDOMAINS_RESTORE=true/XENDOMAINS_RESTORE=false/g' /etc/default/xendomains
+sed -i'.noxenedu2' 's@XENDOMAINS_SAVE=/var/lib/xen/save@XENDOMAINS_SAVE=@g' /etc/default/xendomains
 
 if [ -x /usr/sbin/invoke-rc.d ]; then
 	invoke-rc.d xend restart
@@ -113,6 +114,12 @@ EOP
 #		init q
 		fi
         fi                
+	if dpkg --compare-versions $preversion lt 0.6.1 ; then
+		echo "mise a jour xendomains"
+		sed -i'.noxenedu2' 's@XENDOMAINS_SAVE=/var/lib/xen/save@XENDOMAINS_SAVE=@g' /etc/default/xendomains
+		/etc/init.d/xendomains restart
+	fi
+
 #
 # Fin de la mise a jour
 #

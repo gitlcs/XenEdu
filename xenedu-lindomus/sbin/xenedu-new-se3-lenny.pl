@@ -43,6 +43,7 @@ my $NETWORK="192.168.1.0";     # set with '--network=dd.dd.dd.dd'
 my $xname="se3pdc";              # set with '--name=test'
 my $xmemory="512";
 my $DHCP=0;                    # This setting overides the other options
+my $XENMAC=`xenedu-mac-generator`;  # Mac Address for SE3
 
 #
 #  Parse options.
@@ -50,24 +51,22 @@ my $DHCP=0;                    # This setting overides the other options
         print "IP: ";
         chomp($IP = <STDIN>);
         print "\n";
-        print "GATEWAY: ";
-        chomp($GATEWAY = <STDIN>);
-        print "\n";
         print "MASK: ";
         chomp($NETMASK = <STDIN>);
-        print "\n";
-        print "BROADCAST: ";
-        chomp($BROADCAST = <STDIN>);
-        print "\n";
-        print "NETWORK: ";
-        chomp($NETWORK = <STDIN>);
+	print "\n";
+        print "GATEWAY: ";
+        chomp($GATEWAY = <STDIN>);
         print "\n";
         print "Memoire RAM allouée: ";
         chomp($xmemory = <STDIN>);
         print "\n";
-	print "Nom du serveur sur le domaine (se3pdc) ? :";
-	chomp($HOSTNAME = <STDIN>);
-	print "\n";
+        print "Nom du serveur sur le domaine (se3pdc) ? :";
+        chomp($HOSTNAME = <STDIN>);
+        print "\n";
+	$BROADCAST=`ipcalc -n $IP $NETMASK | grep Broadcast| awk {'print \$2'}`;
+	chomp($BROADCAST);
+	$NETWORK=`ipcalc -n 10.10.7.30 255.255.255.0 | grep Network | awk {'print \$2'}| awk -F/ {'print \$1'}`;
+	chomp($NETWORK);
 
 #
 #  Check that the arguments the user has supplied are both 
@@ -318,7 +317,7 @@ kernel = "/boot/vmlinuz-2.6.26-2-xen-amd64"
 ramdisk = "/boot/initrd.img-2.6.26-2-xen-amd64"
 memory = $xmemory
 name   = "$HOSTNAME"
-vif = [ '' ]
+vif = [ 'mac=$XENMAC' ]
 disk   = [ 'phy:$image,sda1,w','phy:$imgvar,sda2,w','phy:$swap,sda3,w','phy:$imghome,sda4,w','phy:$imgvarse3,sda5,w' ]
 root   = "/dev/sda1 ro"
 extra = "4 xencons=tty"
@@ -336,7 +335,7 @@ close( XEN );
 print "Done\n";
 
 # Ajout du SE3 au boot du dom0
-`ln -snf /etc/xen/xenedu-se3.cfg /etc/xen/auto/02-xenedu-se3.cfg`;
+`ln -snf /etc/xen/xenedu-$HOSTNAME.cfg /etc/xen/auto/02-xenedu-$HOSTNAME.cfg`;
 
 #
 #  Give status message
@@ -347,7 +346,7 @@ print <<EOEND;
 
  Once completed you may start your new instance of Xen with:
 
-    xm create $HOSTNAME.cfg -c
+    xm create xenedu-$HOSTNAME.cfg -c
 
 EOEND
 
