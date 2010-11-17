@@ -454,7 +454,7 @@ sub installUdev
 sub installSE3Packages
 {
 	`chroot $dir /usr/bin/apt-get update`;
-	`DEBIAN_FRONTEND=noninteractive chroot $dir /usr/bin/apt-get --yes --force-yes --download-only install se3`;
+	`DEBIAN_FRONTEND=noninteractive chroot $dir /usr/bin/apt-get --yes --force-yes --download-only install se3 se3-domain`;
 }
               
 =head2 fixupInittab
