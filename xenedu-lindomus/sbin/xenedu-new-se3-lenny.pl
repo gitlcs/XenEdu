@@ -147,7 +147,7 @@ if ( ! -d $dir . "/lost+found" )
 #  Install the base system.
 #
 print "Running debootstrap to install the system.   This will take a while!\n";
-`debootstrap --arch i386 etch $dir http://archive.debian.org/debian`;
+`debootstrap --arch i386 lenny $dir http://archive.debian.org/debian`;
 print "Done\n";
 
 #
@@ -169,17 +169,17 @@ print APT<<E_O_APT;
 
 
 # Stable
-deb http://ftp2.fr.debian.org/debian     etch main contrib non-free
-deb-src http://ftp2.fr.debian.org/debian etch main contrib non-free
+deb http://ftp2.fr.debian.org/debian     lenny main contrib non-free
+deb-src http://ftp2.fr.debian.org/debian lenny main contrib non-free
 
 # 
 #  Security updates
 #
-deb     http://security.debian.org/ etch/updates  main contrib non-free
-deb-src http://security.debian.org/ etch/updates  main contrib non-free
+deb     http://security.debian.org/ lenny/updates  main contrib non-free
+deb-src http://security.debian.org/ lenny/updates  main contrib non-free
 
 # sources pour se3
-deb ftp://wawadeb.crdp.ac-caen.fr/debian etch se3
+deb ftp://wawadeb.crdp.ac-caen.fr/debian lenny se3
 
 E_O_APT
 close( APT );
@@ -451,7 +451,7 @@ sub installUdev
 sub installSE3Packages
 {
 	`chroot $dir /usr/bin/apt-get update`;
-	`DEBIAN_FRONTEND=noninteractive chroot $dir /usr/bin/apt-get --yes --force-yes --download-only install se3`;
+	`DEBIAN_FRONTEND=noninteractive chroot $dir /usr/bin/apt-get --yes --force-yes --download-only install se3 se3-domain`;
 }
 
            
