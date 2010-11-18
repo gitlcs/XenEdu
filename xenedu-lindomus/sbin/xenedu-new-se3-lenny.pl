@@ -56,7 +56,7 @@ my $XENMAC=`xenedu-mac-generator`;  # Mac Address for SE3
         print "GATEWAY: ";
         chomp($GATEWAY = <STDIN>);
         print "\n";
-        print "Memoire RAM allouée ( en MB) : ";
+        print "Memoire RAM allouée (en MB) : ";
         chomp($xmemory = <STDIN>);
         print "\n";
         print "Nom du serveur sur le domaine (se3pdc) ? :";
