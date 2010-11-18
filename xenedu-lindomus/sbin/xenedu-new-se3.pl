@@ -62,7 +62,7 @@ my $DHCP=0;                    # This setting overides the other options
         print "NETWORK: ";
         chomp($NETWORK = <STDIN>);
         print "\n";
-        print "Memoire RAM allouée: ";
+        print "Memoire RAM allouée ( en MB ): ";
         chomp($xmemory = <STDIN>);
         print "\n";
         print "Nom du serveur sur le domaine (se3pdc) ? :";

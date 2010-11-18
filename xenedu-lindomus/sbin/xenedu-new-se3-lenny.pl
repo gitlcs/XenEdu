@@ -27,8 +27,7 @@ use Getopt::Long;
 # Options set on the command line.
 #
 my $HOSTNAME="se3pdc";   # Mandatory.
-my $DIR;        # Mandatory.
-
+#my $DIR;        # Mandatory.
 
 #
 # Either *all* the relevant networking options must be setup, or
@@ -57,7 +56,7 @@ my $XENMAC=`xenedu-mac-generator`;  # Mac Address for SE3
         print "GATEWAY: ";
         chomp($GATEWAY = <STDIN>);
         print "\n";
-        print "Memoire RAM allouée: ";
+        print "Memoire RAM allouée ( en MB) : ";
         chomp($xmemory = <STDIN>);
         print "\n";
         print "Nom du serveur sur le domaine (se3pdc) ? :";
@@ -73,22 +72,6 @@ my $XENMAC=`xenedu-mac-generator`;  # Mac Address for SE3
 # valid, and complete.
 #
 checkArguments();
-
-
-
-#
-#  If the output directories don't exist then create them.
-#
-if ( ! -d $DIR . "/domains/" )
-{
-    mkdir $DIR . '/domains', 0777
-      || die "Cannot create $DIR/domains - $!";
-}
-if ( ! -d $DIR . "/domains/" . $HOSTNAME )
-{
-    mkdir $DIR. '/domains/' . $HOSTNAME, 0777
-      || die "Cannot create $DIR/domains/$HOSTNAME - $!" ;
-}
 
 
 
