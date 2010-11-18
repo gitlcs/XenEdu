@@ -1,12 +1,15 @@
 #!/bin/bash
 # creation d'une VM LCS
-# XenEdu - Simon Cavey - 17/06/2010
+# XenEdu - Simon Cavey - 18/11/2010
 
 source /etc/xenedu/xenedu.conf
 
 
 clear
-echo "Pour installer un LCS vous devez vous munir du numero de "
+echo "Pour installer un LCS vous devez vous munir du numero de preseed"
+echo "Rendez-vous sur la page http://lcs.crdp.ac-caen.fr"
+echo "et préparez une installation automatique"
+echo ""
 
 xenedu-freespace
 echo "indiquez l'espace pour /home les donnees utilisateurs"
@@ -15,13 +18,13 @@ read LCSHOMESIZE
 lvcreate -L"$LCSHOMESIZE"G -n xenedu-lcs-home $XENEDUDISK
 xenedu-freespace
 
-echo "indiquez l'espace pour /usr/share/lcs les application LCS"
-echo "entrez simplement le nombre de Go souhaite"
-read LCSVARSQUID
-lvcreate -L"$LCSVARSQUIDSIZE"G -n xenedu-lcs-usrsharelcs $XENEDUDISK
+#echo "indiquez l'espace pour /usr/share/lcs les application LCS"
+#echo "entrez simplement le nombre de Go souhaite"
+#read LCSSHARELCS
+#lvcreate -L"$LCSSHARELCS"G -n xenedu-lcs-usrsharelcs $XENEDUDISK
 
 
-echo "indiquez l'espace pour /var/spoolsquid le cache Web"
+echo "indiquez l'espace pour /var/spool/squid le cache Web"
 echo "entrez simplement le nombre de Go souhaite"
 read LCSVARSQUID
 lvcreate -L"$LCSVARSQUIDSIZE"G -n xenedu-lcs-squid $XENEDUDISK
@@ -53,7 +56,16 @@ lvcreate -L5G -n xenedu-lcs-var $XENEDUDISK
 lvcreate -L512M -n xenedu-lcs-swp $XENEDUDISK
 lvcreate -L"$LCSVARSQUIDSIZE"G -n xenedu-lcs-squid $XENEDUDISK
 mkfs.ext3 -q "$XENEDUDISK"/xenedu-lcs-home
+mkfs.ext3 -q "$XENEDUDISK"/xenedu-lcs-root
+mkfs.ext3 -q "$XENEDUDISK"/xenedu-lcs-var
 mkfs.ext3 -q "$XENEDUDISK"/xenedu-lcs-squid
+
 
 # Generation de l'adresse Mac
 $XENMAC=`xenedu-mac-generator`
+
+mkdir -p /mnt/xenedu/newlcs
+mount "$XENEDUDISK"/xenedu-lcs-root  /mnt/xenedu/newlcs
+mount "$XENEDUDISK"/xenedu-lcs-var  /mnt/xenedu/newlcs/var
+mount "$XENEDUDISK"/xenedu-lcs-home  /mnt/xenedu/newlcs/home
+mount "$XENEDUDISK"/xenedu-lcs-root  /mnt/xenedu/newlcs
