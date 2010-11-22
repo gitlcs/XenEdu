@@ -44,6 +44,7 @@ my $xname="se3pdc";              # set with '--name=test'
 my $xmemory="512";
 my $DHCP=0;                    # This setting overides the other options
 my $XENMAC=`xenedu-mac-generator`;  # Mac Address for SE3
+$XENMAC=`echo -n $XENMAC`;
 
 #
 #  Parse options.
