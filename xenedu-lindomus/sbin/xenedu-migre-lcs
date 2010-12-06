@@ -89,6 +89,12 @@ chown $proxyuid:$proxygid /mnt/xenedutmp/migrelcs/var/spool/squid
 rm -rf /mnt/xenedutmp/migrelcs/lib/modules/*
 cp -a /lib/modules/*xen* /mnt/xenedutmp/migrelcs/lib/modules
 
+# Correction iptables et services LCS.
+# passage en RC4 par defaut sur Xen.
+
+cp -a /mnt/xenedutmp/migrelcs/etc/rc2.d/*iptables* /mnt/xenedutmp/migrelcs/etc/rc4.d/
+cp -a /mnt/xenedutmp/migrelcs/etc/rc2.d/*lcs* /mnt/xenedutmp/migrelcs/etc/rc4.d/
+
 
 DEBIAN_FRONTEND=noninteractive
 chroot /mnt/xenedutmp/migrelcs  /usr/bin/apt-get --yes --force-yes install udev
