@@ -1,4 +1,10 @@
-xenedu-windomus (0.5~1) unstable; urgency=low
+xenedu-windomus (0.6) stable; urgency=low
+
+  * add windows 7 model
+
+ -- Simon Cavey <simon.cavey@crdp.ac-caen.fr>  Wed, 05 Jan 2011 16:18:08 +0100
+
+xenedu-windomus (0.5) unstable; urgency=low
 
   * fix win xp iso generator tools
 

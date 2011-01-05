@@ -1,0 +1,39 @@
+rch = os.uname()[4]
+if re.search('64', arch):
+    arch_libdir = 'lib64'
+else:
+    arch_libdir = 'lib'
+
+# Kernel image file.
+kernel = "/usr/lib/xen-default/boot/hvmloader"
+
+# The domain build function. HVM domain uses 'hvm'.
+builder='hvm'
+
+memory = 1024
+name = "windows7"
+device_model = '/usr/lib/xen-default/bin/qemu-dm'
+shadow_memory = 8
+
+nic=1
+#vif = [ '' ]
+vif = [ 'type=ioemu, bridge=eth1' ]
+sdl=0
+
+vnc=1
+vnclisten="127.0.0.1"
+vncdisplay=2
+#vncunused=0
+stdvga=0
+
+disk = [ 'phy:/dev/mapper/disk-win7,ioemu:hda,w','file:/iso/windows7.iso,hdc:cdrom,r' ]
+#vfb=[ 'type=vnc,vncunused=1,vncdisplay=0', ]
+boot = 'dc'
+
+on_poweroff = 'destroy'
+on_reboot   = 'restart'
+on_crash    = 'restart'
+
+acpi=1
+apic=1
+usbdevice='tablet'
