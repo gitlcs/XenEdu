@@ -24,9 +24,10 @@ case "$1" in
  	xenedu-windomus-initial
 	 else
         ### mise a jour de xenedu-base
-        if dpkg --compare-versions $preversion lt 0.4 ; then
-        	echo "mise a jour"
-        fi
+        	if dpkg --compare-versions $preversion lt 0.4 ; then
+        		echo "mise a jour"
+        	fi
+	fi
 	   ;;
 
     abort-upgrade|abort-remove|abort-deconfigure)

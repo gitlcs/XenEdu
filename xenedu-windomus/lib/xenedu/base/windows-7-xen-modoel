@@ -10,14 +10,14 @@ kernel = "/usr/lib/xen-default/boot/hvmloader"
 # The domain build function. HVM domain uses 'hvm'.
 builder='hvm'
 
-memory = 1024
+memory = 2048
 name = "windows7"
 device_model = '/usr/lib/xen-default/bin/qemu-dm'
 shadow_memory = 8
 
 nic=1
 #vif = [ '' ]
-vif = [ 'type=ioemu, bridge=eth1' ]
+vif = [ 'type=ioemu, bridge=eth1, mac=@@XENMAC@@' ]
 sdl=0
 
 vnc=1
@@ -26,7 +26,7 @@ vncdisplay=2
 #vncunused=0
 stdvga=0
 
-disk = [ 'phy:/dev/mapper/disk-win7,ioemu:hda,w','file:/iso/windows7.iso,hdc:cdrom,r' ]
+disk = [ 'phy:/dev/mapper/win7,ioemu:hda,w','phy:/dev/cdrom,hdc:cdrom,r' ]
 #vfb=[ 'type=vnc,vncunused=1,vncdisplay=0', ]
 boot = 'dc'
 
@@ -37,3 +37,4 @@ on_crash    = 'restart'
 acpi=1
 apic=1
 usbdevice='tablet'
+vcpu = 4

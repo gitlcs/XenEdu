@@ -1,6 +1,7 @@
-xenedu-windomus (0.6) stable; urgency=low
+xenedu-windomus (0.6.1) stable; urgency=low
 
-  * add windows 7 model
+  * add windows 7 mode
+  * fix post installl
 
  -- Simon Cavey <simon.cavey@crdp.ac-caen.fr>  Wed, 05 Jan 2011 16:18:08 +0100
 
