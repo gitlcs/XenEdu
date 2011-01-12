@@ -2,6 +2,7 @@ xenedu-lindomus (0.5.9.12) stable; urgency=low
 
   * minor fix
   * fix se3 lenny install
+  * fix migre lcs umount
 
  -- Simon Cavey <simon.cavey@crdp.ac-caen.fr>  Tue, 07 Dec 2010 14:06:41 +0100
 

@@ -141,11 +141,13 @@ extra = "4 xencons=tty"
 E_O_XEN
 
 # demontage du lcs virtuel
+cd
 umount /mnt/xenedutmp/migrelcs/var/log
 umount  /mnt/xenedutmp/migrelcs/var/www
 umount  /mnt/xenedutmp/migrelcs/var/spool/squid
 umount  /mnt/xenedutmp/migrelcs/usr/share/lcs
 umount  /mnt/xenedutmp/migrelcs/home
+umount  /mnt/xenedutmp/migrelcs/var
 umount  /mnt/xenedutmp/migrelcs
 
 # Ajout du lcs au boot du dom0
