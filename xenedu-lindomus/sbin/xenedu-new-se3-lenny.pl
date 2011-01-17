@@ -57,18 +57,18 @@ $XENMAC=`echo -n $XENMAC`;
         print "GATEWAY: ";
         chomp($GATEWAY = <STDIN>);
         print "\n";
-        print "Memoire RAM allouée (en MB) : ";
+        print "Memoire RAM a allouer(en MB) : ";
         chomp($xmemory = <STDIN>);
         print "\n";
 	print "indiquer le nombre de CPUs a allouer : ";
 	chomp($XENCPUS = <STDIN>);
-        print "\n"
+        print "\n";
         print "Nom du serveur sur le domaine (se3pdc) ? :";
         chomp($HOSTNAME = <STDIN>);
         print "\n";
 	$BROADCAST=`ipcalc -n $IP $NETMASK | grep Broadcast| awk {'print \$2'}`;
 	chomp($BROADCAST);
-	$NETWORK=`ipcalc -n 10.10.7.30 255.255.255.0 | grep Network | awk {'print \$2'}| awk -F/ {'print \$1'}`;
+	$NETWORK=`ipcalc -n $IP $NETMASK | grep Network | awk {'print \$2'}| awk -F/ {'print \$1'}`;
 	chomp($NETWORK);
 
 #
