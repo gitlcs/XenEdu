@@ -1,4 +1,4 @@
-rch = os.uname()[4]
+arch = os.uname()[4]
 if re.search('64', arch):
     arch_libdir = 'lib64'
 else:
@@ -37,4 +37,4 @@ on_crash    = 'restart'
 acpi=1
 apic=1
 usbdevice='tablet'
-vcpu = 4
+#vcpu = 4
