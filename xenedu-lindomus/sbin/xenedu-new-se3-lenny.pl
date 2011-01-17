@@ -43,6 +43,7 @@ my $xname="se3pdc";              # set with '--name=test'
 my $xmemory="512";
 my $DHCP=0;                    # This setting overides the other options
 my $XENMAC=`xenedu-mac-generator`;  # Mac Address for SE3
+my $XENCPUS=1;
 $XENMAC=`echo -n $XENMAC`;
 #
 #  Parse options.
@@ -59,6 +60,9 @@ $XENMAC=`echo -n $XENMAC`;
         print "Memoire RAM allouée (en MB) : ";
         chomp($xmemory = <STDIN>);
         print "\n";
+	print "indiquer le nombre de CPUs a allouer : ";
+	chomp($XENCPUS = <STDIN>);
+        print "\n"
         print "Nom du serveur sur le domaine (se3pdc) ? :";
         chomp($HOSTNAME = <STDIN>);
         print "\n";
@@ -304,6 +308,8 @@ vif = [ 'mac=$XENMAC' ]
 disk   = [ 'phy:$image,sda1,w','phy:$imgvar,sda2,w','phy:$swap,sda3,w','phy:$imghome,sda4,w','phy:$imgvarse3,sda5,w' ]
 root   = "/dev/sda1 ro"
 extra = "4 xencons=tty"
+vcpus = $XENCPUS
+
 E_O_XEN
 if ( $DHCP )
 {
@@ -348,6 +354,7 @@ sub checkArguments
 
     if (!defined( $HOSTNAME ) )
     {
+    $HOSTNAME="se3pdc";
         print<<EOF
 
   You should set a hostname with '--hostname=foo'.
@@ -358,9 +365,14 @@ EOF
         exit;
     }
 
+    if (!defined( $XENCPUS ) )
+    {
+        $XENCPUS=1;
 
+    }
     if (!defined( $xname ) )
     {
+    $xname="se3pdc";
         print<<EOF
 
   You should set a machine name with '--name=myname'.
