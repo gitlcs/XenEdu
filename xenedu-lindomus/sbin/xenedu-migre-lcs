@@ -45,6 +45,13 @@ clear
 echo "Indiquez le nombre de Mo de ram pour le LCS :"
 read LCSMEMORY
 
+echo "Indiquez le nombre de CPU a allouer a LCS : "
+read XENCPUS
+
+if [ -z $XENVCPUS ]; then
+        XENVCPUS="1"
+fi
+
 # formatage des partitions : 
 for i in  $XENEDUDISK/xenedu-lcs-*; do
 clear
@@ -117,7 +124,7 @@ proc          /proc    proc     defaults              0     0
 E_O_TAB
 
 # Generation de l'adresse Mac
-$XENMAC=`xenedu-mac-generator`
+XENMAC=$(xenedu-mac-generator)
 
 # ecriture du fichier de config xen
 cat > /etc/xen/xenedu-lcs.cfg <<E_O_XEN
@@ -125,7 +132,7 @@ kernel = "/boot/vmlinuz-2.6.26-2-xen-amd64"
 ramdisk = "/boot/initrd.img-2.6.26-2-xen-amd64"
 memory = $LCSMEMORY
 name   = "xenedu-lcs"
-vif = [ 'bridge=eth0,mac=$XENMAC' ]
+vif = [ 'bridge=eth0,mac=$XENMAC ' ]
 disk   = [ 'phy:$XENEDUDISK/xenedu-lcs-root,sda1,w',
 'phy:$XENEDUDISK/xenedu-lcs-swp,sda2,w',
 'phy:$XENEDUDISK/xenedu-lcs-home,sda10,w',
@@ -137,6 +144,7 @@ disk   = [ 'phy:$XENEDUDISK/xenedu-lcs-root,sda1,w',
 root   = "/dev/sda1 ro"
 extra = "4 xencons=tty"
 #dhcp="dhcp"
+vcpus = $XENVCPUS
 
 E_O_XEN
 

@@ -21,9 +21,10 @@ set -e
 
 case "$1" in
     purge|remove|upgrade|failed-upgrade|abort-install|abort-upgrade|disappear)
-	umount /iso
-	sed -i '' '@/iso@d' /etc/fstab
-	lvremove -f /dev/vol0/iso 
+	#umount /iso
+	#sed -i '' '@/iso@d' /etc/fstab
+	#lvremove -f /dev/vol0/iso
+	echo "pensez a affacer la partition ISO si besoin." 
     ;;
 
     *)

@@ -69,6 +69,8 @@ my $DHCP=0;                    # This setting overides the other options
         chomp($HOSTNAME = <STDIN>);
         print "\n";
 
+
+
 #
 #  Check that the arguments the user has supplied are both 
 # valid, and complete.
@@ -364,6 +366,7 @@ sub checkArguments
 
     if (!defined( $HOSTNAME ) )
     {
+    $HOSTNAME="se3pdc";
         print<<EOF
 
   You should set a hostname with '--hostname=foo'.
@@ -377,6 +380,7 @@ EOF
 
     if (!defined( $xname ) )
     {
+    $xname="se3pdc";
         print<<EOF
 
   You should set a machine name with '--name=myname'.
