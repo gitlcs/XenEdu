@@ -270,6 +270,10 @@ print "Done\n";
 
 
 #
+#  Install locales
+#
+installLocales();
+#
 #  Install OpenSSH
 #
 installOpenSSH();
@@ -410,6 +414,20 @@ EOF
 
 
 
+
+=head2 installLocales
+
+  Install Locales and set ot  
+=cut
+  
+sub installLocales
+{
+  `chroot $dir  echo "locales locales/default_environment_locale      select  fr_FR.UTF-8" |debconf-set-selections`;
+  `chroot $dir  echo "locales locales/locales_to_be_generated multiselect     fr_FR ISO-8859-1, fr_FR.UTF-8 UTF-8, fr_FR@euro ISO-8859-15" |debconf-set-selections`;
+  `chroot $dir  echo "tzdata  tzdata/Zones/Europe     select  Paris" |debconf-set-selections`; 
+  `chroot $dir /usr/bin/apt-get update`;
+  `DEBIAN_FRONTEND=noninteractive chroot $dir /usr/bin/apt-get --yes --force-yes install locales`;
+}
 
 =head2 installOpenSSH
 
