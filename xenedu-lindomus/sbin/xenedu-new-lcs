@@ -55,18 +55,19 @@ lvcreate -L3500M -n xenedu-lcs-root $XENEDUDISK
 lvcreate -L5G -n xenedu-lcs-var $XENEDUDISK
 lvcreate -L512M -n xenedu-lcs-swp $XENEDUDISK
 lvcreate -L10G -n xenedu-lcs-usrsharelcs $XENEDUDISK
-lvcreate -L"$LCSVARSQUIDSIZE"G -n xenedu-lcs-squid $XENEDUDISK
-lvcreate -L"$LOGSIZE"G -n xenedu-lcs-log $XENEDUDISK
+lvcreate -L10G -n xenedu-lcs-squid $XENEDUDISK
+lvcreate -L10G -n xenedu-lcs-varlog $XENEDUDISK
 lvcreate -L512M -n xenedu-lcs-swp
-mkswap $XENEDUDISK"/xenedu-lcs-swp
+mkswap "$XENEDUDISK"/xenedu-lcs-swp
 mkfs.ext3 -q "$XENEDUDISK"/xenedu-lcs-home
 mkfs.ext3 -q "$XENEDUDISK"/xenedu-lcs-root
 mkfs.ext3 -q "$XENEDUDISK"/xenedu-lcs-var
+mkfs.ext3 -q "$XENEDUDISK"/xenedu-lcs-varlog
 mkfs.ext3 -q "$XENEDUDISK"/xenedu-lcs-squid
 mkfs.ext3 -q "$XENEDUDISK"/xenedu-lcs-usrsharelcs
 
 # Generation de l'adresse Mac
-$XENMAC=`xenedu-mac-generator`
+XENMAC=`xenedu-mac-generator`
 
 mkdir -p /mnt/xenedu/newlcs
 mount "$XENEDUDISK"/xenedu-lcs-root  /mnt/xenedu/newlcs
@@ -79,8 +80,8 @@ mount "$XENEDUDISK"/xenedu-lcs-home  /mnt/xenedu/newlcs/home
 mkdir -p /mnt/xenedu/usr/share/lcs
 mount "$XENEDUDISK"/xenedu-lcs-usrsharelcs  /mnt/xenedu/usr/share/lcs
 if [ $WANTREPORTS = O ]; then
-	mkdir -p /mnt/xenedu/var/www/squid-reports
-	mount "$XENEDUDISK"/xenedu-lcs-squidreports  /mnt/xenedu/newlcs/var/www/squidreport
+	mkdir -p /mnt/xenedu/newlcs/var/www/squid-reports
+	mount "$XENEDUDISK"/xenedu-lcs-squidreports  /mnt/xenedu/newlcs/var/www/squid-report
 fi
 
 clear
@@ -110,13 +111,13 @@ memory = 1024
 name   = "xenedu-lcs"
 vif = [ 'bridge=eth0,mac=$XENMAC' ]
 disk   = [ 'phy:/dev/vol0/xenedu-lcs-root,sda1,w',
-'phy:"$XENEDUDISK"/xenedu-lcs-swp,sda2,w',
-'phy:"$XENEDUDISK"/xenedu-lcs-home,sda10,w',
-'phy:"$XENEDUDISK"/xenedu-lcs-usrsharelcs,sda6,w',
-'phy:"$XENEDUDISK"/xenedu-lcs-var,sda7,w',
-'phy:"$XENEDUDISK"/xenedu-lcs-varlog,sda8,w',
-'phy:"$XENEDUDISK"/xenedu-lcs-varspoolsquid,sda9,w',
-'phy:"$XENEDUDISK"/xenedu-lcs-www,sda11,w' ]
+'phy:$XENEDUDISK/xenedu-lcs-swp,sda2,w',
+'phy:$XENEDUDISK/xenedu-lcs-home,sda10,w',
+'phy:$XENEDUDISK/xenedu-lcs-usrsharelcs,sda6,w',
+'phy:$XENEDUDISK/xenedu-lcs-var,sda7,w',
+'phy:$XENEDUDISK/xenedu-lcs-varlog,sda8,w',
+'phy:$XENEDUDISK/xenedu-lcs-varspoolsquid,sda9,w',
+'phy:$XENEDUDISK/xenedu-lcs-www,sda11,w' ]
 root   = "/dev/sda1 ro"
 extra = "4 xencons=tty"
 #dhcp="dhcp"
