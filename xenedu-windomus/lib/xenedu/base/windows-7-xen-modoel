@@ -18,7 +18,7 @@ shadow_memory = 8
 nic=1
 #vif = [ '' ]
 vif = [ 'type=ioemu, bridge=eth1, mac=@@XENMAC@@' ]
-sdl=0
+sdl=1
 
 vnc=1
 vnclisten="127.0.0.1"
@@ -26,7 +26,7 @@ vncdisplay=2
 #vncunused=0
 stdvga=0
 
-disk = [ 'phy:/dev/mapper/win7,ioemu:hda,w','phy:/dev/cdrom,hdc:cdrom,r' ]
+disk = [ 'phy:/dev/vol0/win7,ioemu:hda,w','phy:/dev/cdrom,hdc:cdrom,r' ]
 #vfb=[ 'type=vnc,vncunused=1,vncdisplay=0', ]
 boot = 'dc'
 
