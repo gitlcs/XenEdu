@@ -1,4 +1,4 @@
-xenedu-base (0.6.1~2) stable; urgency=low
+xenedu-base (0.6.2) stable; urgency=low
 
   * Add remote SSH feature
   * Stop RSSH after 1 day
