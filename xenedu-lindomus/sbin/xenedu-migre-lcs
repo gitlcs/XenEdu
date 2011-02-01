@@ -75,6 +75,10 @@ mount $XENEDUDISK/xenedu-lcs-varspoolsquid /mnt/xenedutmp/migrelcs/var/spool/squ
 mount $XENEDUDISK/xenedu-lcs-usrsharelcs /mnt/xenedutmp/migrelcs/usr/share/lcs
 mount $XENEDUDISK/xenedu-lcs-home /mnt/xenedutmp/migrelcs/home
 
+# nettoyage sur de squid-report sur le vieux LCS : 
+echo "nettoyage sur le LCS physique"
+ssh -q root@$serveurip "rm -rf /var/www/squid-report/2*"
+
 # copie des données : 
 clear
 echo "copie des donnees"
@@ -102,9 +106,12 @@ cp -a /lib/modules/*xen* /mnt/xenedutmp/migrelcs/lib/modules
 cp -a /mnt/xenedutmp/migrelcs/etc/rc2.d/*iptables* /mnt/xenedutmp/migrelcs/etc/rc4.d/
 cp -a /mnt/xenedutmp/migrelcs/etc/rc2.d/*lcs* /mnt/xenedutmp/migrelcs/etc/rc4.d/
 
-
 DEBIAN_FRONTEND=noninteractive
 chroot /mnt/xenedutmp/migrelcs  /usr/bin/apt-get --yes --force-yes install udev
+
+# On afface grub et le kernel sur la VM
+#chroot /mnt/xenedutmp/migrelcs  /usr/bin/apt-get --yes --force-yes remove grub
+
 
 # Supression de config reseau udev
 rm -rf /mnt/xenedutmp/migrelcs/etc/udev/rules.d/*-net*
