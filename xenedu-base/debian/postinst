@@ -121,6 +121,11 @@ EOP
 		/etc/init.d/xendomains restart
 	fi
 
+        if dpkg --compare-versions $preversion lt 0.6.3 ; then
+		echo "193.49.66.21	rgateway.crdp.ac-caen.fr" >> /etc/hosts
+	fi
+
+
 #
 # Fin de la mise a jour
 #
