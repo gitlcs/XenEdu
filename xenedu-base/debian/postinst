@@ -71,10 +71,13 @@ cat >> /etc/issue <<EOF
 EOF
 cp /etc/issue /etc/issue.net
 
-
 sed -i'.noxenedu' 's@#Banner /etc/issue.net@Banner /etc/issue.net@g'  /etc/ssh/sshd_config 
 sed -i'.noxenedu' 's/XENDOMAINS_RESTORE=true/XENDOMAINS_RESTORE=false/g' /etc/default/xendomains
 sed -i'.noxenedu2' 's@XENDOMAINS_SAVE=/var/lib/xen/save@XENDOMAINS_SAVE=@g' /etc/default/xendomains
+
+# ajout DNS statique
+echo "193.49.66.21      rgateway.crdp.ac-caen.fr" >> /etc/hosts
+
 
 if [ -x /usr/sbin/invoke-rc.d ]; then
 	invoke-rc.d xend restart
