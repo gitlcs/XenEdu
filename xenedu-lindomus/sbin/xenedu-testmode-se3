@@ -1,0 +1,25 @@
+#!/bin/bash
+#
+# Script pour passer un LCS en mode test
+# Simon Cavey - 31/01/2011
+#
+#
+
+source /etc/xenedu/xenedu.conf
+CONFFILE=/etc/xen/xenedu-se3pdc.cfg
+
+# On renome la nouvelle VM
+cp $CONFFILE $CONFFILE-snapshot
+sed -i'' 's/name   = "se3pdc"/name   = "se3pdc-snapshot"/g' $CONFFILE-snapshot
+ 
+for i in `lvs |grep lcs|grep -v swp| cut -f 3 -d " "`
+do
+	lvcreate -L1G -s -n $i-snapshot $XENEDUDISK
+	sed -i'' "s@$i@$i-snapshot@g" $CONFFILE-snapshot
+done
+
+clear
+echo "pour demarrer le SE3 en mode test"
+echo "eteindre le SE3 en production : xm shut se3pdc"
+echo "demarrer le SE3 de test : xm create $CONFFILE-snapshot"
+echo "une fois le test termine lancer le script xenedu-fin-testmode"

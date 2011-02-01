@@ -1,0 +1,24 @@
+#!/bin/bash
+#
+# Script pour passer un LCS en mode test
+# Simon Cavey - 31/01/2011
+#
+#
+
+source /etc/xenedu/xenedu.conf
+CONFFILE=/etc/xen/xenedu-lcs.cfg
+
+cp $CONFFILE $CONFFILE-snapshot
+sed -i'' 's/name   = "xenedu-lcs"/name   = "xenedu-lcs-snapshot"/g' $CONFFILE-snapshot
+
+for i in `lvs |grep lcs|grep -v swp| cut -f 3 -d " "`
+do
+	lvcreate -L1G -s -n $i-snapshot $XENEDUDISK
+	sed -i'' "s@$i@$i-snapshot@g" $CONFFILE-snapshot
+done
+
+clear
+echo "pour demarrer le LCS en mode test"
+echo "eteindre le LCS en production : xm shut xenedu-lcs"
+echo "demarrer le LCS de test : xm create $CONFFILE-snapshot"
+echo "une fois le test termine lancer le script xenedu-fin-testmode"
