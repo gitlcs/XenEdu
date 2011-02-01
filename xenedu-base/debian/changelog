@@ -1,3 +1,9 @@
+xenedu-base (0.6.3) stable; urgency=low
+
+  * add ethernet management scripts
+
+ -- Simon Cavey <simon.cavey@crdp.ac-caen.fr>  Tue, 01 Feb 2011 11:51:45 +0100
+
 xenedu-base (0.6.2) stable; urgency=low
 
   * Add remote SSH feature

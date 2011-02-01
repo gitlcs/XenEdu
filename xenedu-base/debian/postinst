@@ -28,6 +28,7 @@ case "$1" in
 	for i in `ifconfig -a |grep eth |grep -v peth | cut -f 1 -d " "`
 	do 
 	    echo "/etc/xen/scripts/network-bridge \"\$@\" netdev=$i" >> /etc/xen/scripts/network-custom-bridge
+	    echo "ifconfig $i up"  /etc/xen/scripts/network-custom-bridge
 	    echo "$i" >> /etc/xenedu/network
 	done
 	chmod +x /etc/xen/scripts/network-custom-bridge
