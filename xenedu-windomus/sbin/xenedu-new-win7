@@ -2,7 +2,7 @@
 #
 # Preparation de la config Windows 7
 # XenEdu - Simon Cavey - simon.cavey@crdp.ac-caen.fr
-# 12/01/2011 - update 17/01/2011 
+# 12/01/2011 - update 08/02/2011 
 
 source /etc/xenedu/xenedu.conf
 # Generation de l'adresse Mac
@@ -20,4 +20,5 @@ clear
 echo "demarrage de la VM Windows 7"
 xm create /etc/xen/win7.cfg
 
-
+UUID=`xm list -l windows7 | grep uui | head -n 1 | awk {'print $2'} |cut -f 1 -d ")"`
+echo "uuid = \"$UUID\"" >> /etc/xen/win7.cfg

@@ -22,7 +22,7 @@ sdl=1
 
 vnc=1
 vnclisten="127.0.0.1"
-vncdisplay=2
+vncdisplay=1
 #vncunused=0
 stdvga=0
 

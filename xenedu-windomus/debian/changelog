@@ -1,3 +1,9 @@
+xenedu-windomus (0.6.3) stable; urgency=low
+
+  * fix windows uuid
+
+ -- Simon Cavey <simon.cavey@crdp.ac-caen.fr  Tue, 08 Feb 2011 17:11:17 +0100
+
 xenedu-windomus (0.6.2.2) stable; urgency=low
 
   * add windows 7 mode
