@@ -1,3 +1,9 @@
+xenedu-lindomus (0.5.9.20) stable; urgency=low
+
+  * Add xenedu-new-squeeze : Basic debian squeeze VM
+
+ -- Simon Cavey <simon.cavey@crdp.ac-caen.fr>  Wed, 02 Mar 2011 11:22:42 +0100
+
 xenedu-lindomus (0.5.9.19) stable; urgency=low
 
   * minor fix
