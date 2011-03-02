@@ -1,0 +1,36 @@
+#!/bin/bash
+# creation d'une VM squeeze
+# XenEdu - Simon Cavey - 02/03/2011
+
+source /etc/xenedu/xenedu.conf
+
+xenedu-freespace
+echo "indiquez l'espace pour / la racine"
+echo "entrez simplement le nombre de Go souhaite"
+read ROOTSIZE
+lvcreate -L"$ROOTSIZE"G -n xenedu-squeeze-root $XENEDUDISK
+
+xenedu-freespace
+echo "indiquez l'espace pour /home les donnees utilisateurs"
+echo "entrez simplement le nombre de Go souhaite"
+read SE3HOMESIZE
+lvcreate -L"$SE3HOMESIZE"G -n xenedu-squeeze-home $XENEDUDISK
+
+xenedu-freespace
+echo "indiquez l'espace pour /var les donnees d'applications"
+echo "entrez simplement le nombre de Go souhaite"
+read VARSIZE
+lvcreate -L"$VARSIZE"G -n xenedu-squeeze-var $XENEDUDISK
+
+#lvcreate -L5G -n xenedu-se3pdc-root $XENEDUDISK
+#lvcreate -L10G -n xenedu-se3pdc-var $XENEDUDISK
+lvcreate -L512M -n xenedu-squeeze-swp $XENEDUDISK
+mkswap $XENEDUDISK/xenedu-squeeze-swp
+
+mkfs.ext3 -q "$XENEDUDISK"/xenedu-squeeze-home
+mkfs.ext3 -q "$XENEDUDISK"/xenedu-squeeze-var
+
+#
+# appel du script perl
+#
+xenedu-new-squeeze.pl
