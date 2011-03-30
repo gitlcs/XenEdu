@@ -1,0 +1,13 @@
+#kernel = "/boot/netbsd-amd64/netbsd-XEN3_DOMU.gz"
+kernel = "/boot/netbsd-amd64/netbsd-INSTALL_XEN3_DOMU.gz"
+memory = 256
+name   = "netbsd"
+vif = [ 'bridge=eth0', 'bridge=eth1' ]
+disk   = [ 'phy:/dev/vol0/NetBSD,sda,w' ]
+#root   = "/dev/sda1 ro"
+# Set root device. This one does matter for NetBSD
+root = "xbd0a"
+extra = ""
+#dhcp="dhcp"
+#serial_device = hvc0
+#disk_device = xvda
