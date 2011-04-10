@@ -1,0 +1,13 @@
+Source: xenedu-nut
+Section: misc
+Priority: extra
+Maintainer:  Simon Cavey <simon.cavey@crdp.ac-caen.fr>
+Build-Depends: debhelper (>= 7)
+Standards-Version: 3.7.3
+Homepage: http://xenedu.crdp.ac-caen.fr
+
+Package: xenedu-nut
+Architecture: all
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: XenEdu UPS config for nut
+ configure nut for local UPS
