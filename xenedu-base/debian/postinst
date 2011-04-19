@@ -28,7 +28,7 @@ case "$1" in
 	for i in `ifconfig -a |grep eth |grep -v peth | cut -f 1 -d " "`
 	do 
 	    echo "/etc/xen/scripts/network-bridge \"\$@\" netdev=$i" >> /etc/xen/scripts/network-custom-bridge
-	    echo "ifconfig $i up"  /etc/xen/scripts/network-custom-bridge
+	    echo "ifconfig $i up" >> /etc/xen/scripts/network-custom-bridge
 	    echo "$i" >> /etc/xenedu/network
 	done
 	chmod +x /etc/xen/scripts/network-custom-bridge
@@ -36,6 +36,10 @@ case "$1" in
 	# ecriture du fichier de config xen
 	if [ ! -e /etc/xen/xend-config.sxp.noxenedu ] ; then 
 	    mv /etc/xen/xend-config.sxp /etc/xen/xend-config.sxp.noxenedu
+	fi
+	# Config pour grub 2 squeeze
+	if [ -e /etc/grub/20_linux_xen] ; then
+		mv /etc/grub/20_linux_xen /etc/grub/09_linux_xen
 	fi
 	# création du rep auto
 	mkdir -p /etc/xen/auto
