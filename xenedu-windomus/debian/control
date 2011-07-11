@@ -8,7 +8,7 @@ Homepage: http://xenedu.crdp.ac-caen.fr>
 
 Package: xenedu-windomus
 Architecture: all
-Depends: ${misc:Depends}, xenedu-base, mkisofs
+Depends: ${misc:Depends}, xenedu-base, genisoimage
 Description: XenEdu support for windows domU
  this package contain scripts for Windows virtualization
  on xenedu server.
