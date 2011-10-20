@@ -1,4 +1,4 @@
-xenedu-base (0.6.4.1) stable; urgency=low
+xenedu-base (0.8.0.0) stable; urgency=low
 
   * Change grub2 setup for debian squeeze
   * Added Squeeze upgrade script
