@@ -45,6 +45,7 @@ case "$1" in
 	mkdir -p /etc/xen/auto
 
 	cat > /etc/xen/xend-config.sxp <<EOF
+	dpkg-divert --add --rename --divert /etc/grub.d/09_linux_xen /etc/grub.d/20_linux_xen
 # Xen config for XenEdu
 (xend-http-server yes)
 (xend-unix-server yes)
