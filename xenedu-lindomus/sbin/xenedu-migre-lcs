@@ -76,6 +76,7 @@ mount $XENEDUDISK/xenedu-lcs-usrsharelcs /mnt/xenedutmp/migrelcs/usr/share/lcs
 mount $XENEDUDISK/xenedu-lcs-home /mnt/xenedutmp/migrelcs/home
 
 # nettoyage sur de squid-report sur le vieux LCS : 
+
 echo "nettoyage sur le LCS physique"
 ssh -q root@$serveurip "rm -rf /var/www/squid-report/2*"
 
@@ -112,21 +113,20 @@ chroot /mnt/xenedutmp/migrelcs  /usr/bin/apt-get --yes --force-yes install udev
 # On afface grub et le kernel sur la VM
 #chroot /mnt/xenedutmp/migrelcs  /usr/bin/apt-get --yes --force-yes remove grub
 
-
 # Supression de config reseau udev
 rm -rf /mnt/xenedutmp/migrelcs/etc/udev/rules.d/*-net*
 
 # ecriture du nouveau Fstab
 
 cat > /mnt/xenedutmp/migrelcs/etc/fstab <<E_O_TAB
-/dev/sda1       /               ext3    defaults,errors=remount-ro 0       1
-/dev/sda2       none            swap    sw              0       0
-/dev/sda10      /home           ext3    defaults        0       2
-/dev/sda6       /usr/share/lcs  ext3    defaults        0       2
-/dev/sda7       /var            ext3    defaults        0       2
-/dev/sda8       /var/log        ext3    defaults        0       2
-/dev/sda9       /var/spool/squid ext3    defaults        0       2
-/dev/sda11      /var/www          ext3    defaults        0       2
+/dev/xvda1       /               ext3    defaults,errors=remount-ro 0       1
+/dev/xvda2       none            swap    sw              0       0
+/dev/xvda10      /home           ext3    defaults        0       2
+/dev/xvda6       /usr/share/lcs  ext3    defaults        0       2
+/dev/xvda7       /var            ext3    defaults        0       2
+/dev/xvda8       /var/log        ext3    defaults        0       2
+/dev/xvda9       /var/spool/squid ext3    defaults        0       2
+/dev/xvda11      /var/www          ext3    defaults        0       2
 proc          /proc    proc     defaults              0     0
 E_O_TAB
 
@@ -135,21 +135,21 @@ XENMAC=$(xenedu-mac-generator)
 
 # ecriture du fichier de config xen
 cat > /etc/xen/xenedu-lcs.cfg <<E_O_XEN
-kernel = "/boot/vmlinuz-2.6.26-2-xen-amd64"
-ramdisk = "/boot/initrd.img-2.6.26-2-xen-amd64"
+kernel = "/boot/vmlinuz-2.6.32-5-xen-amd64"
+ramdisk = "/boot/initrd.img-2.6.32-5-xen-amd64"
 memory = $LCSMEMORY
 name   = "xenedu-lcs"
 vif = [ 'bridge=eth0,mac=$XENMAC ' ]
-disk   = [ 'phy:$XENEDUDISK/xenedu-lcs-root,sda1,w',
-'phy:$XENEDUDISK/xenedu-lcs-swp,sda2,w',
-'phy:$XENEDUDISK/xenedu-lcs-home,sda10,w',
-'phy:$XENEDUDISK/xenedu-lcs-usrsharelcs,sda6,w',
-'phy:$XENEDUDISK/xenedu-lcs-var,sda7,w',
-'phy:$XENEDUDISK/xenedu-lcs-varlog,sda8,w',
-'phy:$XENEDUDISK/xenedu-lcs-varspoolsquid,sda9,w',
-'phy:$XENEDUDISK/xenedu-lcs-www,sda11,w' ]
-root   = "/dev/sda1 ro"
-extra = "4 xencons=tty"
+disk   = [ 'phy:$XENEDUDISK/xenedu-lcs-root,xvda1,w',
+'phy:$XENEDUDISK/xenedu-lcs-swp,xvda2,w',
+'phy:$XENEDUDISK/xenedu-lcs-home,xvda10,w',
+'phy:$XENEDUDISK/xenedu-lcs-usrsharelcs,xvda6,w',
+'phy:$XENEDUDISK/xenedu-lcs-var,xvda7,w',
+'phy:$XENEDUDISK/xenedu-lcs-varlog,xvda8,w',
+'phy:$XENEDUDISK/xenedu-lcs-varspoolsquid,xvda9,w',
+'phy:$XENEDUDISK/xenedu-lcs-www,xvda11,w' ]
+root   = "/dev/xvda1 ro"
+extra = "4 console=hvc0 xencons=tty"
 #dhcp="dhcp"
 vcpus = $XENVCPUS
 

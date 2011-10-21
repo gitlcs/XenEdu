@@ -289,14 +289,14 @@ fixupInittab();
 print "Setting up Xen configuration file .. ";
 open( XEN, ">", "/etc/xen/xenedu-$HOSTNAME.cfg" );
 print XEN<<E_O_XEN;
-kernel = "/boot/vmlinuz-2.6.26-2-xen-amd64"
-ramdisk = "/boot/initrd.img-2.6.26-2-xen-amd64"
+kernel = "/boot/vmlinuz-2.6.32-5-xen-amd64"
+ramdisk = "/boot/initrd.img-2.6.32-5-xen-amd64"
 memory = $xmemory
 name   = "$HOSTNAME"
 vif = [ 'mac=$XENMAC' ]
 disk   = [ 'phy:$image,xvda1,w','phy:$imgvar,xvda2,w','phy:$swap,xvda3,w','phy:$imghome,xvda4,w' ]
 root   = "/dev/xvda1 ro"
-extra = "4 xencons=tty"
+extra = "4 console=hvc0 xencons=tty"
 vcpus = $XENCPUS
 
 E_O_XEN

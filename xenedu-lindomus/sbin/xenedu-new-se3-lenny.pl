@@ -255,11 +255,11 @@ print "Done\n";
 print "Setting up /etc/fstab .. ";
 open( TAB, ">", $dir . "/etc/fstab" );
 print TAB<<E_O_TAB;
-/dev/sda1     /        ext3     errors=remount-ro     0     1
-/dev/sda2     /var     ext3     errors=remount-ro     0     1
-/dev/sda3     none     swap     sw                    0     0
-/dev/sda4     /home    xfs	defaults,quota	      0	    0
-/dev/sda5     /var/se3 xfs      defaults,quota        0     0
+/dev/xvda1     /        ext3     errors=remount-ro     0     1
+/dev/xvda2     /var     ext3     errors=remount-ro     0     1
+/dev/xvda3     none     swap     sw                    0     0
+/dev/xvda4     /home    xfs	defaults,quota	      0	    0
+/dev/xvda5     /var/se3 xfs      defaults,quota        0     0
 proc          /proc    proc     defaults              0     0
 E_O_TAB
 close( TAB );
@@ -304,14 +304,14 @@ installSE3Packages();
 print "Setting up Xen configuration file .. ";
 open( XEN, ">", "/etc/xen/xenedu-$HOSTNAME.cfg" );
 print XEN<<E_O_XEN;
-kernel = "/boot/vmlinuz-2.6.26-2-xen-amd64"
-ramdisk = "/boot/initrd.img-2.6.26-2-xen-amd64"
+kernel = "/boot/vmlinuz-2.6.32-5-xen-amd64"
+ramdisk = "/boot/initrd.img-2.6.32-5-xen-amd64"
 memory = $xmemory
 name   = "$HOSTNAME"
 vif = [ 'mac=$XENMAC' ]
-disk   = [ 'phy:$image,sda1,w','phy:$imgvar,sda2,w','phy:$swap,sda3,w','phy:$imghome,sda4,w','phy:$imgvarse3,sda5,w' ]
-root   = "/dev/sda1 ro"
-extra = "4 xencons=tty"
+disk   = [ 'phy:$image,xvda1,w','phy:$imgvar,xvda2,w','phy:$swap,xvda3,w','phy:$imghome,xvda4,w','phy:$imgvarse3,xvda5,w' ]
+root   = "/dev/xvda1 ro"
+extra = "4 console=hvc0 xencons=tty"
 vcpus = $XENCPUS
 
 E_O_XEN
@@ -490,7 +490,7 @@ sub fixupInittab
             if ( $line =~ /^1/ )
             {
                 #$line = "s0:12345:respawn:/sbin/getty 115200 ttyS0 linux"
-                $line = "1:2345:respawn:/sbin/getty 38400 tty1"
+                $line = "1:2345:respawn:/sbin/getty 38400 hvc0"
             }
             else
             {
