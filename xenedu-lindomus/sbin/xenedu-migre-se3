@@ -95,11 +95,11 @@ rm -rf /mnt/xenedutmp/migrese3/etc/udev/rules.d/*-net*
 # ecriture du nouveau Fstab
 
 cat > /mnt/xenedutmp/migrese3/etc/fstab <<E_O_TAB
-/dev/sda1       /               ext3   defaults,errors=remount-ro 0       1
-/dev/sda2       none            swap   sw              0       0
-/dev/sda3       /home           xfs    defaults,quota        0       2
-/dev/sda4       /var            ext3   defaults        0       2
-/dev/sda5       /var/se3        xfs    defaults,quota        0       2
+/dev/xvda1       /               ext3   defaults,errors=remount-ro 0       1
+/dev/xvda2       none            swap   sw              0       0
+/dev/xvda3       /home           xfs    defaults,quota        0       2
+/dev/xvda4       /var            ext3   defaults        0       2
+/dev/xvda5       /var/se3        xfs    defaults,quota        0       2
 proc          /proc    proc     defaults              0     0
 E_O_TAB
 
@@ -108,18 +108,18 @@ $XENMAC=`xenedu-mac-generator`
 
 # ecriture du fichier de config xen
 cat > /etc/xen/xenedu-se3.cfg <<E_O_XEN
-kernel = "/boot/vmlinuz-2.6.26-2-xen-amd64"
-ramdisk = "/boot/initrd.img-2.6.26-2-xen-amd64"
+kernel = "/boot/vmlinuz-2.6.32-5-xen-amd64"
+ramdisk = "/boot/initrd.img-2.6.32-5-xen-amd64"
 memory = $SE3MEMORY
 name   = "xenedu-se3"
 vif = [ 'bridge=eth0,mac=$XENMAC' ]
-disk   = [ 'phy:$XENEDUDISK/xenedu-se3-root,sda1,w',
-'phy:$XENEDUDISK/xenedu-se3-swp,sda2,w',
-'phy:$XENEDUDISK/xenedu-se3-home,sda3,w',
-'phy:$XENEDUDISK/xenedu-se3-varse3,sda5,w',
-'phy:$XENEDUDISK/xenedu-se3-var,sda4,w' ]
-root   = "/dev/sda1 ro"
-extra = "4 xencons=tty"
+disk   = [ 'phy:$XENEDUDISK/xenedu-se3-root,xvda1,w',
+'phy:$XENEDUDISK/xenedu-se3-swp,xvda2,w',
+'phy:$XENEDUDISK/xenedu-se3-home,xvda3,w',
+'phy:$XENEDUDISK/xenedu-se3-varse3,xvda5,w',
+'phy:$XENEDUDISK/xenedu-se3-var,xvda4,w' ]
+root   = "/dev/xvda1 ro"
+extra = "4 console=hvc0 xencons=tty"
 #dhcp="dhcp"
 
 E_O_XEN

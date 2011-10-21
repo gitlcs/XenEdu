@@ -1,3 +1,9 @@
+xenedu-lindomus (0.8.0.0~1) stable; urgency=low
+
+  * update-migration script for squeeze
+
+ -- Simon Cavey <simon.cavey@crdp.ac-caen.fr>  Fri, 21 Oct 2011 16:49:15 +0200
+
 xenedu-lindomus (0.5.9.20) stable; urgency=low
 
   * Add xenedu-new-squeeze : Basic debian squeeze VM
