@@ -10,7 +10,7 @@ install:
 	install -d $(DESTDIR)/etc/xenedu/sudo.d
 	install -d $(DESTDIR)/etc/xen
 	install -d $(DESTDIR)/etc/xen/scripts
-	#cp -a etc/* $(DESTDIR)/etc/
+	cp -a etc/* $(DESTDIR)/etc/
 	
 	# install lib exemple
 	install -d $(DESTDIR)/var/lib/xenedu

@@ -24,6 +24,7 @@ case "$1" in
       	echo "Pas de ssh configure, generation des cles"
   	ssh-keygen -t rsa -f  /root/.ssh/id_rsa -P "" -q
     fi
+    ln -snf /sbin/xenedu-new-se3-lenny /sbin/xenedu-new-se3
     ;;
 
     abort-upgrade|abort-remove|abort-deconfigure)
