@@ -8,10 +8,11 @@ Homepage: http://xenedu.crdp.ac-caen.fr
 
 Package: xenedu-lindomus
 Architecture: all
-Depends: ${misc:Depends}, ipcalc, xfsprogs, ssh, pwgen
+Depends: ${misc:Depends}, ipcalc, xfsprogs, ssh, pwgen, xen-tools
 Description: XenEdu tools for installing Linux Dom U
  XenEdu tools for installing Linux Dom U
  New LCS install
  New SE3 install
  LCS migration
  SE3 migration
+ New squeeze install

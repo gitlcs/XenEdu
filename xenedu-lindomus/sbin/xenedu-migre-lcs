@@ -100,6 +100,7 @@ chown $proxyuid:$proxygid /mnt/xenedutmp/migrelcs/var/spool/squid
 # Remplacement des modules
 rm -rf /mnt/xenedutmp/migrelcs/lib/modules/*
 cp -a /lib/modules/*xen* /mnt/xenedutmp/migrelcs/lib/modules
+chroot /mnt/xenedutmp/migrelcs /sbin/depmod  -a
 
 # Correction iptables et services LCS.
 # passage en RC4 par defaut sur Xen.
