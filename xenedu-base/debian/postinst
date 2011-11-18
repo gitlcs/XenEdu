@@ -32,20 +32,12 @@ case "$1" in
 	    echo "$i" >> /etc/xenedu/network
 	done
 	chmod +x /etc/xen/scripts/network-custom-bridge
-	
+
 	# ecriture du fichier de config xen
 	if [ ! -e /etc/xen/xend-config.sxp.noxenedu ] ; then 
 	    mv /etc/xen/xend-config.sxp /etc/xen/xend-config.sxp.noxenedu
 	fi
-	# Config pour grub 2 squeeze
-	if [ -e /etc/grub.d/20_linux_xen] ; then
-		mv /etc/grub.d/20_linux_xen /etc/grub.d/09_linux_xen
-	fi
-	# création du rep auto
-	mkdir -p /etc/xen/auto
-
 	cat > /etc/xen/xend-config.sxp <<EOF
-	dpkg-divert --add --rename --divert /etc/grub.d/09_linux_xen /etc/grub.d/20_linux_xen
 # Xen config for XenEdu
 (xend-http-server yes)
 (xend-unix-server yes)
@@ -58,14 +50,23 @@ case "$1" in
 (vif-script vif-bridge)
 (dom0-min-mem 196)
 (dom0-cpus 0)
+(enable-dom0-ballooning no)
 (vncpasswd '')
 (keymap 'fr')
 EOF
 
-# ecriture du issue
-if [ ! -e /etc/issue.noxenedu ] ; then 
-    mv /etc/issue /etc/issue.noxenedu
-fi
+	# Config pour grub 2 squeeze
+	if [ -e /etc/grub.d/20_linux_xen] ; then
+		#mv /etc/grub.d/20_linux_xen /etc/grub.d/09_linux_xen
+		dpkg-divert --add --rename --divert /etc/grub.d/09_linux_xen /etc/grub.d/20_linux_xen
+	fi
+
+	# création du rep auto
+	mkdir -p /etc/xen/auto
+	# ecriture du issue
+	if [ ! -e /etc/issue.noxenedu ] ; then 
+		mv /etc/issue /etc/issue.noxenedu
+	fi
 
 cat >> /etc/issue <<EOF 
  ___ ___                _______     __        
@@ -122,7 +123,7 @@ kb::kbrequest:/sbin/xenedu-secours-ssh
 EOP
 #		init q
 		fi
-        fi                
+        fi
 	if dpkg --compare-versions $preversion lt 0.6.1 ; then
 		echo "mise a jour xendomains"
 		sed -i'.noxenedu2' 's@XENDOMAINS_SAVE=/var/lib/xen/save@XENDOMAINS_SAVE=@g' /etc/default/xendomains
@@ -132,7 +133,31 @@ EOP
         if dpkg --compare-versions $preversion lt 0.6.3 ; then
 		echo "193.49.66.21	rgateway.crdp.ac-caen.fr" >> /etc/hosts
 	fi
+        if dpkg --compare-versions $preversion lt 0.8.0 ; then
+	                cat > /etc/xen/xend-config.sxp <<EOF
+# Xen config for XenEdu
+(xend-http-server yes)
+(xend-unix-server yes)
+(xend-tcp-xmlrpc-server yes)
+(xend-unix-xmlrpc-server yes)
+(xen-tcp-xmlrpc-server-address 'localhost')
+(xen-tcp-xmlrpc-server-port 8006)
+(xend-port            8000)
+(network-script 'network-network-custom-bridge')
+(vif-script vif-bridge)
+(dom0-min-mem 196)
+(dom0-cpus 0)
+(enable-dom0-ballooning no)
+(vncpasswd '')
+(keymap 'fr')
+EOF
 
+		if [ -x /usr/sbin/invoke-rc.d ]; then
+	        	invoke-rc.d xend restart
+	        	else
+                	/etc/init.d/xend restart 
+		fi
+	fi
 
 #
 # Fin de la mise a jour
