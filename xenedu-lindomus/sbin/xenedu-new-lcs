@@ -31,7 +31,7 @@ lvcreate -L"$LCSVARSQUIDSIZE"G -n xenedu-lcs-squid $XENEDUDISK
 
 #echo "Souaitez vous une partition dédiée pour les log"
 #echo "(O/n)"
-#read $WANTLOG
+#read WANTLOG
 
 #if [ $WANTLOG = O ]; then
 #	echo "indiquez l'espace pour /var/log les log"
@@ -42,7 +42,7 @@ lvcreate -L"$LCSVARSQUIDSIZE"G -n xenedu-lcs-squid $XENEDUDISK
 
 echo "Souaitez vous une partition dédiée pour les rapport squid"
 echo "(O/n)"
-read $WANTREPORTS
+read WANTREPORTS
 
 if [ $WANTREPORTS = O ]; then
 	echo "indiquez l'espace pour /var/www/squid-reports les informations de la consultation web"
