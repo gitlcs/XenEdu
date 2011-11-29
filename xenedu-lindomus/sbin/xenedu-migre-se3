@@ -85,7 +85,7 @@ ssh -q root@$serveurip "tar  --one-file-system -cf - /home" |tar xf - -C /mnt/xe
 # Remplacement des modules
 rm -rf /mnt/xenedutmp/migrese3/lib/modules/*
 cp -a /lib/modules/*xen* /mnt/xenedutmp/migrese3/lib/modules
-chroot /mnt/xenedutmp/migrese3 /sbin/depmod  -a
+chroot /mnt/xenedutmp/migrese3 /sbin/depmod  -a 2.6.32-5-xen-amd64
 
 DEBIAN_FRONTEND=noninteractive
 chroot /mnt/xenedutmp/migrese3  /usr/bin/apt-get --yes --force-yes install udev
