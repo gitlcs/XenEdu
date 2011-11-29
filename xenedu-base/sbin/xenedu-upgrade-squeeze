@@ -3,6 +3,17 @@
 # Script de migration en Squeeze
 # 08/02/2011
 #
+#
+#
+
+echo "Faut-il mettre a jour maintenant ? (o/N) "
+read STARTUPGRADE
+
+if [ $STARTUPGRADE != "o" ]; then
+       exit 1
+else
+	echo "debut de la mise a jour" 
+fi
 
 BOOTDISK=`cat /boot/grub/device.map|awk {'print $2'}`
 
@@ -16,7 +27,7 @@ deb http://security.debian.org/ squeeze/updates main contrib non-free
 deb-src http://security.debian.org/ squeeze/updates main contrib non-free
 
 ## XenEdu
-deb http://xenedu.crdp.ac-caen.fr/lenny xeneduXP main
+deb http://xenedu.crdp.ac-caen.fr/squeeze xenedu main
 EOF
 
 
@@ -77,3 +88,21 @@ update-grub
 
 ## On fait le ménage.
 apt-get	clean
+
+## On propose la maj de VM.
+clean
+echo "La mise a jour de XenEdu vers Squeeze est terminee."
+echo "Vos machines virtuelles doivent être modifiée pour fonctionner a nouveau."
+echo "En cas d'erreur il se peut que vos machines ne fonctionne plus"
+echo "Si vous ne maitrisez pas le fonctionnement de Xen assurez-vous"
+echo "que les personne de l assistance sont disponible."
+
+echo "Faut-il mettre a jour les VM automatiquement ? (o/N) "
+
+read UPGRADEVM 
+
+if [ $UPGRADEVM = "o" ]; then
+	/sbin/xenedu-upgrade-squeeze-4vms
+fi
+
+
