@@ -143,7 +143,7 @@ EOP
 (xen-tcp-xmlrpc-server-address 'localhost')
 (xen-tcp-xmlrpc-server-port 8006)
 (xend-port            8000)
-(network-script 'network-network-custom-bridge')
+(network-script 'network-custom-bridge')
 (vif-script vif-bridge)
 (dom0-min-mem 196)
 (dom0-cpus 0)
