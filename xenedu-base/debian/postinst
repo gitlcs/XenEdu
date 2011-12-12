@@ -50,7 +50,7 @@ case "$1" in
 (vif-script vif-bridge)
 (dom0-min-mem 196)
 (dom0-cpus 0)
-(enable-dom0-ballooning no)
+#(enable-dom0-ballooning no)
 (vncpasswd '')
 (keymap 'fr')
 EOF
@@ -133,7 +133,7 @@ EOP
         if dpkg --compare-versions $preversion lt 0.6.3 ; then
 		echo "193.49.66.21	rgateway.crdp.ac-caen.fr" >> /etc/hosts
 	fi
-        if dpkg --compare-versions $preversion lt 0.8.0 ; then
+        if dpkg --compare-versions $preversion lt 0.8.0.4 ; then
 	                cat > /etc/xen/xend-config.sxp <<EOF
 # Xen config for XenEdu
 (xend-http-server yes)
@@ -147,7 +147,7 @@ EOP
 (vif-script vif-bridge)
 (dom0-min-mem 196)
 (dom0-cpus 0)
-(enable-dom0-ballooning no)
+#(enable-dom0-ballooning no)
 (vncpasswd '')
 (keymap 'fr')
 EOF
@@ -182,3 +182,4 @@ esac
 #DEBHELPER#
 
 exit 0
+
