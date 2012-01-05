@@ -5,6 +5,7 @@
 #
 source /etc/xenedu/xenedu.conf
 source /sbin/xenedu-migre-linux-common
+rm -f /root/.ssh/known_hosts
 
 check-espace-disque lcs
 
@@ -136,8 +137,8 @@ XENMAC=$(xenedu-mac-generator)
 
 # ecriture du fichier de config xen
 cat > /etc/xen/xenedu-lcs.cfg <<E_O_XEN
-kernel = "/boot/vmlinuz-2.6.32-5-xen-amd64"
-ramdisk = "/boot/initrd.img-2.6.32-5-xen-amd64"
+kernel = /boot/vmlinuz-`uname -r`
+initrd = /boot/initrd.img-`uname -r`
 memory = $LCSMEMORY
 name   = "xenedu-lcs"
 vif = [ 'bridge=eth0,mac=$XENMAC ' ]
