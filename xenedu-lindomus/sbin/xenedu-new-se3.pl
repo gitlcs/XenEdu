@@ -209,13 +209,13 @@ foreach my $file ( @hostFiles )
     File::Copy::cp( $file, $dir . "/etc" );
 }
 
-my @hostModules = "/lib/modules/2.6.26-2-xen-amd64";
+my @hostModules = "/lib/modules/2.6.32-5-xen-amd64";
                                                                                           
 foreach my $file ( @hostModules )
 {
 File::Copy::cp( $file, $dir . "/lib/modules" );
 }
-`cp -a /lib/modules/2.6.26-2-xen-amd64  $dir/lib/modules`;
+`cp -a /lib/modules/2.6.32-5-xen-amd64  $dir/lib/modules`;
 
 #
 #  Disable TLS
@@ -271,11 +271,11 @@ print "Done\n";
 print "Setting up /etc/fstab .. ";
 open( TAB, ">", $dir . "/etc/fstab" );
 print TAB<<E_O_TAB;
-/dev/sda1     /        ext3     errors=remount-ro     0     1
-/dev/sda2     /var     ext3     errors=remount-ro     0     1
-/dev/sda3     none     swap     sw                    0     0
-/dev/sda4     /home    xfs	defaults,quota	      0	    0
-/dev/sda5     /var/se3 xfs      defaults,quota        0     0
+/dev/xvda1     /        ext3     errors=remount-ro     0     1
+/dev/xvda2     /var     ext3     errors=remount-ro     0     1
+/dev/xvda3     none     swap     sw                    0     0
+/dev/xvda4     /home    xfs	defaults,quota	      0	    0
+/dev/xvda5     /var/se3 xfs      defaults,quota        0     0
 proc          /proc    proc     defaults              0     0
 E_O_TAB
 close( TAB );
@@ -316,14 +316,14 @@ installSE3Packages();
 print "Setting up Xen configuration file .. ";
 open( XEN, ">", "/etc/xen/xenedu-$HOSTNAME.cfg" );
 print XEN<<E_O_XEN;
-kernel = "/boot/vmlinuz-2.6.26-2-xen-amd64"
-ramdisk = "/boot/initrd.img-2.6.26-2-xen-amd64"
+kernel = "/boot/vmlinuz-2.6.32-5-xen-amd64"
+ramdisk = "/boot/initrd.img-2.6.32-5-xen-amd64"
 memory = $xmemory
 name   = "$HOSTNAME"
 vif = [ '' ]
-disk   = [ 'phy:$image,sda1,w','phy:$imgvar,sda2,w','phy:$swap,sda3,w','phy:$imghome,sda4,w','phy:$imgvarse3,sda5,w' ]
-root   = "/dev/sda1 ro"
-extra = "4 xencons=tty"
+disk   = [ 'phy:$image,xvda1,w','phy:$imgvar,xvda2,w','phy:$swap,xvda3,w','phy:$imghome,xvda4,w','phy:$imgvarse3,xvda5,w' ]
+root   = "/dev/xvda1 ro"
+#extra = "4 xencons=tty"
 E_O_XEN
 if ( $DHCP )
 {

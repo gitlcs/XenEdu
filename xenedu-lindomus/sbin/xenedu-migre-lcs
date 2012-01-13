@@ -137,8 +137,8 @@ XENMAC=$(xenedu-mac-generator)
 
 # ecriture du fichier de config xen
 cat > /etc/xen/xenedu-lcs.cfg <<E_O_XEN
-kernel = /boot/vmlinuz-`uname -r`
-initrd = /boot/initrd.img-`uname -r`
+kernel = "/boot/vmlinuz-`uname -r`"
+initrd = "/boot/initrd.img-`uname -r`"
 memory = $LCSMEMORY
 name   = "xenedu-lcs"
 vif = [ 'bridge=eth0,mac=$XENMAC ' ]
