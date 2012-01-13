@@ -193,13 +193,13 @@ foreach my $file ( @hostFiles )
     File::Copy::cp( $file, $dir . "/etc" );
 }
 
-my @hostModules = "/lib/modules/2.6.26-2-xen-amd64";
+my @hostModules = "/lib/modules/2.6.32-5-xen-amd64";
                                                                                           
 foreach my $file ( @hostModules )
 {
 File::Copy::cp( $file, $dir . "/lib/modules" );
 }
-`cp -a /lib/modules/2.6.26-2-xen-amd64  $dir/lib/modules`;
+`cp -a /lib/modules/2.6.32-5-xen-amd64  $dir/lib/modules`;
 
 #
 #  Disable TLS
