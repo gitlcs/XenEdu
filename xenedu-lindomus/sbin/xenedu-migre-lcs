@@ -114,6 +114,9 @@ chroot /mnt/xenedutmp/migrelcs  /usr/bin/apt-get --yes --force-yes install udev
 
 # On afface grub et le kernel sur la VM
 #chroot /mnt/xenedutmp/migrelcs  /usr/bin/apt-get --yes --force-yes remove grub
+#
+# on corrige la sortie console
+sed  's/1\:2345\:respawn\:\/sbin\/getty\ 38400\ tty1/1\:2345\:respawn\:\/sbin\/getty\ 38400\ hvc0/g' /mnt/xenedutmp/migrelcs/etc/inittab
 
 # Supression de config reseau udev
 rm -rf /mnt/xenedutmp/migrelcs/etc/udev/rules.d/*-net*
@@ -138,7 +141,7 @@ XENMAC=$(xenedu-mac-generator)
 # ecriture du fichier de config xen
 cat > /etc/xen/xenedu-lcs.cfg <<E_O_XEN
 kernel = "/boot/vmlinuz-`uname -r`"
-initrd = "/boot/initrd.img-`uname -r`"
+ramdisk = "/boot/initrd.img-`uname -r`"
 memory = $LCSMEMORY
 name   = "xenedu-lcs"
 vif = [ 'bridge=eth0,mac=$XENMAC ' ]
@@ -151,7 +154,7 @@ disk   = [ 'phy:$XENEDUDISK/xenedu-lcs-root,xvda1,w',
 'phy:$XENEDUDISK/xenedu-lcs-varspoolsquid,xvda9,w',
 'phy:$XENEDUDISK/xenedu-lcs-www,xvda11,w' ]
 root   = "/dev/xvda1 ro"
-extra = "4 console=hvc0 xencons=tty"
+extra = "console=hvc0"
 #dhcp="dhcp"
 vcpus = $XENVCPUS
 
