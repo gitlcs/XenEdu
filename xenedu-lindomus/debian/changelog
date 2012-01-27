@@ -1,3 +1,9 @@
+xenedu-lindomus (0.8.0.7) stable; urgency=low
+
+  * fix lcs squeeze migration
+
+ -- Simon Cavey <simon.cavey@crdp.ac-caen.fr>  Fri, 27 Jan 2012 15:48:58 +0100
+
 xenedu-lindomus (0.8.0.6) stable; urgency=low
 
   * migre-lcs : minors fix
