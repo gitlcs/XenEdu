@@ -22,6 +22,14 @@ echo "Faut-il mettre synchroniser maintenant ? (o/N) "
 read STARTUPGRADE
 
 if [ $STARTUPGRADE != "o" ]; then
+	sync
+	umount /mnt/xenedutmp/usr/share/lcs
+	umount /mnt/xenedutmp/var/spool/squid
+	umount /mnt/xenedutmp/var/www
+	umount /mnt/xenedutmp/var/log
+	umount /mnt/xenedutmp/var
+	umount /mnt/xenedutmp/home
+	umount /mnt/xenedutmp
       exit 1
 else
       echo "debut de la synchro" 
@@ -61,7 +69,7 @@ fi
 
 if [ $reponse = "o" ]; then
 	echo "arret du LCS"
-	ssh root@$serveurip "halt"
+	ssh root@$LCSIP "halt"
 	echo "attente de 10 secondes avant demarrage LCS"
 	sleep 10
 	xm create xenedu-lcs.cfg

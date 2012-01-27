@@ -1,3 +1,9 @@
+xenedu-lindomus (0.8.0.8) stable; urgency=low
+
+  * add mirgation resync tools
+
+ -- Simon Cavey <simon.cavey@crdp.ac-caen.fr>  Fri, 27 Jan 2012 16:42:47 +0100
+
 xenedu-lindomus (0.8.0.7) stable; urgency=low
 
   * fix lcs squeeze migration
