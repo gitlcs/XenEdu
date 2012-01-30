@@ -55,7 +55,7 @@ umount /mnt/xenedutmp
 ###
 # Correction du bug XenEdu 8.0.4
 #
-sed -i'' 's/initrd/ramdisk/g' /etc/xen/xenedu-lcs.cfg
+sed -i'' 's/initrd = /ramdisk = /g' /etc/xen/xenedu-lcs.cfg
 
 
 # Arret du LCS physque et demarrage du lcs virtuel
