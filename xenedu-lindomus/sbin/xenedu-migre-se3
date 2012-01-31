@@ -87,8 +87,10 @@ rm -rf /mnt/xenedutmp/migrese3/lib/modules/*
 cp -a /lib/modules/*xen* /mnt/xenedutmp/migrese3/lib/modules
 chroot /mnt/xenedutmp/migrese3 /sbin/depmod  -a 2.6.32-5-xen-amd64
 
+sed  's/1\:2345\:respawn\:\/sbin\/getty\ 38400\ tty1/1\:2345\:respawn\:\/sbin\/getty\ 38400\ hvc0/g' /mnt/xenedutmp/migrese3/etc/inittab
+
 DEBIAN_FRONTEND=noninteractive
-chroot /mnt/xenedutmp/migrese3  /usr/bin/apt-get --yes --force-yes install udev
+#chroot /mnt/xenedutmp/migrese3  /usr/bin/apt-get --yes --force-yes install udev
 
 # Supression de config reseau udev
 rm -rf /mnt/xenedutmp/migrese3/etc/udev/rules.d/*-net*
@@ -109,8 +111,8 @@ XENMAC=`xenedu-mac-generator`
 
 # ecriture du fichier de config xen
 cat > /etc/xen/xenedu-se3.cfg <<E_O_XEN
-kernel = /boot/vmlinuz-`uname -r`
-initrd = /boot/initrd.img-`uname -r`
+kernel = "/boot/vmlinuz-`uname -r`"
+ramdisk = "/boot/initrd.img-`uname -r`"
 memory = $SE3MEMORY
 name   = "xenedu-se3"
 vif = [ 'bridge=eth0,mac=$XENMAC' ]
@@ -120,7 +122,7 @@ disk   = [ 'phy:$XENEDUDISK/xenedu-se3-root,xvda1,w',
 'phy:$XENEDUDISK/xenedu-se3-varse3,xvda5,w',
 'phy:$XENEDUDISK/xenedu-se3-var,xvda4,w' ]
 root   = "/dev/xvda1 ro"
-extra = "4 console=hvc0 xencons=tty"
+#extra = "4 console=hvc0 xencons=tty"
 #dhcp="dhcp"
 
 E_O_XEN
