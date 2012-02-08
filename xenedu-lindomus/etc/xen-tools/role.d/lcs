@@ -1,6 +1,4 @@
-#!/bin/sh
-#
-#  Configure the new image to be a minimal image, by removing
+onfigure the new image to be a minimal image, by removing
 # packages I don't care about - and installing new ones I prefer.
 #
 # Steve
@@ -56,8 +54,8 @@ removeDebianPackage ${prefix} libpcap0.7
 
 # Editors
 #removeDebianPackage ${prefix} nano
-removeDebianPackage ${prefix} ed
-removeDebianPackage ${prefix} nvi
+#removeDebianPackage ${prefix} ed
+#removeDebianPackage ${prefix} nvi
 
 # Syslog
 #removeDebianPackage ${prefix} klogd
@@ -69,19 +67,36 @@ removeDebianPackage ${prefix} man-db
 removeDebianPackage ${prefix} info
 
 # misc
-removeDebianPackage ${prefix} tasksel tasksel-data
-removeDebianPackage ${prefix} pciutils
-removeDebianPackage ${prefix} fdutils
-removeDebianPackage ${prefix} cpio
+#removeDebianPackage ${prefix} tasksel tasksel-data
+#removeDebianPackage ${prefix} pciutils
+#removeDebianPackage ${prefix} fdutils
+#removeDebianPackage ${prefix} cpio
+#
+# Ajout du dépot lcs
+#
+echo "deb http://lcs.crdp.ac-caen.fr/lenny Lcs main" >> ${prefix}/etc/apt/sources.list
+echo "APT::Get::AllowUnauthenticated 1;" >> ${prefix}/etc/apt/apt.conf.d/00install-lcs
+
 #
 # Upgrade packages
 #
 chroot ${prefix} /usr/bin/apt-get update
 chroot ${prefix} /usr/bin/apt-get upgrade -y
 chroot ${prefix} /usr/bin/apt-get clean
+chroot ${prefix} /usr/bin/apt-get install debian-lcs-keyring lcs-preinstall
+
+#
+# Copy skel
+#
+cp -a /etc/xen-tools/skel/lcs/* ${prefix}
 
 #
 # Copie des modules :
 #
 cp -a /lib/modules/`uname -r` ${prefix}/lib/modules
 chroot ${prefix}  /sbin/depmod -a
+
+#
+# Modif de /etc/hosts
+#
+/bin/sed -i 's/minimal/'${hostname}'/g' ${prefix}/etc/hosts

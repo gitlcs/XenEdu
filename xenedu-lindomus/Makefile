@@ -11,7 +11,8 @@ install:
 	install -d $(DESTDIR)/etc/xen
 	install -d $(DESTDIR)/etc/xen/scripts
 	cp -a etc/* $(DESTDIR)/etc/
-	
+	chmod +x etc/xen-tools/role.d/*
+		
 	# install lib exemple
 	install -d $(DESTDIR)/var/lib/xenedu
 	cp -a lib/* $(DESTDIR)/var/lib/xenedu
