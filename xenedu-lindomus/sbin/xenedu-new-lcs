@@ -1,0 +1,8 @@
+#!/bin/bash
+
+
+
+
+
+
+xen-create-image --config=/etc/xen-tools/xenedu-lcs.conf  --hostname=lcs.test --role=lcs --partitions=lcs --force --ip=10.10.7.70
