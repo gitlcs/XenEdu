@@ -116,7 +116,7 @@ chroot /mnt/xenedutmp/migrelcs  /usr/bin/apt-get --yes --force-yes install udev
 #chroot /mnt/xenedutmp/migrelcs  /usr/bin/apt-get --yes --force-yes remove grub
 #
 # on corrige la sortie console
-sed  's/1\:2345\:respawn\:\/sbin\/getty\ 38400\ tty1/1\:2345\:respawn\:\/sbin\/getty\ 38400\ hvc0/g' /mnt/xenedutmp/migrelcs/etc/inittab
+sed -i'' 's/1\:2345\:respawn\:\/sbin\/getty\ 38400\ tty1/1\:2345\:respawn\:\/sbin\/getty\ 38400\ hvc0/g' /mnt/xenedutmp/migrelcs/etc/inittab
 
 # Supression de config reseau udev
 rm -rf /mnt/xenedutmp/migrelcs/etc/udev/rules.d/*-net*
