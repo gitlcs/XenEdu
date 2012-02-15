@@ -95,6 +95,9 @@ cp -a /etc/xen-tools/skel/lcs/* ${prefix}
 #
 cp -a /lib/modules/`uname -r` ${prefix}/lib/modules
 chroot ${prefix}  /sbin/depmod -a
+#
+#
+chroot ${prefix} debconf-set-selections < /root/lcs.preseed
 
 #
 # Modif de /etc/hosts
