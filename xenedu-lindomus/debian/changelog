@@ -1,3 +1,9 @@
+xenedu-lindomus (0.8.0.13) stable; urgency=low
+
+  * change lcs memory to 1024
+
+ -- Simon Cavey <simon.cavey@crdp.ac-caen.fr>  Wed, 15 Feb 2012 13:52:29 +0100
+
 xenedu-lindomus (0.8.0.12) stable; urgency=low
 
   * new version for xenedu-new-lcs
