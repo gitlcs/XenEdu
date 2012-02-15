@@ -1,8 +1,62 @@
 #!/bin/bash
+#
+# Script d'installation auto lcs
+# Simon Cavey
+
+
+source /etc/xenedu/xenedu.conf
+
+xenedu-freespace
+echo "indiquez l'espace pour /home les donnees utilisateurs"
+echo "entrez simplement le nombre de Go souhaite"
+read LCSHOMESIZE
+#lvcreate -L"$LCSHOMESIZE"G -n xenedu-lcs-home $XENEDUDISK
+#echo "indiquez l'espace pour /usr/share/lcs les application LCS"
+#echo "entrez simplement le nombre de Go souhaite"
+#read LCSSHARELCS
+#lvcreate -L"$LCSSHARELCS"G -n xenedu-lcs-usrsharelcs $XENEDUDISK
+
+xenedu-freespace
+echo "indiquez l'espace pour /var/spool/squid le cache Web"
+echo "entrez simplement le nombre de Go souhaite E"
+read LCSVARSQUID
+#lvcreate -L"$LCSVARSQUIDSIZE"G -n xenedu-lcs-squid $XENEDUDISK
+
+sed -e "s|@@HOMESIZE@@|$LCSHOMESIZE|g" \
+-e "s|@@CACHESIZE@@|"$LCSVARSQUID"|g" \
+/etc/xen-tools/partitions.d/lcs-custom.in > /etc/xen-tools/partitions.d/lcs-custom
 
 
 
+echo "indiquez votre n° de preseed"
+read PRESEEDNUM
+
+#echo "indiquer le nom de domaine pour lcs"
+#read LCSDOMAINE
+#echo "indiquez l'ip pour le LCS :"
+#read LCSIP
+#echo "indiquez le masque de sous réseau"
+#read LCSMASK
+#echo "indiquez la passerelle"
+#read LCSGW
+
+echo "indiquer le nombre de CPU a allouer"
+read VCPUNUM
+
+
+mkdir -p /etc/xen-tools/skel/lcs/root
+mkdir -p /etc/xen-tools/skel/lcs/etc/lcs
+
+wget http://lcs.crdp.ac-caen.fr/diconf/$PRESEEDNUM/lcs.preseed  -O /etc/xen-tools/skel/lcs/root/lcs.preseed
+wget http://lcs.crdp.ac-caen.fr/diconf/$PRESEED/lcs.conf -O /etc/xen-tools/skel/lcs/etc/lcs/lcs.conf
+sed -i'' '/^d-i /d' /etc/xen-tools/skel/lcs/root/lcs.preseed
+MOTDEPASSEALEATOIR=`pwgen 10 1`
+sed -i'' "s/AUTO/string $MOTDEPASSEALEATOIR/g"  /etc/xen-tools/skel/lcs/root/lcs.preseed
+sed -i'' "s/AUTO/string $MOTDEPASSEALEATOIR/g"  /etc/xen-tools/skel/lcs/etc/lcs/lcs.conf
+
+source /etc/xen-tools/skel/lcs/etc/lcs/lcs.conf
+
+xen-create-image --config=/etc/xen-tools/xenedu-lcs.conf  --hostname=lcs.$DOMAIN --role=lcs --partitions=lcs-custom --force --ip=$IPADDR0 --gateway=$GATEWAY  --netmask=$NETMASK0 --vcpus=$VCPUNUM
 
 
 
-xen-create-image --config=/etc/xen-tools/xenedu-lcs.conf  --hostname=lcs.test --role=lcs --partitions=lcs --force --ip=10.10.7.70
