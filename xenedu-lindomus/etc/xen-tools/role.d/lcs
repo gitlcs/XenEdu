@@ -83,7 +83,7 @@ echo "APT::Get::AllowUnauthenticated 1;" >> ${prefix}/etc/apt/apt.conf.d/00insta
 chroot ${prefix} /usr/bin/apt-get update
 chroot ${prefix} /usr/bin/apt-get upgrade -y
 chroot ${prefix} /usr/bin/apt-get clean
-chroot ${prefix} /usr/bin/apt-get install debian-lcs-keyring lcs-preinstall
+#chroot ${prefix} /usr/bin/apt-get install debian-lcs-keyring lcs-preinstall
 
 #
 # Copy skel
@@ -93,8 +93,8 @@ cp -a /etc/xen-tools/skel/lcs/* ${prefix}
 #
 # Copie des modules :
 #
-cp -a /lib/modules/`uname -r` ${prefix}/lib/modules
-chroot ${prefix}  /sbin/depmod -a
+#cp -a /lib/modules/`uname -r` ${prefix}/lib/modules
+#chroot ${prefix}  /sbin/depmod -a
 #
 #
 chroot ${prefix} debconf-set-selections < /root/lcs.preseed
@@ -103,3 +103,8 @@ chroot ${prefix} debconf-set-selections < /root/lcs.preseed
 # Modif de /etc/hosts
 #
 /bin/sed -i 's/minimal/'${hostname}'/g' ${prefix}/etc/hosts
+
+# 
+# Ajout de paquets LCS
+#
+installDebianPackage ${prefix} debian-lcs-keyring lcs-preinstall lcs-dns lcs-web lcs-smtp lcs-imap lcs-squirrelmail lcs-sysinfo lcs-security
