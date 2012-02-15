@@ -133,7 +133,7 @@ if ( ! -d $dir . "/lost+found" )
 #
 #  Install the base system.
 #
-print "Running debootstrap to install the system.   This will take a while!\n";
+print "Installation en cours  Merci de patienter ! \n";
 `debootstrap --arch i386 lenny $dir http://ftp2.fr.debian.org/debian`;
 print "Done\n";
 
