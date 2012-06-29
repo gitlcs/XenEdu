@@ -156,14 +156,14 @@ print APT<<E_O_APT;
 
 
 # Stable
-deb http://ftp2.fr.debian.org/debian     lenny main contrib non-free
-deb-src http://ftp2.fr.debian.org/debian lenny main contrib non-free
+deb http://archive.debian.org/debian     lenny main contrib non-free
+deb-src http://archive.debian.org/debian lenny main contrib non-free
 
 # 
 #  Security updates
 #
-deb     http://security.debian.org/ lenny/updates  main contrib non-free
-deb-src http://security.debian.org/ lenny/updates  main contrib non-free
+#deb     http://archive.debian.org/ lenny/updates  main contrib non-free
+#deb-src http://archive.debian.org/ lenny/updates  main contrib non-free
 
 # sources pour se3
 deb ftp://wawadeb.crdp.ac-caen.fr/debian lenny se3
