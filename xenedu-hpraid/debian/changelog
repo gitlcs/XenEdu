@@ -1,4 +1,4 @@
-xenedu-hpraid (1.0-2) stable; urgency=low
+xenedu-hpraid (1.0-3) stable; urgency=low
 
   * Initial release : check all logical volume for HP RAID
 
