@@ -10,7 +10,7 @@ Homepage: http://xenedu.crdp.ac-caen.fr/
 
 Package: xenedu-hpraid
 Architecture: all
-Depends: ${misc:Depends}, hpacucli
+Depends: ${misc:Depends}, hpacucli, postfix, bsd-mailx
 Description: Adding tools for HP RAID management and check
  this package provide scripts to check RAID configuration
  on HP server RAID

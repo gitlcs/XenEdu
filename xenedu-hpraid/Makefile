@@ -13,8 +13,8 @@ install:
 	#cp -a etc/* $(DESTDIR)/etc/
 	
 	# install lib exemple
-	#install -d $(DESTDIR)/var/lib/xenedu
-	#cp -a lib/* $(DESTDIR)/var/lib/xenedu
+	install -d $(DESTDIR)/var/lib/xenedu
+	cp -a lib/* $(DESTDIR)/var/lib
 	# install sbin
 	install -d $(DESTDIR)/sbin
 	install -m 755 sbin/* $(DESTDIR)/sbin/
