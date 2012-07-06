@@ -20,7 +20,7 @@ set -e
 
 case "$1" in
     configure)
-    	localdomain=`hotname -d`
+    	localdomain=`hostname -d`
 	sed -i'' 's/@@DOMAIN@@/$localdomain/g' /var/lib/xenedu/preconf-postfix
 	debconf-set-selections < /var/lib/xenedu/preconf-postfix
 	dpkg-reconfigure -f Noninteractive postfix
