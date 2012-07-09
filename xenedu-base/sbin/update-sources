@@ -1,0 +1,20 @@
+#!/bin/bash
+
+os_version=$(cat /etc/debian_version | cut -d. -f1-2)
+
+if [ $os_version == "5.0" ]; then
+echo "lenny detected"
+cat>/root/sources.list.archive<<END
+#
+# Fichier sources list pour XenEdu
+#
+deb http://archive.debian.org/debian  lenny main
+deb http://archive.debian.org/debian-security  lenny/updates main
+deb http://archive.debian.org/debian-volatile  lenny/volatile main
+END
+#
+grep "crdp" /etc/apt/sources.list>>  /root/sources.list.archive
+mv /root/sources.list.archive /etc/apt/sources.list
+fi
+
+exit 0

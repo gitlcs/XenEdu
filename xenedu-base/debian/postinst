@@ -43,8 +43,8 @@ case "$1" in
 (xend-unix-server yes)
 (xend-tcp-xmlrpc-server yes)
 (xend-unix-xmlrpc-server yes)
-(xen-tcp-xmlrpc-server-address 'localhost')
-(xen-tcp-xmlrpc-server-port 8006)
+(xend-tcp-xmlrpc-server-address 'localhost')
+(xend-tcp-xmlrpc-server-port 8006)
 (xend-port            8000)
 (network-script 'network-custom-bridge')
 (vif-script vif-bridge)
@@ -69,7 +69,7 @@ EOF
 	fi
 
 cat >> /etc/issue <<EOF 
- ___ ___                _______     __        
+ ___ ___                _______     __
 |   |   |.-----..-----.|    ___|.--|  |.--.--.
 |-     -||  -__||     ||    ___||  _  ||  |  |
 |___|___||_____||__|__||_______||_____||_____|
@@ -158,6 +158,9 @@ EOF
                 	/etc/init.d/xend restart 
 		fi
 	fi
+        if dpkg --compare-versions $preversion lt 0.8.1 ; then
+		/sbin/update-sources
+        fi
 
 #
 # Fin de la mise a jour
