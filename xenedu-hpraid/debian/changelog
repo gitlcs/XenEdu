@@ -1,5 +1,0 @@
-xenedu-hpraid (1.1~1) stable; urgency=low
-
-  * Initial release : check all logical volume for HP RAID
-
- -- Simon Cavey <simon.cavey@crdp.ac-caen.fr>  Tue, 12 Jun 2012 14:56:37 +0200
