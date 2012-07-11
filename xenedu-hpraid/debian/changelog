@@ -1,5 +1,5 @@
-xenedu-hpraid (1.1-1) unstable; urgency=low
+xenedu-hpraid (1.2) stable; urgency=low
 
-  * Initial release (Closes: #nnnn)  <nnnn is the bug number of your ITP>
+  * Initial release : Check HP RAID integrity
 
  -- Simon Cavey <simon.cavey@crdp.ac-caen.fr>  Fri, 06 Jul 2012 16:17:23 +0200

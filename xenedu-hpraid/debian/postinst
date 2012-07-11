@@ -20,6 +20,10 @@ set -e
 
 case "$1" in
     configure)
+    	if [ `hostname -d | cut -f 2 -d "."` == "clg14" ]; then 
+	    	echo "alerte-raid: 	root, alerte-raid-cg14@crdp.ac-caen.fr " >> /etc/aliases
+    		newaliases
+      	fi
     	localdomain=`hostname -d`
 	sed -i'' 's/@@DOMAIN@@/$localdomain/g' /var/lib/xenedu/preconf-postfix
 	debconf-set-selections < /var/lib/xenedu/preconf-postfix

@@ -10,10 +10,10 @@ postfix	postfix/destinations	string	XenEdu.@@DOMAIN@@, XenEdu localhost.@@DOMAIN
 postfix	postfix/retry_upgrade_warning	boolean	
 # Faut-il installer postfix malgré l'incompatibilité du noyau ?
 postfix	postfix/kernel_version_warning	boolean	
-postfix	postfix/not_configured	error	
+#postfix	postfix/not_configured	error	
 postfix	postfix/mailbox_limit	string	0
 postfix	postfix/relayhost	string	mail.crdp.ac-caen.fr
 postfix	postfix/procmail	boolean	true
-postfix	postfix/bad_recipient_delimiter	error	
+#postfix	postfix/bad_recipient_delimiter	error	
 postfix	postfix/protocols	select	all
 postfix	postfix/chattr	boolean	false
