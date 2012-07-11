@@ -161,6 +161,9 @@ EOF
         if dpkg --compare-versions $preversion lt 0.8.1 ; then
 		/sbin/update-sources
         fi
+        if dpkg --compare-versions $preversion lt 0.8.2 ; then
+                        /sbin/xenedu-fix-domain
+        fi
 
 #
 # Fin de la mise a jour

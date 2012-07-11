@@ -1,3 +1,9 @@
+xenedu-base (0.8.2) stable; urgency=low
+
+  * fix XenEdu hostname
+
+ -- Simon Cavey <simon.cavey@crdp.ac-caen.fr>  Wed, 11 Jul 2012 13:18:34 +0200
+
 xenedu-base (0.8.1.1) stable; urgency=low
 
   * fix mail system and update source list if XE run on lenny
