@@ -92,10 +92,12 @@ apt-get	clean
 ## On propose la maj de VM.
 clean
 echo "La mise a jour de XenEdu vers Squeeze est terminee."
-echo "Vos machines virtuelles doivent être modifiée pour fonctionner a nouveau."
-echo "En cas d'erreur il se peut que vos machines ne fonctionne plus"
+echo "Vos machines virtuelles doivent être modifiées pour fonctionner a nouveau."
+echo "Les machines virtuelles doivent être arrêtées."
+echo "Ensuite un rédemarrage du serveur physique est nécessaire."
+echo "En cas d'erreur il se peut que vos machines ne fonctionnent plus"
 echo "Si vous ne maitrisez pas le fonctionnement de Xen assurez-vous"
-echo "que les personne de l assistance sont disponible."
+echo "que les personnes de l assistance sont disponibles."
 
 echo "Faut-il mettre a jour les VM automatiquement ? (o/N) "
 
