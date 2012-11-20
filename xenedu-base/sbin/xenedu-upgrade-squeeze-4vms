@@ -12,7 +12,7 @@ do
 		echo "$VM n'a pas besoin de modifications"
 	else
 		VMROOT=`xm list -l $vm 2>>/dev/null | grep root |grep phy| cut -f 2 -d ":" | cut -f 1 -d ")"`
-		VMCONF=`grep -il xm dest $vm 2>>/dev/null$vm /etc/xen/*`
+		VMCONF=`grep -il  "$vm" /etc/xen/*`
 		echo "Mise a jours de $vm"
 		echo "arrêt de $vm"
 			xm shut $vm 2>>/dev/null
@@ -33,12 +33,12 @@ do
 		sed -i'' '1ikernel = \"/boot/vmlinuz-2.6.32-5-xen-amd64\"' $VMCONF
 		sed -i'' '2iramdisk = \"/boot/initrd.img-2.6.32-5-xen-amd64\"' $VMCONF
 		sed -i'' 's/sda/xvda/g' $VMCONF
-		sed -i''  '^extra/d' $VMCONF
+		sed -i''  '/^extra/d' $VMCONF
 		#echo "extra = \"4 console=hvc0\"" >> $VMCONF
 		echo "FIN de migration de $vm"
 	fi
 done
-echo "Toutes les machine virtuelle ont ete adaptees pour Squeeze"
+echo "Toutes les machines virtuelle ont ete adaptees pour Squeeze"
 echo "Le systeme doit être redemarre"
 echo "voulez-vous redemarrer maintenant ? (o/N)"
 read RESTART
