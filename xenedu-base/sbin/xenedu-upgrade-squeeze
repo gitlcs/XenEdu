@@ -10,13 +10,14 @@ echo "Faut-il mettre a jour maintenant ? (o/N) "
 read STARTUPGRADE
 
 if [ $STARTUPGRADE != "o" ]; then
-       exit 1
+	echo "mise a jour annulee"
+	exit 1
 else
-	echo "debut de la mise a jour" 
+	echo "debut de la mise a jour"
 fi
 
 ### Check de la version du script : 
-XENEDUVERSION = `dpkg -l xenedu-base | grep ^ii | awk '{print $3}'`
+XENEDUVERSION=`dpkg -l xenedu-base | grep ^ii | awk '{print $3}'`
 NEEDVERSION="`curl http://xenedu.crdp.ac-caen.fr/xenedu-ugrade-squeeze-needed`"
 if [ "$XENEDUVERSION" != "$NEEDVERSION" ]; then
 	echo "erreur de version : veuillez mettre à jour la version lenny avant de poursuivre."
