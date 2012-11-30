@@ -1,4 +1,10 @@
-xenedu-nut (0.6-1) stable; urgency=low
+xenedu-nut (0.8.2) stable; urgency=low
+
+  * bug fix
+
+ -- Simon Cavey <simon.cavey@crdp.ac-caen.fr>  Fri, 30 Nov 2012 16:33:44 +0100
+
+xenedu-nut (0.8.1) stable; urgency=low
 
   * Initial release 
 
