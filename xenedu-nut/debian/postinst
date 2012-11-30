@@ -22,6 +22,9 @@ case "$1" in
     configure)
     	LOCALDOMAINE=`hostname -d `
     	sed 's/--DOMAINE--/$LOCALDOMAINE/g' /etc/nut/mail_alert.sh.IN > /etc/nut/mail_alert.sh 
+    	sed -i'' 's/START_UPSD=no/START_UPSD=yes/g' /etc/default/nut
+    	sed -i'' 's/START_UPSMON=no/START_UPSMON=yes/g' /etc/default/nut
+    	/etc/init.d/nut restart
     ;;
 
     abort-upgrade|abort-remove|abort-deconfigure)
