@@ -19,7 +19,7 @@ fi
 ### Check de la version du script : 
 XENEDUVERSION=`dpkg -l xenedu-base | grep ^ii | awk '{print $3}'`
 NEEDVERSION="`curl http://xenedu.crdp.ac-caen.fr/xenedu-ugrade-squeeze-needed`"
-if [ "$XENEDUVERSION" != "$NEEDVERSION" ]; then
+if [ "$XENEDUVERSION" -le "$NEEDVERSION" ]; then
 	echo "erreur de version : veuillez mettre à jour la version lenny avant de poursuivre."
        	exit 1
 else
