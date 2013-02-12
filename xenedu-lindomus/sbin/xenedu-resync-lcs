@@ -1,0 +1,81 @@
+#!/bin/bash
+#
+# Simon Cavey 27/01/2012
+# script de resynchro lors de migration LCS.
+#
+
+source /etc/xenedu/xenedu.conf
+mkdir -p /mnt/xenedutmp
+mount $XENEDUDISK/xenedu-lcs-root /mnt/xenedutmp
+mount $XENEDUDISK/xenedu-lcs-home /mnt/xenedutmp/home
+mount $XENEDUDISK/xenedu-lcs-var /mnt/xenedutmp/var
+mount $XENEDUDISK/xenedu-lcs-varlog /mnt/xenedutmp/var/log
+mount $XENEDUDISK/xenedu-lcs-www /mnt/xenedutmp/var/www
+mount $XENEDUDISK/xenedu-lcs-varspoolsquid /mnt/xenedutmp/var/spool/squid
+mount $XENEDUDISK/xenedu-lcs-usrsharelcs /mnt/xenedutmp/usr/share/lcs
+
+LCSIP=`cat /mnt/xenedutmp/etc/network/interfaces | grep address | awk {'print $2'}`
+echo "L'ip du lcs est $LCSIP"
+
+
+echo "Faut-il mettre synchroniser maintenant ? (o/N) "
+read STARTUPGRADE
+
+if [ $STARTUPGRADE != "o" ]; then
+	sync
+	umount /mnt/xenedutmp/usr/share/lcs
+	umount /mnt/xenedutmp/var/spool/squid
+	umount /mnt/xenedutmp/var/www
+	umount /mnt/xenedutmp/var/log
+	umount /mnt/xenedutmp/var
+	umount /mnt/xenedutmp/home
+	umount /mnt/xenedutmp
+      exit 1
+else
+      echo "debut de la synchro" 
+fi
+
+
+echo "Syncho LCS en cours"
+rsync -aq --delete --exclude "proc" --exclude "lib/modules" --exclude "etc" --exclude "sys" -e ssh $LCSIP:/ /mnt/xenedutmp
+#cp -a /mnt/xenedutmp/etc/rc2.d/S12iptables /mnt/xenedutmp/etc/rc4.d/
+
+sync
+umount /mnt/xenedutmp/usr/share/lcs
+umount /mnt/xenedutmp/var/spool/squid
+umount /mnt/xenedutmp/var/www
+umount /mnt/xenedutmp/var/log
+umount /mnt/xenedutmp/var
+umount /mnt/xenedutmp/home
+umount /mnt/xenedutmp
+
+# Echo "synchro terminee"
+
+
+###
+# Correction du bug XenEdu 8.0.4
+#
+sed -i'' 's/initrd = /ramdisk = /g' /etc/xen/xenedu-lcs.cfg
+
+
+# Arret du LCS physque et demarrage du lcs virtuel
+echo "Faut-il arreter le LCS physique et demarrer le virtuel maintenant : (o/N)"
+read reponse
+
+if [ -z $reponse ]; then
+	reponse=n
+fi
+
+
+if [ $reponse = "o" ]; then
+	echo "arret du LCS"
+	ssh root@$LCSIP "halt"
+	echo "attente de 10 secondes avant demarrage LCS"
+	sleep 10
+	xm create xenedu-lcs.cfg
+else
+	echo "vous pouvez eteindre le LCS physique"
+	echo "tapez "
+	echo "     xm create xenedu-lcs.cfg "
+	echo "pour demarrer le LCS virtuel"
+fi

@@ -1,0 +1,191 @@
+#!/bin/sh
+# postinst script for xenedu-base
+#
+# see: dh_installdeb(1)
+
+set -e
+preversion=$2
+
+# summary of how this script can be called:
+#        * <postinst> `configure' <most-recently-configured-version>
+#        * <old-postinst> `abort-upgrade' <new version>
+#        * <conflictor's-postinst> `abort-remove' `in-favour' <package>
+#          <new-version>
+#        * <postinst> `abort-remove'
+#        * <deconfigured's-postinst> `abort-deconfigure' `in-favour'
+#          <failed-install-package> <version> `removing'
+#          <conflicting-package> <version>
+# for details, see http://www.debian.org/doc/debian-policy/ or
+# the debian-policy package
+
+
+case "$1" in
+    configure)
+	if [ "$2" = "" ] || [ "$2" = "$VER" ]; then
+		
+	# ecriture de /etc/xen/scripts/network-custom-bridge
+	echo "#!/bin/bash" > /etc/xen/scripts/network-custom-bridge
+	for i in `ifconfig -a |grep eth |grep -v peth | cut -f 1 -d " "`
+	do 
+	    echo "/etc/xen/scripts/network-bridge \"\$@\" netdev=$i" >> /etc/xen/scripts/network-custom-bridge
+	    echo "ifconfig $i up" >> /etc/xen/scripts/network-custom-bridge
+	    echo "$i" >> /etc/xenedu/network
+	done
+	chmod +x /etc/xen/scripts/network-custom-bridge
+
+	# ecriture du fichier de config xen
+	if [ ! -e /etc/xen/xend-config.sxp.noxenedu ] ; then 
+	    mv /etc/xen/xend-config.sxp /etc/xen/xend-config.sxp.noxenedu
+	fi
+	cat > /etc/xen/xend-config.sxp <<EOF
+# Xen config for XenEdu
+(xend-http-server yes)
+(xend-unix-server yes)
+(xend-tcp-xmlrpc-server yes)
+(xend-unix-xmlrpc-server yes)
+(xend-tcp-xmlrpc-server-address 'localhost')
+(xend-tcp-xmlrpc-server-port 8006)
+(xend-port            8000)
+(network-script 'network-custom-bridge')
+(vif-script vif-bridge)
+(dom0-min-mem 196)
+(dom0-cpus 0)
+#(enable-dom0-ballooning no)
+(vncpasswd '')
+(keymap 'fr')
+EOF
+
+	# Config pour grub 2 squeeze
+	if [ -e /etc/grub.d/20_linux_xen] ; then
+		#mv /etc/grub.d/20_linux_xen /etc/grub.d/09_linux_xen
+		dpkg-divert --add --rename --divert /etc/grub.d/09_linux_xen /etc/grub.d/20_linux_xen
+	fi
+
+	# création du rep auto
+	mkdir -p /etc/xen/auto
+	# ecriture du issue
+	if [ ! -e /etc/issue.noxenedu ] ; then 
+		mv /etc/issue /etc/issue.noxenedu
+	fi
+
+cat >> /etc/issue <<EOF 
+ ___ ___                _______     __
+|   |   |.-----..-----.|    ___|.--|  |.--.--.
+|-     -||  -__||     ||    ___||  _  ||  |  |
+|___|___||_____||__|__||_______||_____||_____|
+
+EOF
+cp /etc/issue /etc/issue.net
+
+sed -i'.noxenedu' 's@#Banner /etc/issue.net@Banner /etc/issue.net@g'  /etc/ssh/sshd_config 
+sed -i'.noxenedu' 's/XENDOMAINS_RESTORE=true/XENDOMAINS_RESTORE=false/g' /etc/default/xendomains
+sed -i'.noxenedu2' 's@XENDOMAINS_SAVE=/var/lib/xen/save@XENDOMAINS_SAVE=@g' /etc/default/xendomains
+
+# ajout DNS statique
+echo "193.49.66.21      rgateway.crdp.ac-caen.fr" >> /etc/hosts
+
+
+if [ -x /usr/sbin/invoke-rc.d ]; then
+	invoke-rc.d xend restart
+else
+	/etc/init.d/xend restart
+fi
+
+if [ `grep -c rssh /etc/passwd` = 0 ]; then
+	### installation du compte rssh
+	useradd -K UID_MIN=100 -K UID_MAX=999 -K GID_MIN=100 -K GID_MAX=999 rssh
+	chown -R rssh\:rssh /home/rssh
+	chmod -R 700 /home/rssh/.ssh
+	cat >> /etc/inittab <<EOP
+# Action on special keypress SSH inverse de secours XenEdu (ALT-UpArrow).
+kb::kbrequest:/sbin/xenedu-secours-ssh
+EOP
+#	init q
+fi
+
+        else
+        ### mise a jour de xenedu-base
+        if dpkg --compare-versions $preversion lt 0.4 ; then
+        	echo "mise a jour"
+        	sed -i'.noxenedu' 's/XENDOMAINS_RESTORE=true/XENDOMAINS_RESTORE=false/g' /etc/default/xendomains
+		mkdir -p /etc/xen/auto
+        fi
+        if dpkg --compare-versions $preversion lt 0.6 ; then
+
+	if [ `grep -c rssh /etc/passwd` = 0 ]; then
+		echo "Ajout du compte RSSH"
+	        	useradd -K UID_MIN=100 -K UID_MAX=999 -K GID_MIN=100 -K GID_MAX=999 rssh
+        		chown -R rssh\:rssh /home/rssh
+        		chmod -R 700 /home/rssh/.ssh
+cat >> /etc/inittab <<EOP
+# Action on special keypress SSH inverse de secours XenEdu (ALT-UpArrow).
+kb::kbrequest:/sbin/xenedu-secours-ssh
+EOP
+#		init q
+		fi
+        fi
+	if dpkg --compare-versions $preversion lt 0.6.1 ; then
+		echo "mise a jour xendomains"
+		sed -i'.noxenedu2' 's@XENDOMAINS_SAVE=/var/lib/xen/save@XENDOMAINS_SAVE=@g' /etc/default/xendomains
+		/etc/init.d/xendomains restart
+	fi
+
+        if dpkg --compare-versions $preversion lt 0.6.3 ; then
+		echo "193.49.66.21	rgateway.crdp.ac-caen.fr" >> /etc/hosts
+	fi
+        if dpkg --compare-versions $preversion lt 0.8.0.4 ; then
+	                cat > /etc/xen/xend-config.sxp <<EOF
+# Xen config for XenEdu
+(xend-http-server yes)
+(xend-unix-server yes)
+(xend-tcp-xmlrpc-server yes)
+(xend-unix-xmlrpc-server yes)
+(xen-tcp-xmlrpc-server-address 'localhost')
+(xen-tcp-xmlrpc-server-port 8006)
+(xend-port            8000)
+(network-script 'network-custom-bridge')
+(vif-script vif-bridge)
+(dom0-min-mem 196)
+(dom0-cpus 0)
+#(enable-dom0-ballooning no)
+(vncpasswd '')
+(keymap 'fr')
+EOF
+
+		if [ -x /usr/sbin/invoke-rc.d ]; then
+	        	invoke-rc.d xend restart
+	        	else
+                	/etc/init.d/xend restart 
+		fi
+	fi
+        if dpkg --compare-versions $preversion lt 0.8.1 ; then
+		/sbin/update-sources
+        fi
+        if dpkg --compare-versions $preversion lt 0.8.2 ; then
+                        /sbin/xenedu-fix-domain
+        fi
+
+#
+# Fin de la mise a jour
+#
+echo "Termine."
+fi
+               
+    ;;
+
+    abort-upgrade|abort-remove|abort-deconfigure)
+    ;;
+
+    *)
+        echo "postinst called with unknown argument \`$1'" >&2
+        exit 1
+    ;;
+esac
+
+# dh_installdeb will replace this with shell code automatically
+# generated by other debhelper scripts.
+
+#DEBHELPER#
+
+exit 0
+

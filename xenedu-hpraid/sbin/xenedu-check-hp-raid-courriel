@@ -1,0 +1,37 @@
+#!/bin/bash
+
+
+# On test les volumes logiques :
+servername=`hostname -f`
+
+for vl in `echo "ctrl all show config"  | hpacucli | grep "logicaldrive" | awk  {'print  $2 '}`
+do
+        vlcheck=`echo "ctrl all show config"  | hpacucli | grep "logicaldrive $vl" | awk  {'print  $7 '}`
+        if [ "$vlcheck" == "OK)" ] && [ "$1" != "-v" ] ; then
+                echo "le volume logique $vl est correct ($vlcheck"  > /dev/null
+        elif [ "$vlcheck" == "Recovering," ] ; then
+        echo "Sur le serveur : $servername" > /tmp/xenedu-alerte-raid
+        echo "Le volume $vl est en reconstruction"      >> /tmp/xenedu-alerte-raid
+
+        else
+                echo "Sur le serveur : $servername" > /tmp/xenedu-alerte-raid
+                echo "le volume logique $vl est $vlcheck" >> /tmp/xenedu-alerte-raid
+                echo -e "Détail des disques : " >> /tmp/xenedu-alerte-raid
+                for disk in `echo "ctrl all show config"  | hpacucli | grep "physicaldrive" | awk  {'print  $2 '}`
+                do
+                        diskcheck=`echo "ctrl all show config"  | hpacucli | grep "physicaldrive $disk" | awk  {'print  $10 '}`
+                        if [ "$diskcheck" == "OK)" ] ; then
+                                echo -e "\t Le disque $disk est OK" >> /tmp/xenedu-alerte-raid
+                        elif [ "$diskcheck" == "Rebuilding)" ] ; then
+                                echo -e"\t Le disque $disk du volume logique $vl est en reconstruction" >> /tmp/xenedu-alerte-raid
+                        elif [ "$diskcheck" == "Failed)" ] ; then
+                                echo -e "\t Le disque $disk est en erreur Failed" >> /tmp/xenedu-alerte-raid
+                        fi
+                done
+        fi
+done
+
+if [ -e /tmp/xenedu-alerte-raid ]; then
+        cat /tmp/xenedu-alerte-raid | mail -s "[CG14-XenEdu] diagnostique $HOSTNAME" alerte-raid
+        rm /tmp/xenedu-alerte-raid
+fi

@@ -1,0 +1,7 @@
+#!/bin/bash
+#
+# Script de mise a jour de XenEdu
+#
+
+apt-get	update
+apt-get	-y dist-upgrade

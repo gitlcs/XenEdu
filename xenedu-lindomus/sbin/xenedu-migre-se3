@@ -1,0 +1,162 @@
+#!/bin/bash
+#
+# script de migration SE3 pour XenEdu
+# Simon Cavey 01/06/2010
+#
+
+source /etc/xenedu/xenedu.conf
+source /sbin/xenedu-migre-linux-common
+rm -f /root/.ssh/known_hosts
+check-espace-disque se3
+
+echo -n "Entrez l'adresse IP du SE3 reference : "
+read serveurip
+export $serveurip
+
+installkey
+#installkeyrev
+
+# creation des partitions
+lvcreate -L5G -n xenedu-se3-root $XENEDUDISK
+lvcreate -L5G -n xenedu-se3-var $XENEDUDISK
+lvcreate -L512M -n xenedu-se3-swp $XENEDUDISK
+mkswap $XENEDUDISK/xenedu-se3-swp
+
+# Question sur /home
+oldhomeseize=`ssh -q root@$serveurip "df -h /home" |grep home | awk {'print $2'}`
+oldhomeoqp=`ssh -q root@$serveurip "df -h /home" |grep home | awk {'print $5'}`
+oldhomepc=`ssh -q root@$serveurip "df -h /home" |grep home | awk {'print $3'}`
+
+clear
+xenedu-freespace
+echo "Sur votre SE3 la partition /home fait $oldhomeseize"
+echo "elle est utilisA(C)e A  $oldhomesepcoit $oldhomeoqp"
+echo "quelle taille souhaitez-vous pour la partion /home du nouveau SE3"
+echo "indiquez l'espace pour /home les donnees utilisateurs"
+echo "entrez simplement le nombre de Go souhaite"
+read SE3HOMESIZE
+lvcreate -L"$SE3HOMESIZE"G -n xenedu-se3-home $XENEDUDISK
+
+# Meme chose sur var se3
+oldvarse3seize=`ssh -q root@$serveurip "df -h /var/se3" |grep se3 | awk {'print $2'}`
+oldvarse3oqp=`ssh -q root@$serveurip "df -h /var/se3" |grep se3 | awk {'print $5'}`
+oldvarse3pc=`ssh -q root@$serveurip "df -h /var/se3" |grep se3 | awk {'print $3'}`
+
+clear
+xenedu-freespace
+echo "Sur votre SE3 la partition /var/se3 fait $oldvarse3seize"
+echo "elle est utilisA(C)e A  $oldvarse3pc coit $oldvarse3oqp"
+echo "quelle taille souhaitez-vous pour la partion /var/se3du nouveau SE3"
+echo "indiquez l'espace pour /var/se3 les donnees communes"
+echo "entrez simplement le nombre de Go souhaite"
+read SE3VARSIZE
+lvcreate -L"$SE3VARSIZE"G -n xenedu-se3-varse3 $XENEDUDISK
+
+clear
+echo "Indiquez le nombre de Mo de ram pour le SE3 :"
+read SE3MEMORY
+
+# formatage des partitions :
+clear
+echo "##### FORMATAGE DES PARTITIONS DU NOUVEAU SE3 #####"
+mkfs.ext3 -m4 $XENEDUDISK/xenedu-se3-root
+mkfs.ext3 -m4 $XENEDUDISK/xenedu-se3-var
+
+mkfs.xfs -f $XENEDUDISK/xenedu-se3-home
+mkfs.xfs -f $XENEDUDISK/xenedu-se3-varse3
+
+mkdir -p /mnt/xenedutmp/migrese3
+mount $XENEDUDISK/xenedu-se3-root /mnt/xenedutmp/migrese3
+mkdir -p /mnt/xenedutmp/migrese3/var
+mount $XENEDUDISK/xenedu-se3-var /mnt/xenedutmp/migrese3/var
+mkdir -p /mnt/xenedutmp/migrese3/var/se3
+mount $XENEDUDISK/xenedu-se3-varse3 /mnt/xenedutmp/migrese3/var/se3
+mkdir -p /mnt/xenedutmp/migrese3/home
+mount $XENEDUDISK/xenedu-se3-home /mnt/xenedutmp/migrese3/home
+
+# copie des donnA(C)es :
+clear
+echo "copie des donnees"
+ssh -q root@$serveurip "tar  --one-file-system -cf - /" |tar xf - -C /mnt/xenedutmp/migrese3
+ssh -q root@$serveurip "tar  --one-file-system -cf - /var" |tar xf - -C /mnt/xenedutmp/migrese3
+ssh -q root@$serveurip "tar  --one-file-system -cf - /var/se3" |tar xf - -C /mnt/xenedutmp/migrese3
+ssh -q root@$serveurip "tar  --one-file-system -cf - /home" |tar xf - -C /mnt/xenedutmp/migrese3
+
+# Remplacement des modules
+rm -rf /mnt/xenedutmp/migrese3/lib/modules/*
+cp -a /lib/modules/*xen* /mnt/xenedutmp/migrese3/lib/modules
+chroot /mnt/xenedutmp/migrese3 /sbin/depmod  -a 2.6.32-5-xen-amd64
+
+sed  -i'' 's/1\:2345\:respawn\:\/sbin\/getty\ 38400\ tty1/1\:2345\:respawn\:\/sbin\/getty\ 38400\ hvc0/g' /mnt/xenedutmp/migrese3/etc/inittab
+
+DEBIAN_FRONTEND=noninteractive
+#chroot /mnt/xenedutmp/migrese3  /usr/bin/apt-get --yes --force-yes install udev
+
+# Supression de config reseau udev
+rm -rf /mnt/xenedutmp/migrese3/etc/udev/rules.d/*-net*
+
+# ecriture du nouveau Fstab
+
+cat > /mnt/xenedutmp/migrese3/etc/fstab <<E_O_TAB
+/dev/xvda1       /               ext3   defaults,errors=remount-ro 0       1
+/dev/xvda2       none            swap   sw              0       0
+/dev/xvda3       /home           xfs    defaults,quota        0       2
+/dev/xvda4       /var            ext3   defaults        0       2
+/dev/xvda5       /var/se3        xfs    defaults,quota        0       2
+proc          /proc    proc     defaults              0     0
+E_O_TAB
+
+# Generation de l'adresse Mac
+XENMAC=`xenedu-mac-generator`
+
+# ecriture du fichier de config xen
+cat > /etc/xen/xenedu-se3.cfg <<E_O_XEN
+kernel = "/boot/vmlinuz-`uname -r`"
+ramdisk = "/boot/initrd.img-`uname -r`"
+memory = $SE3MEMORY
+name   = "xenedu-se3"
+vif = [ 'bridge=eth0,mac=$XENMAC' ]
+disk   = [ 'phy:$XENEDUDISK/xenedu-se3-root,xvda1,w',
+'phy:$XENEDUDISK/xenedu-se3-swp,xvda2,w',
+'phy:$XENEDUDISK/xenedu-se3-home,xvda3,w',
+'phy:$XENEDUDISK/xenedu-se3-varse3,xvda5,w',
+'phy:$XENEDUDISK/xenedu-se3-var,xvda4,w' ]
+root   = "/dev/xvda1 ro"
+#extra = "4 console=hvc0 xencons=tty"
+#dhcp="dhcp"
+
+E_O_XEN
+
+# demontage du se3 virtuel
+umount /mnt/xenedutmp/migrese3/var/se3
+umount  /mnt/xenedutmp/migrese3/var
+umount  /mnt/xenedutmp/migrese3/home
+umount  /mnt/xenedutmp/migrese3
+
+# Ajout du SE3 au boot du dom0
+cd /etc/xen/auto
+ln -snf ../xenedu-se3.cfg 02-xenedu-se3.cfg
+
+# Arret du se3 physque et demarrage du se3 virtuel
+echo "Faut-il arreter le se3 physique et demarrer le virtuel maintenant : (o/N)"
+read reponse
+
+if [ -z $reponse ]; then
+	reponse=n
+fi
+        
+if [ $reponse = "o" ]; then
+        echo "arret du SE3"
+        ssh root@$serveurip "halt"
+        echo "attente de 10 secondes avant demarrage SE3"
+        sleep 10
+        xm create xenedu-se3.cfg
+else
+       echo "vous pouvez eteindre le SE3 physique"
+       echo "tapez "
+       echo "     xm create xenedu-se3.cfg "
+       echo "pour demarrer le SE3 virtuel"
+fi
+
+echo "Migration du SE3 complete lancez un restore_droits.sh "
+echo "Sur le nouveau SE3 pour l utiliser"

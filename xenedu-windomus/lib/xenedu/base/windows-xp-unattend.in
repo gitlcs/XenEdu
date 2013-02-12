@@ -1,0 +1,111 @@
+;SetupMgrTag
+
+[Data]
+    AutoPartition=1
+    MsDosInitiated="0"
+    UnattendedInstall="Yes"
+
+[Unattended]
+    UnattendMode=FullUnattended
+    OemSkipEula=Yes
+    OemPreinstall=Yes
+    TargetPath=\WINDOWS
+    WaitForReboot="No"
+    AutoActivate="No"
+    Hibernation="No"
+
+[GuiUnattended]
+    AdminPassword="@@ADMINPASS@@"
+    EncryptedAdminPassword=NO
+    AutoLogon=Yes
+    AutoLogonCount=4
+    OEMSkipRegional=1
+    TimeZone=105
+    OemSkipWelcome=1
+
+[UserData]
+    ProductKey=@@SERIALWIN@@
+    FullName="@@WINFULLNAM@@"
+    OrgName="@@ORGNAME@@"
+    ComputerName=@@COMPUNAME@@
+
+[Display]
+    BitsPerPel=24
+    Xresolution=1024
+    YResolution=768
+
+[Shell]
+    DefaultStartPanelOff="Yes"
+    DefaultThemesOff="Yes"
+
+[Components]
+    Games="off"
+    msmsgs="off"
+    Pinball="off"
+    deskpaper="Off"
+    mousepoint="Off"
+    hypertrm="off"
+    Fax="off"
+    msnexplr="off"
+    zonegames="off"
+    templates="off"
+    chat="off"
+    deskpaper="off"
+    freecell="off"
+    hearts="off"
+    minesweeper="off"
+    pinball="off"
+    solitaire="off"
+    spider="off"
+    media_clips="off"
+    media_utopia="off"
+
+[TapiLocation]
+    CountryCode=33
+
+[RegionalSettings]
+    LanguageGroup=1
+    SystemLocale=0000040c
+    UserLocale=0000040c
+    InputLocale=040c:0000040c
+
+[Identification]
+    JoinWorkgroup=Serveurs
+
+[Networking]
+    InstallDefaultComponents=No
+
+[NetAdapters]
+    Adapter1=params.Adapter1
+
+
+[params.Adapter1]
+    INFID=*
+
+[NetClients]
+    MS_MSClient=params.MS_MSClient
+
+[NetServices]
+    MS_SERVER=params.MS_SERVER
+    MS_PSched=params.MS_PSched
+
+[NetProtocols]
+    MS_TCPIP=params.MS_TCPIP
+
+
+[params.MS_TCPIP]
+    DNS=No
+    UseDomainNameDevolution=No
+    EnableLMHosts=Yes
+    AdapterSections=params.MS_TCPIP.Adapter1
+
+[params.MS_TCPIP.Adapter1]
+    SpecificTo=Adapter1
+    DHCP=No
+    IPAddress=@@WINIP@@
+    SubnetMask=@@WINMASQUE@@
+    DefaultGateway=@@WINGATEWAY@@
+    DNSServerSearchOrder=@@WINDNS@@
+    WINS=No
+    NetBIOSOptions=0
+

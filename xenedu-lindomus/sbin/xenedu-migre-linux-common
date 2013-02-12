@@ -1,0 +1,50 @@
+#!/bin/bash
+ 
+### copie des cle ssh
+function installkey { 
+ echo "********* Attention *********"
+ echo "le mot de passe qui sera demande est celui du Serveur physique $serveurip"
+ echo "********* Attention *********"
+
+## Tentative de copie de la cle pub sur le serveur a migrer : 
+
+cat /root/.ssh/id_rsa.pub | ssh -o StrictHostKeyChecking=no -q root@$serveurip "cat - >>/root/.ssh/authorized_keys2"
+    if [ $? != 0 ]; then
+	echo "Erreur pas de repertoire /root/.ssh sur le serveur physique"
+	echo "le mot de passe va vous etre demande deux fois. "
+	ssh -o StrictHostKeyChecking=no -q root@$serveurip "mkdir -p /root/.ssh"
+	cat /root/.ssh/id_rsa.pub | ssh -o StrictHostKeyChecking=no -q root@$serveurip "cat - >>/root/.ssh/authorized_keys2"
+    fi
+  
+    if [ $?=0 ]; then
+	echo "communication avec lcs resource OK"
+    else
+	echo "Erreur pas d'acces au lcs resource"
+	exit 1
+    fi
+}
+function installkeyrev {
+    if [ `ssh -o StrictHostKeyChecking=no root@$serveurip "ls /root/.ssh/id_rsa.pub"` = 1 ]; then
+	echo "installation communication reverse cas 1"
+	echo "Generation des cles distantes"
+	ssh -o StrictHostKeyChecking=no root@$serveurip "ssh-keygen -t rsa -f /root/.ssh/id_rsa -P '' -q"
+	cp /root/.ssh/authorized_keys2 /root/.ssh/authorized_keys2.migr
+	scp -q root@$serveurip:/root/.ssh/id_rsa.pub /root/.ssh/cletmp
+	cat /root/.ssh/cletmp >> /root/.ssh/authorized_keys2.migr
+    else
+	echo "installation communication reverse cas 0"
+	cp /root/.ssh/authorized_keys2 /root/.ssh/authorized_keys2.migr
+	scp -q root@$serveurip:/root/.ssh/id_rsa.pub /root/.ssh/cletmp
+	cat /root/.ssh/cletmp >> /root/.ssh/authorized_keys2.migr
+    fi
+}
+
+function check-espace-disque {
+	if [ $1 = "lcs" ]; then
+	echo "verification de l'epace disque pour lcs"
+	fi
+	if [ $1 = "se3" ]; then
+	echo "verification de l'epace disque pour se3"
+	fi
+	
+}
