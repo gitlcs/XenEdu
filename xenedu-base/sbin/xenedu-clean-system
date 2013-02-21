@@ -1,0 +1,12 @@
+#!/bin/bash
+#
+# Script de nettoyage régulier de XenEdu
+#
+rm -f /var/spool/cron/atjobs/*
+rm -f /var/log/syslog*
+rm -f /var/log/messages*
+rm -f /var/log/dmesg*
+/etc/init.d/rsyslog restart
+/etc/init.d/rsyslog restart
+/etc/init.d/atd restart
+/etc/init.d/cron restart

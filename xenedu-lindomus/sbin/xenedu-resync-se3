@@ -1,0 +1,70 @@
+#!/bin/bash
+#
+# Simon Cavey 27/01/2012
+# script de resynchro lors de migration SE3.
+#
+
+source /etc/xenedu/xenedu.conf
+mkdir -p /mnt/xenedutmp
+mount $XENEDUDISK/xenedu-se3-root /mnt/xenedutmp
+mount $XENEDUDISK/xenedu-se3-var /mnt/xenedutmp/var
+mount $XENEDUDISK/xenedu-se3-varse3 /mnt/xenedutmp/var/se3
+mount $XENEDUDISK/xenedu-se3-home /mnt/xenedutmp/home
+
+
+SE3IP=`cat /mnt/xenedutmp/etc/network/interfaces | grep address | awk {'print $2'}`
+echo "L'ip du SE3 est $SE3IP"
+
+echo "Faut-il mettre synchroniser maintenant ? (o/N) "
+read STARTUPGRADE
+
+if [ $STARTUPGRADE != "o" ]; then
+	sync
+	umount /mnt/xenedutmp/var/se3
+	umount /mnt/xenedutmp/var
+	umount /mnt/xenedutmp/home
+	umount /mnt/xenedutmp
+      exit 1
+else
+      echo "debut de la synchro" 
+fi
+
+
+echo "Syncho SE3 en cours"
+rsync -aq --delete --exclude "proc" --exclude "lib/modules" --exclude "etc" --exclude "sys" -e ssh $SE3IP:/ /mnt/xenedutmp
+#cp -a /mnt/xenedutmp/etc/rc2.d/S12iptables /mnt/xenedutmp/etc/rc4.d/
+
+sync
+umount /mnt/xenedutmp/var/se3
+umount /mnt/xenedutmp/var
+umount /mnt/xenedutmp/home
+umount /mnt/xenedutmp
+
+# Echo "synchro terminee"
+
+###
+# Correction du bug XenEdu 8.0.4
+#
+#sed -i'' 's/initrd/ramdisk/g' /etc/xen/xenedu-lcs.cfg
+
+# Arret du LCS physque et demarrage du lcs virtuel
+echo "Faut-il arreter le SE3 physique et demarrer le virtuel maintenant : (o/N)"
+read reponse
+
+if [ -z $reponse ]; then
+	reponse=n
+fi
+
+
+if [ $reponse = "o" ]; then
+	echo "arret du SE3"
+	ssh root@$SE3IP halt"
+	echo "attente de 10 secondes avant demarrage SE3"
+	sleep 10
+	xm create xenedu-se3.cfg
+else
+	echo "vous pouvez eteindre le SE3 physique"
+	echo "tapez "
+	echo "     xm create xenedu-se3.cfg "
+	echo "pour demarrer le SE3 virtuel"
+fi

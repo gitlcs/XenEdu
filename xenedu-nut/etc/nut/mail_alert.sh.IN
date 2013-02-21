@@ -1,0 +1,4 @@
+#!/bin/bash 
+# NUT mail Alerte 
+ 
+echo "$*" | mail -s "UPS alert"	admin@--DOMAINE--

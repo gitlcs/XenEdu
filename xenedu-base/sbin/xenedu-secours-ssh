@@ -1,0 +1,32 @@
+#!/bin/bash
+#
+# Creation d'un tunnel SSH de Secours
+#
+
+#
+# On Check les cle ssh de l'equipe TICE
+#
+/sbin/xenedu-get-TiceKey
+clear
+
+#
+# Geneation d'un numero de port entre 10000 et 32000
+#
+PORTMIN=10000
+PORTMAX=32000
+nombre=0   #initialise
+while [ "$nombre" -le $PORTMIN ]
+do
+  nombre=$RANDOM
+ let "nombre %= $PORTMAX"  # Ramene $nombre dans $ECHELLE.
+done
+echo "Numero du port pour l assistance ---  $nombre"
+echo
+
+#
+# Ouverture du tunnel SSH inverse
+#
+
+su -c "/usr/bin/ssh -f -N -o 'StrictHostKeyChecking=no' -p22 -R $nombre:127.0.0.1:22 rssh@rgateway.crdp.ac-caen.fr" rssh
+
+echo  "/sbin/xenedu-stop-secourssh" | at now+1 day

@@ -1,0 +1,98 @@
+#!/bin/sh
+#
+#  Configure the new image to be a minimal image, by removing
+# packages I don't care about - and installing new ones I prefer.
+#
+#
+# Simon Cavey
+# 24/11/2011
+
+prefix=$1
+
+
+
+#
+#  Source our common functions - this will let us install a Debian package.
+#
+if [ -e /usr/lib/xen-tools/common.sh ]; then
+    . /usr/lib/xen-tools/common.sh
+else
+    echo "Installation problem"
+fi
+
+
+
+
+#
+#  Install some new packages - do this first to avoid dependency errors.
+#
+#installDebianPackage ${prefix} syslog-ng 
+installDebianPackage ${prefix} deborphan
+installDebianPackage ${prefix} less
+installDebianPackage ${prefix} screen
+installDebianPackage ${prefix} sudo
+installDebianPackage ${prefix} vim
+installDebianPackage ${prefix} udev
+installDebianPackage ${prefix} openssh-server
+installDebianPackage ${prefix} postfix
+installDebianPackage ${prefix} mailx
+installDebianPackage ${prefix} ntp
+installDebianPackage ${prefix} bzip2
+installDebianPackage ${prefix} yafc
+installDebianPackage ${prefix} tree
+
+#
+#  Remove some standard packages.
+#
+
+# PPP stuff.
+removeDebianPackage ${prefix} pppconfig
+removeDebianPackage ${prefix} pppoeconf
+removeDebianPackage ${prefix} pppoe
+removeDebianPackage ${prefix} ppp
+removeDebianPackage ${prefix} libpcap0.7
+
+# Editors
+#removeDebianPackage ${prefix} nano
+removeDebianPackage ${prefix} ed
+removeDebianPackage ${prefix} nvi
+
+# Syslog
+#removeDebianPackage ${prefix} klogd
+#removeDebianPackage ${prefix} sysklogd
+
+# manpages
+removeDebianPackage ${prefix} manpages  
+removeDebianPackage ${prefix} man-db 
+removeDebianPackage ${prefix} info
+
+# misc
+removeDebianPackage ${prefix} tasksel tasksel-data
+removeDebianPackage ${prefix} pciutils
+removeDebianPackage ${prefix} fdutils
+removeDebianPackage ${prefix} cpio
+#
+# Upgrade packages
+#
+chroot ${prefix} /usr/bin/apt-get update
+chroot ${prefix} /usr/bin/apt-get update
+chroot ${prefix} /usr/bin/apt-get upgrade -y
+chroot ${prefix} /usr/bin/apt-get clean
+
+#
+# Copie des modules :
+#
+cp -a /lib/modules/`uname -r` ${prefix}/lib/modules
+chroot ${prefix}  /sbin/depmod -a
+
+#
+# install ssh
+#
+DEBIAN_FRONTEND=noninteractive chroot ${prefix} /usr/bin/apt-get --yes --force-yes install ssh`;
+chroot ${prefix} /etc/init.d/ssh stop
+
+#
+# Pre-install SE3
+#
+chroot ${prefix} /usr/bin/apt-get update
+DEBIAN_FRONTEND=noninteractive chroot ${prefix} /usr/bin/apt-get --yes --force-yes --download-only install se3 se3-domain

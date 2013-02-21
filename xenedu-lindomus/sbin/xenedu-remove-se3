@@ -1,0 +1,31 @@
+#!/bin/bash
+# supression d'une VM se3
+# XenEdu - Simon Cavey - 17/06/2010
+
+source /etc/xenedu/xenedu.conf
+xenedu-freespace
+
+echo "etes vous certain de vouloir effacer definitivement le SE3"
+echo "(o/N)"
+read SE3REMOVE
+
+case $SE3REMOVE in
+	o) echo "DESTRUCTION DU SE3"
+		destructionse3()	;;
+	y) echo "DESTRUCTION DU SE3"
+		destructionse3() ;;
+	O) echo "DESTRUCTION DU SE3"
+		destructionse3();;
+	Y) echo "DESTRUCTION DU SE3"
+		destructionse3();;
+	*) exit;;
+esac 
+
+function destructionse3{
+	xm destroy se3pdc
+	lvremove -d $XENEDUDISK/xenedu-se3pdc-*
+	rm -f /etc/xen/xenedu-se3pdc.cfg
+	rm -f /etc/xen/auto/*xenedu-se3pdc.cfg
+	xenedu-freespace	
+}
+
