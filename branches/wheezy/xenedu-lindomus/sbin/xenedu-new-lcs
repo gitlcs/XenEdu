@@ -1,0 +1,75 @@
+#!/bin/bash
+#
+# Script d'installation auto lcs
+# Simon Cavey
+
+
+source /etc/xenedu/xenedu.conf
+
+xenedu-freespace
+echo "indiquez l'espace pour /home les donnees utilisateurs"
+echo "entrez simplement le nombre de Go souhaite"
+read LCSHOMESIZE
+#lvcreate -L"$LCSHOMESIZE"G -n xenedu-lcs-home $XENEDUDISK
+#echo "indiquez l'espace pour /usr/share/lcs les application LCS"
+#echo "entrez simplement le nombre de Go souhaite"
+#read LCSSHARELCS
+#lvcreate -L"$LCSSHARELCS"G -n xenedu-lcs-usrsharelcs $XENEDUDISK
+
+xenedu-freespace
+echo "indiquez l'espace pour /var/spool/squid le cache Web"
+echo "entrez simplement le nombre de Go souhaite "
+read LCSVARSQUID
+#lvcreate -L"$LCSVARSQUIDSIZE"G -n xenedu-lcs-squid $XENEDUDISK
+
+sed -e "s|@@HOMESIZE@@|$LCSHOMESIZE|g" \
+-e "s|@@CACHESIZE@@|"$LCSVARSQUID"|g" \
+/etc/xen-tools/partitions.d/lcs-custom.in > /etc/xen-tools/partitions.d/lcs-custom
+
+
+
+echo "indiquez votre n° de preseed"
+read PRESEEDNUM
+
+#echo "indiquer le nom de domaine pour lcs"
+#read LCSDOMAINE
+#echo "indiquez l'ip pour le LCS :"
+#read LCSIP
+#echo "indiquez le masque de sous réseau"
+#read LCSMASK
+#echo "indiquez la passerelle"
+#read LCSGW
+
+#echo "indiquer en Mo la memoire a allouer au LCS :"
+#read LCSMEMORY
+
+echo "indiquer le nombre de CPU a allouer"
+read VCPUNUM
+
+
+
+mkdir -p /etc/xen-tools/skel/lcs/root
+mkdir -p /etc/xen-tools/skel/lcs/etc/lcs
+
+wget "http://lcs.crdp.ac-caen.fr/diconf/$PRESEEDNUM/lcs.preseed"  -O /etc/xen-tools/skel/lcs/root/lcs.preseed
+wget "http://lcs.crdp.ac-caen.fr/diconf/$PRESEEDNUM/lcs.conf" -O /etc/xen-tools/skel/lcs/etc/lcs/lcs.conf
+sed -i'' '/^d-i /d' /etc/xen-tools/skel/lcs/root/lcs.preseed
+MOTDEPASSEALEATOIR=`pwgen 10 1`
+sed -i'' "s/AUTO/string $MOTDEPASSEALEATOIR/g"  /etc/xen-tools/skel/lcs/root/lcs.preseed
+sed -i'' "s/AUTO/$MOTDEPASSEALEATOIR/g"  /etc/xen-tools/skel/lcs/etc/lcs/lcs.conf
+MYSQLPASS=`pwgen 10 1`
+sed -i'' "s/MYSQLPW=$MOTDEPASSEALEATOIR/MYSQLPW=$MYSQLPASS/g"  /etc/xen-tools/skel/lcs/etc/lcs/lcs.conf
+echo "mysql-server mysql-server/root_password select $MYSQLPASS" >> /etc/xen-tools/skel/lcs/root/lcs.preseed
+echo "mysql-server mysql-server/root_password_again select $MYSQLPASS" >> /etc/xen-tools/skel/lcs/root/lcs.pres$
+echo "[client]" > /etc/xen-tools/skel/lcs/root/.my.cnf-not-set
+echo "                password=$MYSQLPASS" >> /etc/xen-tools/skel/lcs/root/.my.cnf-not-set
+echo "                user=root" >> /etc/xen-tools/skel/lcs/root/.my.cnf-not-set
+
+source /etc/xen-tools/skel/lcs/etc/lcs/lcs.conf
+
+xen-create-image --config=/etc/xen-tools/xenedu-lcs.conf  --hostname=lcs.$DOMAIN --role=lcs --partitions=lcs-custom --force --ip=$IPADDR0 --gateway=$GATEWAY  --netmask=$NETMASK0 --vcpus=$VCPUNUM
+
+mv /etc/xen/lcs.$DOMAIN.cfg  /etc/xen/xenedu-lcs.cfg
+ln -snf /etc/xen/xenedu-lcs.cfg /etc/xen/auto/01-xenedu-lcs.cfg
+echo "pour lancer le LCS taper la commande : "
+echo "xm create -c xenedu-lcs.cfg"

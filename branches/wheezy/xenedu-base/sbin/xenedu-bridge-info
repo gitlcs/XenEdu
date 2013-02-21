@@ -1,0 +1,12 @@
+#!/bin/bash
+#
+# Information sur les bridges
+# Simon Cavey - 31/01/2011
+#
+
+for i in `xm list  |grep -v "Name" |grep -v 0| awk '{print $2}'`
+do
+	BRIDGE=`xm list -l $i | grep "(bridge" |awk {'print $2'}|cut -f 1 -d ")"`
+	NAME=`xm list -l 1 | grep "(name" |awk {'print $2'}|cut -f 1 -d ")"`
+	echo "la machine virtuelle $NAME est raccordee sur la carte $BRIDGE"
+done

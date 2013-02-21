@@ -1,0 +1,7 @@
+xenedu-netbsdomus (0.6-1) unstable; urgency=low
+
+  * Initial release 
+  * NetBSD 5.1 support for XenEdu
+
+ -- Simon Cavey <simon.cavey@crdp.ac-caen.fr>  Wed, 30 Mar 2011 17:56:40 +0200
+
