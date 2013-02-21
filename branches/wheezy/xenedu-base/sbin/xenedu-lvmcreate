@@ -1,0 +1,5 @@
+#!/bin/bash
+source /etc/xenedu/xenedu.conf
+
+lvcreate -L $NEWLVMSIZE -n $NEWLVMNAME $XENEDUDISK
+

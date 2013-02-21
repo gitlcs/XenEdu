@@ -1,0 +1,24 @@
+#!/bin/bash
+#
+# Preparation de la config Windows 7
+# XenEdu - Simon Cavey - simon.cavey@crdp.ac-caen.fr
+# 12/01/2011 - update 08/02/2011 
+
+source /etc/xenedu/xenedu.conf
+# Generation de l'adresse Mac
+XENMAC=$(xenedu-mac-generator)
+
+cp /var/lib/xenedu/base/windows-7-xen-modoel /etc/xen/win7.cfg
+sed -i'' "s/@@XENMAC@@/$XENMAC/g" /etc/xen/win7.cfg
+
+echo "Indiquez le nombre de CPU a allouer a Windows : "
+read XENCPUS
+echo "vcpus = $XENCPUS" >>  /etc/xen/win7.cfg
+
+ln -snf /etc/xen/win7.cfg /etc/xen/auto/03-win7.cfg
+clear
+echo "demarrage de la VM Windows 7"
+xm create /etc/xen/win7.cfg
+
+UUID=`xm list -l windows7 | grep uui | head -n 1 | awk {'print $2'} |cut -f 1 -d ")"`
+echo "uuid = \"$UUID\"" >> /etc/xen/win7.cfg

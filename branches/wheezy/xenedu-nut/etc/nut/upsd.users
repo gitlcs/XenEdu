@@ -1,0 +1,4 @@
+[admin]
+password = XenEduPWD
+allowfrom = localhost
+upsmon master

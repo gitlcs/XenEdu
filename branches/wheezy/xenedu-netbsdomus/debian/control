@@ -1,0 +1,15 @@
+Source: xenedu-netbsdomus
+Section: misc
+Priority: extra
+Maintainer: Simon Cavey <simon.cavey@crdp.ac-caen.fr>
+Build-Depends: debhelper (>= 7)
+Standards-Version: 3.7.3
+Homepage: http://xenedu.crdp.ac-caen.fr/
+
+Package: xenedu-netbsdomus
+Architecture: all
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: NetBSD Domu support for XenEdu
+ This package provide NetBSD kernel for install
+ as xen domu. Sample config and scripts are here for
+ help you in install.

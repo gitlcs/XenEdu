@@ -1,0 +1,108 @@
+xenedu-lindomus (0.8.0.16) stable; urgency=low
+
+  * set lenny to archive
+
+ -- Simon Cavey <simon.cavey@crdp.ac-caen.fr>  Thu, 14 Jun 2012 15:26:20 +0200
+
+xenedu-lindomus (0.8.0.13) stable; urgency=low
+
+  * change lcs memory to 1024
+
+ -- Simon Cavey <simon.cavey@crdp.ac-caen.fr>  Wed, 15 Feb 2012 13:52:29 +0100
+
+xenedu-lindomus (0.8.0.12) stable; urgency=low
+
+  * new version for xenedu-new-lcs
+
+ -- Simon Cavey <simon.cavey@crdp.ac-caen.fr>  Wed, 15 Feb 2012 09:26:02 +0100
+
+xenedu-lindomus (0.8.0.11) stable; urgency=low
+
+  * add mirgation resync tools
+
+ -- Simon Cavey <simon.cavey@crdp.ac-caen.fr>  Fri, 27 Jan 2012 16:42:47 +0100
+
+xenedu-lindomus (0.8.0.7) stable; urgency=low
+
+  * fix lcs squeeze migration
+
+ -- Simon Cavey <simon.cavey@crdp.ac-caen.fr>  Fri, 27 Jan 2012 15:48:58 +0100
+
+xenedu-lindomus (0.8.0.6) stable; urgency=low
+
+  * migre-lcs : minors fix
+
+ -- Simon Cavey <simon.cavey@crdp.ac-caen.fr>  Thu, 26 Jan 2012 15:01:59 +0100
+
+xenedu-lindomus (0.8.0.5) stable; urgency=low
+
+  * upgrade migration scripts
+
+ -- Simon Cavey <simon.cavey@crdp.ac-caen.fr>  Fri, 13 Jan 2012 11:49:32 +0100
+
+xenedu-lindomus (0.8.0.3) stable; urgency=low
+
+  * lcs se3 migrations fix
+
+ -- Simon Cavey <simon.cavey@crdp.ac-caen.fr>  Thu, 05 Jan 2012 11:41:11 +0100
+
+xenedu-lindomus (0.8.0.2~1) stable; urgency=low
+
+  * update scripts
+
+ -- Simon Cavey <simon.cavey@crdp.ac-caen.fr>  Tue, 29 Nov 2011 15:20:07 +0100
+
+xenedu-lindomus (0.8.0.1~1) stable; urgency=low
+
+  * minor bug fix
+  * start using xen-tools
+
+ -- Simon Cavey <simon.cavey@crdp.ac-caen.fr>  Fri, 18 Nov 2011 14:48:03 +0100
+
+xenedu-lindomus (0.8.0.0~1) stable; urgency=low
+
+  * update-migration script for squeeze
+
+ -- Simon Cavey <simon.cavey@crdp.ac-caen.fr>  Fri, 21 Oct 2011 16:49:15 +0200
+
+xenedu-lindomus (0.5.9.20) stable; urgency=low
+
+  * Add xenedu-new-squeeze : Basic debian squeeze VM
+
+ -- Simon Cavey <simon.cavey@crdp.ac-caen.fr>  Wed, 02 Mar 2011 11:22:42 +0100
+
+xenedu-lindomus (0.5.9.19) stable; urgency=low
+
+  * minor fix
+  * fix se3 lenny install
+  * fix migre lcs umount
+  * support for VCPUS
+  * fix locales
+
+ -- Simon Cavey <simon.cavey@crdp.ac-caen.fr>  Tue, 07 Dec 2010 14:06:41 +0100
+
+xenedu-lindomus (0.5.9.8) stable; urgency=low
+
+  * correct mirgation scripts
+  * add hostname question for SE3
+  * add ip calcul
+
+ -- Simon Cavey <simon.cavey@crdp.ac-caen.fr>  Tue, 09 Nov 2010 15:19:39 +0100
+
+xenedu-lindomus (0.5) unstable; urgency=low
+
+  * linux add model
+
+ -- Simon Cavey <simon.cavey@crdp.ac-caen.Fr>  Thu, 16 Sep 2010 08:09:40 +0200
+
+xenedu-lindomus (0.4~5) unstable; urgency=low
+
+  * update etch to archive
+
+ -- Simon Cavey <simc@UltraMeuh.simc.be>  Wed, 30 Jun 2010 11:46:42 +0200
+
+xenedu-lindomus (0.4~1) unstable; urgency=low
+
+  * Initial release 
+
+ -- Simon Cavey <simon.cavey@crdp.ac-caen.Fr>  Mon, 29 Mar 2010 22:42:13 +0200

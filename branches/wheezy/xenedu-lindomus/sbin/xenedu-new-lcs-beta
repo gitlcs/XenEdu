@@ -1,0 +1,152 @@
+#!/bin/bash
+# creation d'une VM LCS
+# XenEdu - Simon Cavey - 18/11/2010
+# Mise a jour 12/01/2011
+
+source /etc/xenedu/xenedu.conf
+
+clear
+echo "Pour installer un LCS vous devez vous munir du numero de preseed"
+echo "Rendez-vous sur la page http://lcs.crdp.ac-caen.fr"
+echo "et préparez une installation automatique"
+echo ""
+
+xenedu-freespace
+echo "indiquez l'espace pour /home les donnees utilisateurs"
+echo "entrez simplement le nombre de Go souhaite"
+read LCSHOMESIZE
+lvcreate -L"$LCSHOMESIZE"G -n xenedu-lcs-home $XENEDUDISK
+xenedu-freespace
+
+#echo "indiquez l'espace pour /usr/share/lcs les application LCS"
+#echo "entrez simplement le nombre de Go souhaite"
+#read LCSSHARELCS
+#lvcreate -L"$LCSSHARELCS"G -n xenedu-lcs-usrsharelcs $XENEDUDISK
+
+
+echo "indiquez l'espace pour /var/spool/squid le cache Web"
+echo "entrez simplement le nombre de Go souhaite"
+read LCSVARSQUID
+lvcreate -L"$LCSVARSQUIDSIZE"G -n xenedu-lcs-squid $XENEDUDISK
+
+#echo "Souaitez vous une partition dédiée pour les log"
+#echo "(O/n)"
+#read WANTLOG
+
+#if [ $WANTLOG = O ]; then
+#	echo "indiquez l'espace pour /var/log les log"
+#	echo "entrez simplement le nombre de Go souhaite"
+#	read LOGSIZE	
+#	lvcreate -L"$LOGSIZE"G -n xenedu-lcs-log $XENEDUDISK
+#fi
+
+echo "Souaitez vous une partition dédiée pour les rapport squid"
+echo "(O/n)"
+read WANTREPORTS
+
+if [ $WANTREPORTS = O ]; then
+	echo "indiquez l'espace pour /var/www/squid-reports les informations de la consultation web"
+	echo "entrez simplement le nombre de Go souhaite"
+	read REPORTSIZE	
+	lvcreate -L"$REPORTSIZE"G -n xenedu-lcs-squidreports $XENEDUDISK
+fi
+
+lvcreate -L3500M -n xenedu-lcs-root $XENEDUDISK
+lvcreate -L5G -n xenedu-lcs-var $XENEDUDISK
+lvcreate -L512M -n xenedu-lcs-swp $XENEDUDISK
+lvcreate -L10G -n xenedu-lcs-usrsharelcs $XENEDUDISK
+lvcreate -L10G -n xenedu-lcs-squid $XENEDUDISK
+lvcreate -L10G -n xenedu-lcs-varlog $XENEDUDISK
+lvcreate -L512M -n xenedu-lcs-swp
+mkswap "$XENEDUDISK"/xenedu-lcs-swp
+mkfs.ext3 -q "$XENEDUDISK"/xenedu-lcs-home
+mkfs.ext3 -q "$XENEDUDISK"/xenedu-lcs-root
+mkfs.ext3 -q "$XENEDUDISK"/xenedu-lcs-var
+mkfs.ext3 -q "$XENEDUDISK"/xenedu-lcs-varlog
+mkfs.ext3 -q "$XENEDUDISK"/xenedu-lcs-squid
+mkfs.ext3 -q "$XENEDUDISK"/xenedu-lcs-usrsharelcs
+
+# Generation de l'adresse Mac
+XENMAC=`xenedu-mac-generator`
+
+mkdir -p /mnt/xenedu/newlcs
+mount "$XENEDUDISK"/xenedu-lcs-root  /mnt/xenedu/newlcs
+mkdir -p /mnt/xenedu/newlcs/var
+mount "$XENEDUDISK"/xenedu-lcs-var  /mnt/xenedu/newlcs/var
+mkdir -p /mnt/xenedu/var/log
+mount "$XENEDUDISK"/xenedu-lcs-log  /mnt/xenedu/newlcs/var/log
+mkdir -p /mnt/xenedu/newlcs/home
+mount "$XENEDUDISK"/xenedu-lcs-home  /mnt/xenedu/newlcs/home
+mkdir -p /mnt/xenedu/usr/share/lcs
+mount "$XENEDUDISK"/xenedu-lcs-usrsharelcs  /mnt/xenedu/usr/share/lcs
+if [ $WANTREPORTS = O ]; then
+	mkdir -p /mnt/xenedu/newlcs/var/www/squid-reports
+	mount "$XENEDUDISK"/xenedu-lcs-squidreports  /mnt/xenedu/newlcs/var/www/squid-report
+fi
+
+clear
+echo installation de Debian Lenny.
+	debootstrap lenny /mnt/xenedu/newlcs/ http://ftp.fr.debian.org/debian
+
+echo "Ecriture du Fstab
+
+cat > /mnt/xenedu/newlcs/etc/fstab <<EOF 
+/dev/sda1       /               ext3    defaults,errors=remount-ro 0       1
+/dev/sda2       none            swap    sw              0       0
+/dev/sda10      /home           ext3    defaults        0       2
+/dev/sda6       /usr/share/lcs  ext3    defaults        0       2
+/dev/sda7       /var            ext3    defaults        0       2
+/dev/sda8       /var/log        ext3    defaults        0       2
+/dev/sda9       /var/spool/squid ext3    defaults        0       2
+/dev/sda11      /var/www          ext3    defaults        0       2
+proc          /proc    proc     defaults              0     0
+
+EOF
+
+echo "Ecriture fichier de config Xen"
+cat > /etc/xen/xenedu-lcs.cfg  <<EOF
+kernel = "/boot/vmlinuz-2.6.26-2-xen-amd64"
+ramdisk = "/boot/initrd.img-2.6.26-2-xen-amd64"
+memory = 1024
+name   = "xenedu-lcs"
+vif = [ 'bridge=eth0,mac=$XENMAC' ]
+disk   = [ 'phy:/dev/vol0/xenedu-lcs-root,sda1,w',
+'phy:$XENEDUDISK/xenedu-lcs-swp,sda2,w',
+'phy:$XENEDUDISK/xenedu-lcs-home,sda10,w',
+'phy:$XENEDUDISK/xenedu-lcs-usrsharelcs,sda6,w',
+'phy:$XENEDUDISK/xenedu-lcs-var,sda7,w',
+'phy:$XENEDUDISK/xenedu-lcs-varlog,sda8,w',
+'phy:$XENEDUDISK/xenedu-lcs-varspoolsquid,sda9,w',
+'phy:$XENEDUDISK/xenedu-lcs-www,sda11,w' ]
+root   = "/dev/sda1 ro"
+extra = "4 xencons=tty"
+#dhcp="dhcp"
+#vcpus = 4
+
+EOF
+
+echo "Ecriture fichier de config Source LCS"
+cat > /mnt/xenedu/newlcs/etc/apt/sources.list <<EOF
+
+deb     http://ftp.fr.debian.org/debian     lenny main contrib non-free
+deb-src http://ftp.fr.debian.org/debian     lenny main contrib non-free
+
+deb     http://ftp.fr.debian.org/debian-security lenny/updates  main contrib non-free
+deb-src http://ftp.fr.debian.org/debian-security lenny/updates  main contrib non-free
+deb http://lcs.crdp.ac-caen.fr/lenny Lcs main
+
+EOF
+
+echo "Indiquez le numero du preseed : "
+read PRESEEDNUM
+
+wget http://lcs.crdp.ac-caen.fr/diconf/$PRESEEDNUM/lcs.preseed -O /mnt/xenedu/newlcs/root/lcs.preseed
+mkdir -p /mnt/xenedu/newlcs/etc/lcs
+wget http://lcs.crdp.ac-caen.fr/diconf/$PRESEEDNUM/lcs.conf -O /mnt/xenedu/newlcs/etc/lcs/lcs.conf
+
+sed -i'' '/^d-i /d' /mnt/xenedu/newlcs/root/lcs.preseed
+
+MOTDEPASSEALEATOIR=`pwgen 10 1`
+sed -i'' "s/AUTO/string $MOTDEPASSEALEATOIR/g"  /mnt/xenedu/newlcs/root/lcs.preseed
+
+
