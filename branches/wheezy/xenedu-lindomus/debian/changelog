@@ -1,3 +1,9 @@
+xenedu-lindomus (0.9.0~1) unstable; urgency=low
+
+  * XenEdu adaptation for Debian Wheezy
+
+ -- Simon Cavey <simon.cavey@crdp.ac-caen.fr>  Thu, 21 Feb 2013 13:15:04 +0100
+
 xenedu-lindomus (0.8.0.16) stable; urgency=low
 
   * set lenny to archive

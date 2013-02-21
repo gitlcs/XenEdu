@@ -144,7 +144,7 @@ kernel = "/boot/vmlinuz-`uname -r`"
 ramdisk = "/boot/initrd.img-`uname -r`"
 memory = $LCSMEMORY
 name   = "xenedu-lcs"
-vif = [ 'bridge=eth0,mac=$XENMAC ' ]
+vif = [ 'bridge=xenbreth0,mac=$XENMAC ' ]
 disk   = [ 'phy:$XENEDUDISK/xenedu-lcs-root,xvda1,w',
 'phy:$XENEDUDISK/xenedu-lcs-swp,xvda2,w',
 'phy:$XENEDUDISK/xenedu-lcs-home,xvda10,w',

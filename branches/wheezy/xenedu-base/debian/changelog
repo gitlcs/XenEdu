@@ -1,3 +1,9 @@
+xenedu-base (0.9.0~1) unstable; urgency=low
+
+  * XenEdu adaptation for Debian Wheezy
+
+ -- Simon Cavey <simon.cavey@crdp.ac-caen.fr>  Thu, 21 Feb 2013 11:24:11 +0100
+
 xenedu-base (0.8.6) stable; urgency=low
 
   * change upgrade condition test

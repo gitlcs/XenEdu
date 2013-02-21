@@ -22,16 +22,95 @@ preversion=$2
 case "$1" in
     configure)
 	if [ "$2" = "" ] || [ "$2" = "$VER" ]; then
-		
 	# ecriture de /etc/xen/scripts/network-custom-bridge
 	echo "#!/bin/bash" > /etc/xen/scripts/network-custom-bridge
-	for i in `ifconfig -a |grep eth |grep -v peth | cut -f 1 -d " "`
-	do 
-	    echo "/etc/xen/scripts/network-bridge \"\$@\" netdev=$i" >> /etc/xen/scripts/network-custom-bridge
-	    echo "ifconfig $i up" >> /etc/xen/scripts/network-custom-bridge
-	    echo "$i" >> /etc/xenedu/network
-	done
+	#for i in `ifconfig -a |grep eth |grep -v peth | cut -f 1 -d " "`
+	#do 
+	#    echo "/etc/xen/scripts/network-bridge \"\$@\" netdev=$i" >> /etc/xen/scripts/network-custom-bridge
+	#    echo "ifconfig $i up" >> /etc/xen/scripts/network-custom-bridge
+	#    echo "$i" >> /etc/xenedu/network
+	#done
+	echo 'echo "Configuration du réseau Xen par /etc/network/interfaces"' >> /etc/xen/scripts/network-custom-bridge
 	chmod +x /etc/xen/scripts/network-custom-bridge
+	#
+	# ecriture du fichier network/interface compatible avec Xen 4.1
+	#
+	#
+	if [ ! -e /etc/xen/xend-config.sxp.noxenedu ] ; then 
+	  cp  /etc/network/interfaces /etc/network/interfaces.noxenedu
+	fi
+	# Config initial de net-interfaces
+	cat > /etc/network/interfaces <<EOF
+# The loopback network interface
+auto lo
+iface lo inet loopback	
+EOF
+
+	for i in `ifconfig -a |grep eth |grep -v peth | cut -f 1 -d " "`
+	do
+		IFIP=`ifconfig $i | grep "inet adr:" | cut -f 2 -d ":" | cut -f 1 -d " "`
+		if [ -z $IFIP ]; then 
+			echo "l'interface $i n a pas d'ip";
+			cat >> /etc/network/interfaces <<EOF
+# $i network interface
+auto $i
+iface $i inet manual
+# $i xen bridge
+iface xenbr$i inet manual
+	bridge_ports $i
+	bridge_maxwait 5
+	bridge_fd 0
+EOF
+		else  
+			echo "l'interface $i a l'ip $IFIP"";
+			IFMASK=`ifconfig $i | grep "inet adr:" | cut -f 4 -d ":"`
+			IFBCAST=`ifconfig $i | grep "inet adr:" | cut -f 3 -d ":" | cut -f 1 -d " "`
+			IFNET=`ipcalc -n  $IFIP $IFMASK | grep "Network" | awk '{print $2}'| cut -f 1 -d "/"` 
+			IFGATE=``
+			if [ -z $IFGATE ]; then 
+				echo "l interface n a pas de GW";
+				cat >> /etc/network/interfaces <<EOF
+auto xenbr$i
+        iface xenbr$i inet static
+        address $IFIP
+        netmask $IFMASK
+        network $IFNET
+        broadcast $IFBCAST
+        bridge_ports $i
+        bridge_maxwait 5
+        bridge_fd 0
+EOF
+
+			else
+			echo "l interface a une GW";
+				cat >> /etc/network/interfaces <<EOF
+auto xenbr$i
+	iface xenbr$i inet static
+		address $IFIP
+		netmask $IFMASK
+		network $IFNET
+		broadcast $IFBCAST
+		gateway $IFGATE
+		bridge_ports $i
+		bridge_maxwait 5
+		bridge_fd 0
+EOF
+
+			fi
+		fi
+	done
+
+	# ON ajoute une interface interne pour les VMs.
+	cat >> /etc/network/interfaces <<EOF
+# Xen Backend
+auto dummy0
+iface dummy0 inet manual
+auto xenbrdummy0
+        iface xenbrdummy0 inet manual
+                bridge_ports dummy0
+                 bridge_maxwait 5
+                 bridge_fd 0
+EOF
 
 	# ecriture du fichier de config xen
 	if [ ! -e /etc/xen/xend-config.sxp.noxenedu ] ; then 
@@ -105,64 +184,10 @@ fi
 
         else
         ### mise a jour de xenedu-base
-        if dpkg --compare-versions $preversion lt 0.4 ; then
+        if dpkg --compare-versions $preversion lt 0.9 ; then
         	echo "mise a jour"
-        	sed -i'.noxenedu' 's/XENDOMAINS_RESTORE=true/XENDOMAINS_RESTORE=false/g' /etc/default/xendomains
-		mkdir -p /etc/xen/auto
-        fi
-        if dpkg --compare-versions $preversion lt 0.6 ; then
-
-	if [ `grep -c rssh /etc/passwd` = 0 ]; then
-		echo "Ajout du compte RSSH"
-	        	useradd -K UID_MIN=100 -K UID_MAX=999 -K GID_MIN=100 -K GID_MAX=999 rssh
-        		chown -R rssh\:rssh /home/rssh
-        		chmod -R 700 /home/rssh/.ssh
-cat >> /etc/inittab <<EOP
-# Action on special keypress SSH inverse de secours XenEdu (ALT-UpArrow).
-kb::kbrequest:/sbin/xenedu-secours-ssh
-EOP
-#		init q
-		fi
-        fi
-	if dpkg --compare-versions $preversion lt 0.6.1 ; then
-		echo "mise a jour xendomains"
-		sed -i'.noxenedu2' 's@XENDOMAINS_SAVE=/var/lib/xen/save@XENDOMAINS_SAVE=@g' /etc/default/xendomains
-		/etc/init.d/xendomains restart
-	fi
-
-        if dpkg --compare-versions $preversion lt 0.6.3 ; then
-		echo "193.49.66.21	rgateway.crdp.ac-caen.fr" >> /etc/hosts
-	fi
-        if dpkg --compare-versions $preversion lt 0.8.0.4 ; then
-	                cat > /etc/xen/xend-config.sxp <<EOF
-# Xen config for XenEdu
-(xend-http-server yes)
-(xend-unix-server yes)
-(xend-tcp-xmlrpc-server yes)
-(xend-unix-xmlrpc-server yes)
-(xen-tcp-xmlrpc-server-address 'localhost')
-(xen-tcp-xmlrpc-server-port 8006)
-(xend-port            8000)
-(network-script 'network-custom-bridge')
-(vif-script vif-bridge)
-(dom0-min-mem 196)
-(dom0-cpus 0)
-#(enable-dom0-ballooning no)
-(vncpasswd '')
-(keymap 'fr')
-EOF
-
-		if [ -x /usr/sbin/invoke-rc.d ]; then
-	        	invoke-rc.d xend restart
-	        	else
-                	/etc/init.d/xend restart 
-		fi
-	fi
-        if dpkg --compare-versions $preversion lt 0.8.1 ; then
-		/sbin/update-sources
-        fi
-        if dpkg --compare-versions $preversion lt 0.8.2 ; then
-                        /sbin/xenedu-fix-domain
+        	echo "pour mettre à jour XenEdu depuis Squeeze"
+        	echo "lancez le script xenedu-upgrade-wheezy"
         fi
 
 #

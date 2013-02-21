@@ -1,24 +1,19 @@
-arch = os.uname()[4]
-if re.search('64', arch):
-    arch_libdir = 'lib64'
-else:
-    arch_libdir = 'lib'
-
 # Kernel image file.
-kernel = "/usr/lib/xen-default/boot/hvmloader"
+kernel = "hvmloader"
 
 # The domain build function. HVM domain uses 'hvm'.
 builder='hvm'
 
 memory = 2048
-name = "windows7"
+name = windows7
 device_model = '/usr/lib/xen-default/bin/qemu-dm'
 shadow_memory = 8
 
 nic=1
 #vif = [ '' ]
 vif = [ 'type=ioemu, bridge=eth1, mac=@@XENMAC@@' ]
-sdl=1
+# bridge sur xenbreth0 , xenbreth1,....
+#sdl=1
 
 vnc=1
 vnclisten="127.0.0.1"
