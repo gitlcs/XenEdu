@@ -115,7 +115,7 @@ kernel = "/boot/vmlinuz-`uname -r`"
 ramdisk = "/boot/initrd.img-`uname -r`"
 memory = $SE3MEMORY
 name   = "xenedu-se3"
-vif = [ 'bridge=eth0,mac=$XENMAC' ]
+vif = [ 'bridge=xenbreth0,mac=$XENMAC' ]
 disk   = [ 'phy:$XENEDUDISK/xenedu-se3-root,xvda1,w',
 'phy:$XENEDUDISK/xenedu-se3-swp,xvda2,w',
 'phy:$XENEDUDISK/xenedu-se3-home,xvda3,w',
