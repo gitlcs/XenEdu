@@ -62,11 +62,11 @@ iface xenbr$i inet manual
 	bridge_fd 0
 EOF
 		else  
-			echo "l'interface $i a l'ip $IFIP"";
+			echo "l'interface $i a l'ip $IFIP";
 			IFMASK=`ifconfig $i | grep "inet adr:" | cut -f 4 -d ":"`
 			IFBCAST=`ifconfig $i | grep "inet adr:" | cut -f 3 -d ":" | cut -f 1 -d " "`
 			IFNET=`ipcalc -n  $IFIP $IFMASK | grep "Network" | awk '{print $2}'| cut -f 1 -d "/"` 
-			IFGATE=``
+			IFGATE=`route -n | grep $i | grep "^0.0.0.0"| awk '{print $2}'`
 			if [ -z $IFGATE ]; then 
 				echo "l interface n a pas de GW";
 				cat >> /etc/network/interfaces <<EOF
@@ -165,9 +165,9 @@ echo "193.49.66.21      rgateway.crdp.ac-caen.fr" >> /etc/hosts
 
 
 if [ -x /usr/sbin/invoke-rc.d ]; then
-	invoke-rc.d xend restart
+	invoke-rc.d xen restart
 else
-	/etc/init.d/xend restart
+	/etc/init.d/xen restart
 fi
 
 if [ `grep -c rssh /etc/passwd` = 0 ]; then
