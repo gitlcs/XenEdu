@@ -1,0 +1,83 @@
+#!/bin/bash
+#
+# Reconfiguration des interfaces réseaux pour XenEdu.
+# Simon Cavey - 06/03/2013
+#
+	# ecriture du fichier network/interface compatible avec Xen 4.1
+	#
+	#
+	if [ ! -e /etc/xen/xend-config.sxp.noxenedu ] ; then
+	  cp  /etc/network/interfaces /etc/network/interfaces.noxenedu
+	fi
+	# Config initial de net-interfaces
+	cat > /etc/network/interfaces <<EOF
+# The loopback network interface
+auto lo
+iface lo inet loopback
+EOF
+
+	for i in `ifconfig -a |grep eth |grep -v peth | cut -f 1 -d " "`
+	do
+		IFIP=`ifconfig $i | grep "inet adr:" | cut -f 2 -d ":" | cut -f 1 -d " "`
+		if [ -z $IFIP ]; then
+			echo "l'interface $i n a pas d'ip";
+			cat >> /etc/network/interfaces <<EOF
+# $i network interface
+auto $i
+iface $i inet manual
+# $i xen bridge
+iface xenbr$i inet manual
+	bridge_ports $i
+	bridge_maxwait 5
+	bridge_fd 0
+EOF
+		else
+			echo "l'interface $i a l'ip $IFIP";
+			IFMASK=`ifconfig $i | grep "inet adr:" | cut -f 4 -d ":"`
+			IFBCAST=`ifconfig $i | grep "inet adr:" | cut -f 3 -d ":" | cut -f 1 -d " "`
+			IFNET=`ipcalc -n  $IFIP $IFMASK | grep "Network" | awk '{print $2}'| cut -f 1 -d "/"`
+			IFGATE=`route -n | grep $i | grep "^0.0.0.0"| awk '{print $2}'`
+			if [ -z $IFGATE ]; then
+				echo "l interface n a pas de GW";
+				cat >> /etc/network/interfaces <<EOF
+auto xenbr$i
+        iface xenbr$i inet static
+        address $IFIP
+        netmask $IFMASK
+        network $IFNET
+        broadcast $IFBCAST
+        bridge_ports $i
+        bridge_maxwait 5
+        bridge_fd 0
+EOF
+
+			else
+			echo "l interface a une GW";
+				cat >> /etc/network/interfaces <<EOF
+auto xenbr$i
+	iface xenbr$i inet static
+		address $IFIP
+		netmask $IFMASK
+		network $IFNET
+		broadcast $IFBCAST
+		gateway $IFGATE
+		bridge_ports $i
+		bridge_maxwait 5
+		bridge_fd 0
+EOF
+
+			fi
+		fi
+	done
+
+	# ON ajoute une interface interne pour les VMs.
+	cat >> /etc/network/interfaces <<EOF
+# Xen Backend
+auto dummy0
+iface dummy0 inet manual
+auto xenbrdummy0
+        iface xenbrdummy0 inet manual
+                bridge_ports dummy0
+                 bridge_maxwait 5
+                 bridge_fd 0
+EOF
