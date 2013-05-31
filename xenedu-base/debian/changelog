@@ -1,3 +1,9 @@
+xenedu-base (0.9.0) stable; urgency=low
+
+  * remove tilde for release
+
+ -- Simon Cavey <simon.cavey@crdp.ac-caen.fr>  Fri, 31 May 2013 10:17:42 +0200
+
 xenedu-base (0.9.0~3) unstable; urgency=low
 
   * add network reconfig script
