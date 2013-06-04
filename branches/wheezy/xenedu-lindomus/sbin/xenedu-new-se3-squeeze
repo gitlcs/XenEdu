@@ -35,7 +35,7 @@ read SE3MEMORY
 cp /etc/xen-tools/partitions.d/xenedu-se3.in  /etc/xen-tools/partitions.d/xenedu-se3
 
 sed -i'' 's/@@HOMESE3SIZE@@/$SE3HOMESIZE/g'  /etc/xen-tools/partitions.d/xenedu-se3
-sed -i'' 's/@@VARSE3SIZE@@/SE3VARSE3SIZE/g'  /etc/xen-tools/partitions.d/xenedu-se3
+sed -i'' 's/@@VARSE3SIZE@@/$SE3VARSE3SIZE/g'  /etc/xen-tools/partitions.d/xenedu-se3
 
  
 xen-create-image --config=/etc/xen-tools/xenedu-se3.conf  --hostname=se3pdc.$DOMAIN --role=se3 --partitions=xenedu-se3 --force --ip=$SE3IP --gateway=$GATEWAY  --netmask=$NETMASK0 --vcpus=$VCPUNUM −−memory=$SE3MEMORY  --bridge=xenbreth0
