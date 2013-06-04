@@ -70,7 +70,7 @@ removeDebianPackage ${prefix} info
 removeDebianPackage ${prefix} tasksel tasksel-data
 removeDebianPackage ${prefix} pciutils
 removeDebianPackage ${prefix} fdutils
-removeDebianPackage ${prefix} cpio
+#removeDebianPackage ${prefix} cpio
 #
 # Upgrade packages
 #
@@ -78,6 +78,7 @@ chroot ${prefix} /usr/bin/apt-get update
 chroot ${prefix} /usr/bin/apt-get update
 chroot ${prefix} /usr/bin/apt-get upgrade -y
 chroot ${prefix} /usr/bin/apt-get clean
+
 
 #
 # Copie des modules :
