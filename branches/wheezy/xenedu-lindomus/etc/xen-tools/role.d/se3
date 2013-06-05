@@ -95,5 +95,6 @@ chroot ${prefix} /etc/init.d/ssh stop
 #
 # Pre-install SE3
 #
+echo "deb http://wawadeb.crdp.ac-caen.fr/debian squeeze se3" >>  ${prefix}/etc/apt/sources.list
 chroot ${prefix} /usr/bin/apt-get update
 DEBIAN_FRONTEND=noninteractive chroot ${prefix} /usr/bin/apt-get --yes --force-yes --download-only install se3 se3-domain

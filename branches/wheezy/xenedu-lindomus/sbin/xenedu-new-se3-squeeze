@@ -15,13 +15,13 @@ echo "indiquez l'espace pour /var/se3 les donnees communes"
 echo "entrez simplement le nombre de Go souhaite"
 read SE3VARSE3SIZE
 
-DOMAINE=`hostname -d`
-
-echo "indiquez le masque de sous-reseau pour le SE3 :"
-read NETMASK0
+DOMAIN=`hostname -d`
 
 echo "indiquez l'ip pour le SE3 :"
 read SE3IP
+
+echo "indiquez le masque de sous-reseau pour le SE3 :"
+read NETMASK0
 
 GATEWAY=`route -n | grep ^0.0.0.0 | awk '{print $2}'`
 
@@ -34,8 +34,9 @@ read SE3MEMORY
 
 cp /etc/xen-tools/partitions.d/xenedu-se3.in  /etc/xen-tools/partitions.d/xenedu-se3
 
-sed -i'' 's/@@HOMESE3SIZE@@/$SE3HOMESIZE/g'  /etc/xen-tools/partitions.d/xenedu-se3
-sed -i'' 's/@@VARSE3SIZE@@/$SE3VARSE3SIZE/g'  /etc/xen-tools/partitions.d/xenedu-se3
+sed -i'' "s/@@HOMESE3SIZE@@/$SE3HOMESIZE/g"  /etc/xen-tools/partitions.d/xenedu-se3
+sed -i'' "s/@@VARSE3SIZE@@/$SE3VARSE3SIZE/g"  /etc/xen-tools/partitions.d/xenedu-se3
 
  
 xen-create-image --config=/etc/xen-tools/xenedu-se3.conf  --hostname=se3pdc.$DOMAIN --role=se3 --partitions=xenedu-se3 --force --ip=$SE3IP --gateway=$GATEWAY  --netmask=$NETMASK0 --vcpus=$VCPUNUM −−memory=$SE3MEMORY  --bridge=xenbreth0
+ln -snf  /etc/xen/se3pdc.$DOMAIN.cfg /etc/xen/01-se3.cfg
