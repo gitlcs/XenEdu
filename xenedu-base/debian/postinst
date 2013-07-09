@@ -135,7 +135,7 @@ EOF
 EOF
 
 	# Config pour grub 2 squeeze
-	if [ -e /etc/grub.d/20_linux_xen] ; then
+	if [ -e /etc/grub.d/20_linux_xen ] ; then
 		#mv /etc/grub.d/20_linux_xen /etc/grub.d/09_linux_xen
 		dpkg-divert --add --rename --divert /etc/grub.d/09_linux_xen /etc/grub.d/20_linux_xen
 	fi
