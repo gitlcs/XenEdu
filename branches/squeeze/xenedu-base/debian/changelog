@@ -1,3 +1,9 @@
+xenedu-base (x.x.x)
+  * add xenedu-upgrade-wheezy
+  * add xenedu-upgrade-wheezy-4vms
+ -- Mikael Bailleul <MikaelBailleul@gmail.com>
+ -- David Gloux <david.gloux@tice.ac-caen.fr>  Wed, 23 Apr 2014 11:39:00 +0100
+
 xenedu-base (0.8.6) stable; urgency=low
 
   * change upgrade condition test
