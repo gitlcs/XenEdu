@@ -1,3 +1,12 @@
+xenedu-base (x.x.x)
+
+  * add xenedu-new-wheezy (unstable)
+  * add xenedu-new-wheezy.pl (unstable)
+		**correction à venir: console à changer(inittab)/nom des volumes logiques/...
+		
+ -- Mikael Bailleul <MikaelBailleul@gmail.com>
+ -- David Gloux <david.gloux@tice.ac-caen.fr>  Wed, 23 Apr 2014 11:50:00 +0100
+ 
 xenedu-lindomus (0.9.0~3) unstable; urgency=low
 
   * update new-se3
