@@ -1,4 +1,11 @@
 xenedu-base (x.x.x)
+  
+  * update xenedu-migre-se3 (Testing)
+  
+ -- Mikael Bailleul <MikaelBailleul@gmail.com>
+ -- David Gloux <david.gloux@tice.ac-caen.fr>  Tue, 24 Apr 2014 09:47:00 +0100
+ 
+xenedu-base (x.x.x)
 
   * add xenedu-new-wheezy (unstable)
   * add xenedu-new-wheezy.pl (unstable)
