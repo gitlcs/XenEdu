@@ -1,6 +1,10 @@
 #!/bin/bash
 # creation d'une VM squeeze
 # XenEdu - Simon Cavey - 02/03/2011
+clear
+echo "-- Nouvelle VM Debian Wheezy --"
+echo "Indiquez le nom de la machine :"
+read HOSTNAME
 
 source /etc/xenedu/xenedu.conf
 
@@ -8,29 +12,30 @@ xenedu-freespace
 echo "indiquez l'espace pour / la racine"
 echo "entrez simplement le nombre de Go souhaite"
 read ROOTSIZE
-lvcreate -L"$ROOTSIZE"G -n xenedu-wheezy-root $XENEDUDISK
+lvcreate -L"$ROOTSIZE"G -n xenedu-wheezy-${HOSTNAME}-root $XENEDUDISK
 
 xenedu-freespace
 echo "indiquez l'espace pour /home les donnees utilisateurs"
 echo "entrez simplement le nombre de Go souhaite"
 read SE3HOMESIZE
-lvcreate -L"$SE3HOMESIZE"G -n xenedu-wheezy-home $XENEDUDISK
+lvcreate -L"$SE3HOMESIZE"G -n xenedu-wheezy-${HOSTNAME}-home $XENEDUDISK
 
 xenedu-freespace
 echo "indiquez l'espace pour /var les donnees d'applications"
 echo "entrez simplement le nombre de Go souhaite"
 read VARSIZE
-lvcreate -L"$VARSIZE"G -n xenedu-wheezy-var $XENEDUDISK
+lvcreate -L"$VARSIZE"G -n xenedu-wheezy-${HOSTNAME}-var $XENEDUDISK
 
 #lvcreate -L5G -n xenedu-se3pdc-root $XENEDUDISK
 #lvcreate -L10G -n xenedu-se3pdc-var $XENEDUDISK
-lvcreate -L512M -n xenedu-wheezy-swp $XENEDUDISK
-mkswap $XENEDUDISK/xenedu-wheezy-swp
+lvcreate -L512M -n xenedu-wheezy-${HOSTNAME}-swp $XENEDUDISK
+mkswap $XENEDUDISK/xenedu-wheezy-${HOSTNAME}-swp
 
-mkfs.ext3 -q "$XENEDUDISK"/xenedu-wheezy-home
-mkfs.ext3 -q "$XENEDUDISK"/xenedu-wheezy-var
+mkfs.ext3 -q "$XENEDUDISK"/xenedu-wheezy-${HOSTNAME}-home
+mkfs.ext3 -q "$XENEDUDISK"/xenedu-wheezy-${HOSTNAME}-var
 
 #
 # appel du script perl
 #
+echo $HOSTNAME > /tmp/hostname
 ./xenedu-new-wheezy.pl
