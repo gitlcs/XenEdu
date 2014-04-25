@@ -1,15 +1,23 @@
-xenedu-base (x.x.x)
+xenedu-lindomus (x.x.x~1)
+
+  * update xenedu-new-wheezy (Testing)
+  * update xenedu-new-wheezy.pl (Testing)
+		**correction: Possibilité de créer plusieurs VM en implementant le hostname au LV/Problèmes inittab et "extra" du fichier .cfg réglés.
+		
+ -- Mikael Bailleul <MikaelBailleul@gmail.com>
+ -- David Gloux <david.gloux@tice.ac-caen.fr>  Fri, 25 Apr 2014 14:39:00 +0100
+
+xenedu-lindomus (x.x.x)
   
   * update xenedu-migre-se3 (Testing)
   
  -- Mikael Bailleul <MikaelBailleul@gmail.com>
  -- David Gloux <david.gloux@tice.ac-caen.fr>  Tue, 24 Apr 2014 09:47:00 +0100
  
-xenedu-base (x.x.x)
+xenedu-lindomus (x.x.x)
 
   * add xenedu-new-wheezy (unstable)
   * add xenedu-new-wheezy.pl (unstable)
-		**correction à venir: console à changer(inittab)/nom des volumes logiques/...
 		
  -- Mikael Bailleul <MikaelBailleul@gmail.com>
  -- David Gloux <david.gloux@tice.ac-caen.fr>  Wed, 23 Apr 2014 11:50:00 +0100
