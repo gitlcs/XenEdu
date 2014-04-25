@@ -24,9 +24,10 @@ use Getopt::Long;
 #
 # Options set on the command line.
 #
-my $HOSTNAME="debian-wheezy";   # Mandatory.
+#my $HOSTNAME="debian-wheezy";   # Mandatory.
 #my $DIR;        # Mandatory.
-
+my $HOSTT=`echo -n |cat /tmp/hostname`;			# set with '--hostname=toto'
+my $HOSTNAME=`echo -n $HOSTT`;			# set with '--hostname=toto'
 #
 # Either *all* the relevant networking options must be setup, or
 # DHCP must be selected.
@@ -37,7 +38,9 @@ my $GATEWAY;                   # set with '--gateway=dd.dd.dd.dd'
 my $NETMASK="255.255.255.0";   # set with '--mask=dd.dd.dd.dd'
 my $BROADCAST="192.168.1.255"; # set with '--broadcase=ddd.dd.dd.d'
 my $NETWORK="192.168.1.0";     # set with '--network=dd.dd.dd.dd'
-my $xname="wheezy";              # set with '--name=test'
+my $xname=`echo -n wheezy-${HOSTNAME}`;              # set with '--name=test'
+#my $iimage=`echo "/dev/vol0/xenedu-"$xname"-root"`;
+#my $iimage = "/dev/vol0/xenedu-".$xname."-root";
 my $xmemory="512";
 my $DHCP=0;                    # This setting overides the other options
 my $XENMAC=`xenedu-mac-generator`;  # Mac Address for SE3
@@ -49,6 +52,10 @@ $XENMAC=`echo -n $XENMAC`;
         print "IP: ";
         chomp($IP = <STDIN>);
         print "\n";
+	#print "$xname";
+	#print "\n";
+        #print "$iimage";
+	#print "\n";
         print "MASK: ";
         chomp($NETMASK = <STDIN>);
 	print "\n";
@@ -61,9 +68,9 @@ $XENMAC=`echo -n $XENMAC`;
 	print "indiquer le nombre de CPUs a allouer : ";
 	chomp($XENCPUS = <STDIN>);
         print "\n";
-        print "Nom de la machine (hostname) ? :";
-        chomp($HOSTNAME = <STDIN>);
-        print "\n";
+        #print "Nom de la machine (hostname) ? :";
+        #chomp($HOSTNAME = <STDIN>);
+        #print "\n";
 	$BROADCAST=`ipcalc -n $IP $NETMASK | grep Broadcast| awk {'print \$2'}`;
 	chomp($BROADCAST);
 	$NETWORK=`ipcalc -n $IP $NETMASK | grep Network | awk {'print \$2'}| awk -F/ {'print \$1'}`;
@@ -78,10 +85,10 @@ checkArguments();
 #
 # The two images we'll use, one for the disk image, one for swap.
 #
-my $image = "/dev/vol0/xenedu-".$xname."-root" ;
-my $swap  = "/dev/vol0/xenedu-".$xname."-swp" ;
-my $imgvar  = "/dev/vol0/xenedu-".$xname."-var" ;
-my $imghome = "/dev/vol0/xenedu-".$xname."-home";
+my $image = "/dev/vol0/xenedu-$xname-root" ;
+my $swap  = "/dev/vol0/xenedu-$xname-swp" ;
+my $imgvar  = "/dev/vol0/xenedu-$xname-var" ;
+my $imghome = "/dev/vol0/xenedu-$xname-home";
 #
 #  Create swapfile and initialise it.
 #
@@ -284,16 +291,16 @@ fixupInittab();
 #
 print "Setting up Xen configuration file .. ";
 open( XEN, ">", "/etc/xen/xenedu-$HOSTNAME.cfg" );
-KERNEL=`uname -r`;
+#KERNEL=3.2.0-4-amd64;
 print XEN<<E_O_XEN;
-kernel = "/boot/vmlinuz-$KERNEL"
-ramdisk = "/boot/initrd.img-$KERNEL"
+kernel = "/boot/vmlinuz-3.2.0-4-amd64"
+ramdisk = "/boot/initrd.img-3.2.0-4-amd64"
 memory = $xmemory
 name   = "$HOSTNAME"
 vif = [ 'bridge=eth0,mac=$XENMAC' ]
 disk   = [ 'phy:$image,xvda1,w','phy:$imgvar,xvda2,w','phy:$swap,xvda3,w','phy:$imghome,xvda4,w' ]
 root   = "/dev/xvda1 ro"
-extra = "console=hvc0"
+#extra = "console=hvc0"
 vcpus = $XENCPUS
 
 E_O_XEN
@@ -310,7 +317,7 @@ close( XEN );
 print "Done\n";
 
 # Ajout de la vm au boot du dom0
-`ln -snf /etc/xen/xenedu-$HOSTNAME.cfg /etc/xen/auto/02-xenedu-$HOSTNAME.cfg`;
+`ln -snf /etc/xen/xenedu-wheezy-$HOSTNAME.cfg /etc/xen/auto/02-xenedu-wheezy-$HOSTNAME.cfg`;
 
 #
 #  Give status message
@@ -321,11 +328,11 @@ print <<EOEND;
  Once completed you may start your new instance of Xen with:
  Vous pouvez désormais demarrer votre machine virutelle squeeze avec la commande :
  
-    xm create xenedu-$HOSTNAME.cfg -c
+    xm create xenedu-wheezy-${HOSTNAME}.cfg -c
 
  La machine virtuelle sera demarrer automatiquement au boot de  la machine physique.
  pour annuler ce comportement : 
-  rm /etc/xen/auto/02-xenedu-$HOSTNAME.cfg
+  rm /etc/xen/auto/02-xenedu-wheezy-$HOSTNAME.cfg
   
     
 EOEND
@@ -344,7 +351,7 @@ sub checkArguments
 
     if (!defined( $HOSTNAME ) )
     {
-    $HOSTNAME="squeeze";
+    $HOSTNAME="wheezy";
     print<<EOF
 
   You should set a hostname with '--hostname=foo'.
@@ -362,7 +369,7 @@ EOF
     }
     if (!defined( $xname ) )
     {
-    $xname="squeeze";
+    $xname="wheezy";
         print<<EOF
 
   You should set a machine name with '--name=myname'.
@@ -476,7 +483,7 @@ sub fixupInittab
             if ( $line =~ /^1/ )
             {
                 #$line = "s0:12345:respawn:/sbin/getty 115200 ttyS0 linux"
-                $line = "1:2345:respawn:/sbin/getty 38400 tty1"
+                $line = "1:2345:respawn:/sbin/getty 38400 hvc0"
             }
             else
             {
