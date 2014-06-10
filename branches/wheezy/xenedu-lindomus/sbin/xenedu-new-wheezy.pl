@@ -285,6 +285,7 @@ fixupInittab();
 `umount $dir/var`;
 `umount $dir`;
 
+`rm /tmp/hostname`;
 
 #
 # Finally setup Xen to allow us to create the image.

@@ -24,8 +24,11 @@ use Getopt::Long;
 #
 # Options set on the command line.
 #
-my $HOSTNAME="debian-squeeze";   # Mandatory.
+#my $HOSTNAME="debian-squeeze";   # Mandatory.
 #my $DIR;        # Mandatory.
+
+my $HOSTT=`echo -n |cat /tmp/hostname`;
+my $HOSTNAME=`echo -n $HOSTT`;
 
 #
 # Either *all* the relevant networking options must be setup, or
@@ -37,7 +40,7 @@ my $GATEWAY;                   # set with '--gateway=dd.dd.dd.dd'
 my $NETMASK="255.255.255.0";   # set with '--mask=dd.dd.dd.dd'
 my $BROADCAST="192.168.1.255"; # set with '--broadcase=ddd.dd.dd.d'
 my $NETWORK="192.168.1.0";     # set with '--network=dd.dd.dd.dd'
-my $xname="squeeze";              # set with '--name=test'
+my $xname=`echo -n squeeze-${HOSTNAME}`;
 my $xmemory="512";
 my $DHCP=0;                    # This setting overides the other options
 my $XENMAC=`xenedu-mac-generator`;  # Mac Address for SE3
@@ -61,9 +64,9 @@ $XENMAC=`echo -n $XENMAC`;
 	print "indiquer le nombre de CPUs a allouer : ";
 	chomp($XENCPUS = <STDIN>);
         print "\n";
-        print "Nom de la machine (hostname) ? :";
-        chomp($HOSTNAME = <STDIN>);
-        print "\n";
+       # print "Nom de la machine (hostname) ? :";
+       # chomp($HOSTNAME = <STDIN>);
+       # print "\n";
 	$BROADCAST=`ipcalc -n $IP $NETMASK | grep Broadcast| awk {'print \$2'}`;
 	chomp($BROADCAST);
 	$NETWORK=`ipcalc -n $IP $NETMASK | grep Network | awk {'print \$2'}| awk -F/ {'print \$1'}`;
@@ -78,10 +81,10 @@ checkArguments();
 #
 # The two images we'll use, one for the disk image, one for swap.
 #
-my $image = "/dev/vol0/xenedu-".$xname."-root" ;
-my $swap  = "/dev/vol0/xenedu-".$xname."-swp" ;
-my $imgvar  = "/dev/vol0/xenedu-".$xname."-var" ;
-my $imghome = "/dev/vol0/xenedu-".$xname."-home";
+my $image = "/dev/vol0/xenedu-$xname-root" ;
+my $swap  = "/dev/vol0/xenedu-$xname-swp" ;
+my $imgvar  = "/dev/vol0/xenedu-$xname-var" ;
+my $imghome = "/dev/vol0/xenedu-$xname-home";
 #
 #  Create swapfile and initialise it.
 #
@@ -99,7 +102,7 @@ print "Creating disk image: $image\n";
 print "Creating EXT3 filesystem\n";
 `/sbin/mkfs.ext3 -F $image`;
 print "Done\n";
-print "Creating disk image var: $image\n";
+print "Creating disk image var: $imgvar\n";
 `/bin/dd if=/dev/zero of=$imgvar bs=2M count=1 seek=1024 >/dev/null 2>/dev/null`;
 print "Creating EXT3 filesystem\n";
 `/sbin/mkfs.ext3 -F $imgvar`;
@@ -128,7 +131,7 @@ if ( ! -d $dir . "/lost+found" )
 #  Install the base system.
 #
 print "Running debootstrap to install the system.   This will take a while!\n";
-`debootstrap --arch amd64 squeeze $dir http://ftp2.fr.debian.org/debian`;
+`debootstrap --arch amd64 squeeze $dir http://ftp.fr.debian.org/debian/`;
 print "Done\n";
 
 #
@@ -149,8 +152,8 @@ print APT<<E_O_APT;
 #
 #
 # Stable
-deb http://ftp2.fr.debian.org/debian     squeeze main contrib non-free
-deb-src http://ftp2.fr.debian.org/debian squeeze main contrib non-free
+deb http://ftp.fr.debian.org/debian     squeeze main contrib non-free
+deb-src http://ftp.fr.debian.org/debian squeeze main contrib non-free
 
 # 
 #  Security updates
@@ -183,13 +186,13 @@ foreach my $file ( @hostFiles )
     File::Copy::cp( $file, $dir . "/etc" );
 }
 
-my @hostModules = "/lib/modules/*-xen*";
+my @hostModules = "/lib/modules/`uname -r`";
                                                                                           
 foreach my $file ( @hostModules )
 {
 File::Copy::cp( $file, $dir . "/lib/modules" );
 }
-`cp -a /lib/modules/*-xen-*  $dir/lib/modules`;
+`cp -a /lib/modules/3.2.0-4-amd64  $dir/lib/modules`;
 
 #
 #  Disable TLS
@@ -227,8 +230,6 @@ iface eth0 inet static
  address $IP
  gateway $GATEWAY
  netmask $NETMASK
- network $NETWORK
- broadcast $BROADCAST
 E_O_STATIC
 }
 
@@ -282,6 +283,8 @@ fixupInittab();
 `umount $dir/var`;
 `umount $dir`;
 
+`rm /tmp/hostname`;
+
 
 #
 # Finally setup Xen to allow us to create the image.
@@ -289,14 +292,14 @@ fixupInittab();
 print "Setting up Xen configuration file .. ";
 open( XEN, ">", "/etc/xen/xenedu-$HOSTNAME.cfg" );
 print XEN<<E_O_XEN;
-kernel = "/boot/vmlinuz-`uname -r`"
-ramdisk = "/boot/initrd.img-`uname -r`"
+kernel = "/boot/vmlinuz-3.2.0-4-amd64"
+ramdisk = "/boot/initrd.img-3.2.0-4-amd64"
 memory = $xmemory
 name   = "$HOSTNAME"
-vif = [ 'mac=$XENMAC' ]
+vif = [ 'bridge=eth0,mac=$XENMAC' ]
 disk   = [ 'phy:$image,xvda1,w','phy:$imgvar,xvda2,w','phy:$swap,xvda3,w','phy:$imghome,xvda4,w' ]
 root   = "/dev/xvda1 ro"
-extra = "console=hvc0"
+#extra = "console=hvc0"
 vcpus = $XENCPUS
 
 E_O_XEN
@@ -324,7 +327,7 @@ print <<EOEND;
  Once completed you may start your new instance of Xen with:
  Vous pouvez désormais demarrer votre machine virutelle squeeze avec la commande :
  
-    xm create xenedu-$HOSTNAME.cfg -c
+    xm create xenedu-${HOSTNAME}.cfg -c
 
  La machine virtuelle sera demarrer automatiquement au boot de  la machine physique.
  pour annuler ce comportement : 
@@ -479,7 +482,7 @@ sub fixupInittab
             if ( $line =~ /^1/ )
             {
                 #$line = "s0:12345:respawn:/sbin/getty 115200 ttyS0 linux"
-                $line = "1:2345:respawn:/sbin/getty 38400 tty1"
+                $line = "1:2345:respawn:/sbin/getty 38400 hvc0"
             }
             else
             {
