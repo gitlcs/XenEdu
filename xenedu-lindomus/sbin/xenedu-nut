@@ -1,0 +1,139 @@
+#!/bin/bash
+################################################################
+################# SCRIPT UPGRADE XEN EN WHEEZY #################
+################################################################
+
+##
+## Sauvegarde ancienne configuration
+##
+
+echo "Sauvegarde de l'ancienne configuration si existante"
+cp /etc/nut{,.org} 2>/dev/null
+if [ $? == 1 ];then
+	echo "Pas de configuration de nut trouvé"
+	INSTALL=0
+else
+	echo "Configuration sauvegarder dans /etc/nut.org/"
+	echo "Pour restaurer la configuration exécuter la commande suivante : "
+	echo "mv /etc/nut.org/ /etc/nut"
+	echo ""
+	echo "Arrêt du sevice nut"
+	`service nut-server stop` 2>/dev/null
+	`service nut-client stop` 2>/dev/null
+	echo "Appuyer sur Entrée pour continuer"
+	read toto
+	INSTALL=1
+fi
+
+##
+## Installation du service nut
+##
+
+#if [ $INSTALL = 1 ];then
+	aptitude remove nut
+#fi
+aptitude install -y nut
+
+##
+## Demande de Configuration
+##
+
+echo "Sur quel port est branché l'onduleur"
+echo "1-Serie"
+echo "2-USB"
+echo "rep?(1/2)"
+read PORT
+
+echo "De quel onduleur s'agit-il?"
+echo "1-Eaton Evolution 650"
+echo "2-MGE Pulsar Evolution 1150"
+echo "rep?(1/2)"
+read ONDULEUR
+
+##
+## Cas USB
+##
+
+if [ $PORT = 2 ];then
+	echo "Veuillez brancher le cable USB si ce n'est pas fait et appuyer sur Entrée"
+	read pause
+	BUS=`lsusb|grep UPS|cut -d" " -f2`
+	DEVICE=`lsusb|grep UPS|cut -d" " -f4|cut -b 1-3`
+	CHEMINUSB="/dev/bus/usb/$BUS/$DEVICE"
+	`chgrp nut $CHEMINUSB`
+fi
+
+##
+## Ecriture des Fichiers de Configurations
+##
+
+## nut.conf
+echo "MODE=standalone">/etc/nut/nut.conf
+
+## ups.conf
+echo "[myups]" >/etc/nut/ups.conf
+if [ $PORT = 1 ];then
+	echo "driver = mge-shut" >>/etc/nut/ups.conf
+else
+	echo "driver = usbhid-ups" >>/etc/nut/ups.conf
+fi
+echo "port = auto" >>/etc/nut/ups.conf
+if [ $ONDULEUR = 1 ];then
+	echo 'desc = "Eaton Evolution 650"' >>/etc/nut/ups.conf
+else
+	echo 'desc = "MGE Pulsar Evolution 1150"' >>/etc/nut/ups.conf
+fi
+
+## upsd.conf
+echo "MAXAGE 15" >/etc/nut/upsd.conf
+echo "LISTEN 127.0.0.1 3493" >>/etc/nut/upsd.conf
+echo "MAXCONN 1024" >>/etc/nut/upsd.conf
+
+## upsd.users
+echo "UPSD Entrer un mot de passe pour l'admin :"
+read PASSADMIN
+echo "UPSD Entrez un mot de passe pour l'utilisateur upsmon :"
+read PASSUPSMON
+cat > /etc/nut/upsd.users <<EOF
+[root]
+    password = $PASSADMIN
+    actions = SET
+    instcmds = ALL
+
+[upsmonitor]
+    password  = $PASSUPSMON
+    upsmon master
+EOF
+
+## upsmon.conf
+cat >/etc/nut/upsmon.conf <<EOF
+MONITOR myups@localhost 1 upsmonitor $PASSUPSMON "master"
+MINSUPPLIES 1
+
+FINALDELAY 10
+SHUTDOWNCMD "/sbin/shutdown -h +0"
+------------------------------------------------
+# POLLFREQ <n>
+# Fréquence d'interrogation en secondes en fonctionnement normal de l'onduleur.
+# La valeur par défaut est de 5 secondes.
+POLLFREQ 5
+------------------------------------------------
+# POLLFREQALERT <n>
+# Fréquence d'interrogation en secondes pendant que l'onduleur est sur batterie.
+# La valeur par défaut est de 5 secondes.
+POLLFREQALERT 5
+------------------------------------------------
+HOSTSYNC 15
+DEADTIME 15
+POWERDOWNFLAG /etc/killpower
+RBWARNTIME 43200
+NOCOMMWARNTIME 300
+EOF
+
+## Redémarage de nut
+echo "Redémarage de nut pour prendre en compte la configuration..."
+service nut-client restart
+service nut-server restart
+upsdrvctl start
+
+
