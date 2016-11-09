@@ -1,0 +1,288 @@
+#!/bin/bash
+# Xenedu Squeeze to Wheezy
+# xenedu-upgrade-wheezy-ng 
+# 05/11/2016 jLCF jean-luc.chretien@ac-caen.fr
+# ---------------------------------------------------------------------------
+# Phase 0 : Préparatoire
+# Phase 1 : On vire les xeneries et on passe sur un noyau squeeze 2.6 non Xen
+# Phase 2 : Upgrade Wheezy
+# Phase 3 : On vire le vieux noyau 2.6 de old squeeze
+# Phase 4 : Install Xenneries Wheezy et modif network/interfaces
+# Phase 5 : Finalisation
+# ---------------------------------------------------------------------------
+
+# Fonctions 
+go()
+{
+# On demande confirmation
+echo "Faut-il lancer la phase : $1 ? (o/N) "
+read STARTUPGRADE
+if [ $STARTUPGRADE != "o" ]; then
+	echo "Mise a jour annulee !"
+	exit 1
+else
+	echo "Lancement de la mise a jour..."
+fi
+}
+
+verif()
+{
+# On demande confirmation
+echo "Cette configuration vous semble bonne ? (o/N)"
+read VISU
+if [ $VISU != "o" ]; then
+	echo "ERR : Interruption de la phase de mise a jour"
+	exit 1
+else
+	echo "On continue..."
+fi
+}
+
+wait()
+{
+echo "tapez une touche pour continuer"
+read WAIT
+}
+
+netconfig()
+{
+IFIP=`ifconfig $1 | grep "inet adr:" | cut -f 2 -d ":" | cut -f 1 -d " "`
+IFMASK=`ifconfig $1 | grep "inet adr:" | cut -f 4 -d ":"`
+IFBCAST=`ifconfig $1 | grep "inet adr:" | cut -f 3 -d ":" | cut -f 1 -d " "`
+IFNET=`ipcalc -n  $IFIP $IFMASK | grep "Network" | awk '{print $2}'| cut -f 1 -d "/"`
+IFGATE=`route -n | grep $1 | grep "^0.0.0.0"| awk '{print $2}'`
+
+echo "auto lo
+iface lo inet loopback
+
+allow-hotplug $1
+iface $1 inet static
+    address $IFIP
+    pre-up ip addr del $IFIP/24 dev eth0 2> /dev/null || true
+    network $IFNET
+    netmask $IFMASK
+    broadcast $IFBCAST
+    gateway $IFGATE" > /etc/network/interfaces
+}
+
+# Si at n'est pas la, on l'installe
+if [ ! -f /usr/bin/at ]; then
+	apt-get install at -y
+fi
+
+
+if [ ! -f /root/phasemigrexenedu ]; then
+# Phase 0
+#--------
+	# On test la version Debian
+	DEBVERSION=`cat /etc/debian_version |cut -f 1 -d .`
+	if [ "$DEBVERSION" != "6" ]; then
+        echo "Err: ce script est prevu pour Debian Squeeze uniquement."
+        exit 1
+	fi
+	# On test si il existe un acces ssh rgateway
+	if [ `ps aux | grep StrictHostKeyChecking | wc -l` != "2" ]; then
+    	echo "Vous DEVEZ acceder au Dom0 depuis une session ssh secours"
+    	echo "Lancez xenedu-secours puis vous connecter via rgateway et relancer le script"
+    	exit 1
+	fi
+	# On demande confirmation pour le lancement de la Phase 0
+	go 0
+	# On conserve les scripts ssh secours
+	echo "Migration Squeeze Wheezy XenEdu : Phase 0"
+	mkdir /root/secours
+	cp /sbin/xenedu-secours-ssh /root/secours/
+	cp /sbin/xenedu-stop-secourssh /root/secours/
+	cp /sbin/xenedu-get-TiceKey /root/secours/
+	cp -a /home/rssh /root/secours/
+	# On shut les vm pour continuer a travailler depuis rgateway
+	echo "Arret des DomU"
+	for vm in `xm list 2>>/dev/null | cut -f 1 -d " "|grep -v "Name"| grep -v "Domain-0"`
+	do
+		echo "Arrêt de $vm"
+    	xm shut $vm 2>>/dev/null
+    	sleep 60
+    	xm dest $vm 2>>/dev/null
+	done
+	echo "Fin Phase 0"
+	echo "1" > /root/phasemigrexenedu
+fi
+
+
+# Phase 1
+#--------
+if grep "1" /root/phasemigrexenedu; then
+	# On demande confirmation
+	go 1
+	echo "Migration Squeeze Wheezy XenEdu : Phase 1"
+	# On vire les xeneries
+	apt-get remove xenstore-utils -y
+	apt-get remove xenedu-lindomus -y
+	apt-get remove xenedu-base -y
+	apt-get remove xen-tools -y
+	apt-get remove xen-qemu-dm-4.0 -y
+	apt-get remove xen-linux-system-2.6.32-5-xen-amd64 -y
+	apt-get remove xen-hypervisor-4.0-amd64 -y
+	apt-get autoremove -y
+	# On change le noyau par defaut en 2.6.32-5
+	sed -i s/GRUB_DEFAULT=0/GRUB_DEFAULT=2/g /etc/default/grub
+	update-grub
+	# On remet en place les elements pour le ssh secours
+	cp -a /root/secours/rssh /home/
+	cp /root/secours/xenedu-* /sbin/
+	# On se prepare a ouvrir apres reboot un session ssh de secours automatiquement
+	########
+	PORTMIN=10000
+	PORTMAX=32000
+	nombre=0   #initialise
+	while [ "$nombre" -le $PORTMIN ]
+	do
+  		nombre=$RANDOM
+ 		let "nombre %= $PORTMAX"  # Ramene $nombre dans $ECHELLE.
+	done
+	cp /etc/rc.local /root/secours/
+	grep -v "exit 0" /root/secours/rc.local > /etc/rc.local
+	echo "Au prochain reboot le numero de port pour le ssh secours sera $nombre"
+	echo "su -c \"/usr/bin/ssh -f -N -o 'StrictHostKeyChecking=no' -p22 -R $nombre:127.0.0.1:22 rssh@rgateway.crdp.ac-caen.fr\" rssh" >> /etc/rc.local
+	echo "exit 0" >> /etc/rc.local
+	########
+	echo "2" > /root/phasemigrexenedu
+	# 1er reboot
+	# On reboot sur le noyau 2.6.32-5 pas xen
+	echo "Fin phase 1, on reboot..."
+	wait
+	reboot
+	exit 0
+	# Fin Phase 1
+fi
+
+# Phase 2
+# -------
+if grep "2" /root/phasemigrexenedu; then
+	# On demande confirmation
+	go 2
+	echo "Migration Squeeze Wheezy XenEdu : Phase 2"
+	echo "Mise a jour de la distribution en Wheezy"
+	# On remet 0 dans grub
+	sed -i s/GRUB_DEFAULT=2/GRUB_DEFAULT=0/g /etc/default/grub
+	update-grub
+	if ! uname -r | grep xen; then
+        echo "Plus de Xeneries, on vire le noyo xen"
+        apt-get remove linux-image-2.6.32-5-xen-amd64 -y
+        # Modif source list
+		echo "changement des sources en wheezy"
+		cat > /etc/apt/sources.list <<EOF
+deb http://ftp.fr.debian.org/debian/ wheezy main non-free contrib
+deb-src http://ftp.fr.debian.org/debian/ wheezy main non-free contrib
+
+deb http://security.debian.org/ wheezy/updates main contrib non-free
+deb-src http://security.debian.org/ wheezy/updates main contrib non-free
+
+## XenEdu
+deb http://xenedu.crdp.ac-caen.fr/wheezy xenedu main
+EOF
+		
+		apt-get update
+		apt-get install debian-archive-keyring
+		apt-get -y --force-yes dist-upgrade
+		#
+		# Nous sommes en wheezy, on reboot sur le noyau Wheezy 3.2.0-4-amd64		
+		# second reboot
+		echo "Fin phase 2, on reboot..."
+		echo "Vous pourrez relancer le script en reouvrant une session ssh de secours"
+		echo "avec le meme numero que precedement..."
+		echo "3" > /root/phasemigrexenedu
+		wait
+		reboot
+		exit 0		
+	else
+		echo "ERR : Veuillez rebooter sur un noyau standard 2.6.32-5"
+		exit 1		
+	fi
+fi
+
+
+# Phase 3
+# -------
+if grep "3" /root/phasemigrexenedu; then
+	# On demande confirmation
+	go 3
+	echo "Migration Squeeze Wheezy XenEdu : Phase 3"
+	if uname -r | grep 3.2.0-4; then
+		# On vire le noyau 2.6 faillible
+		apt-get remove linux-image-2.6.32-5-amd64 -y
+		update-grub
+		# Troisieme reboot
+		echo "Fin phase 3, on reboot..."
+		echo "Vous pourrez relancer le script en reouvrant une session ssh de secours"
+		echo "avec le meme numero que precedement..."
+		echo "4" > /root/phasemigrexenedu
+		wait
+		reboot
+		exit 0
+	else
+		echo "Err : Anomalie : nous ne sommes pas sur le noyau 3.2.0-4"
+		echo "Phase 3 interrompu"
+		exit 1	
+	fi
+fi
+
+# Phase 4
+# -------
+if grep "4" /root/phasemigrexenedu; then
+	# On demande confirmation
+	go 4
+	echo "Migration Squeeze Wheezy XenEdu : Phase 4"
+	echo "Installation des Xeneries 4.0 Wheezy..."
+	# On efface les /sbin/xenedu*
+	rm -f /sbin/xenedu*
+	# On installe les nouvelles Xeneries
+	apt-get install xenedu-base
+	# Modification networkin/interfaces
+	# A noter que l'on peu rester en peth0 mais dans ce cas, ajouter :
+	# au dessous de :
+	#	address xxx.xxxx.xxxx.xxxx
+	#   pre-up ip addr del xxx.xxx.xxx.xxx/24 dev eth0 2> /dev/null || true
+	# car sinon, pas de gateway sur l'interface !
+	# On verifie visuellement la config interfaces
+	echo "Voici la configuration reseau initiale :"
+	cat /etc/network/interfaces	
+	#
+	cp -a /etc/network/interfaces /root/secours	
+	netconfig eth0
+	# On verifie visuellement la config interfaces
+	echo "Voici la nouvelle configuration reseau :"
+	cat /etc/network/interfaces
+	verif
+	# Quatrieme reboot
+	echo "Fin phase 4, on reboot..."
+	echo "Vous pourrez relancer le script en reouvrant une session ssh de secours"
+	echo "avec le meme numero que precedement..."
+	echo "5" > /root/phasemigrexenedu
+	wait
+	reboot
+	exit 0
+fi
+
+# Phase 5
+#---------
+if grep "5" /root/phasemigrexenedu; then
+	# On demande confirmation
+	go 5
+	echo "Migration Squeeze Wheezy XenEdu : Phase 5"
+	echo "Finalisation et verifications"
+	# On verifie que le xend est up
+	if ! xm list | grep "Domain-0"; then
+        echo "ERR : Pas de daemon xend up"
+        exit 1
+	else
+		echo "Xend up :)"
+		echo "Il faut desormais modifier les DomU..."
+		echo "cf script https://svn.tice.ac-caen.fr/svn/XenEdu/branches/wheezy/xenedu-base/sbin/xenedu-upgrade-wheezy-4vms"
+		echo "Ou manuellement"
+		# On remet en place rc.local
+		cp -a /root/secours/rc.local /etc/
+	fi             
+fi
+# FIN
+
