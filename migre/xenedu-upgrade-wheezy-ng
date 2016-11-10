@@ -171,6 +171,9 @@ if grep "1" /root/phasemigrexenedu; then
 	# On remet en place les elements pour le ssh secours
 	cp -a /root/secours/rssh /home/
 	cp /root/secours/xenedu-* /sbin/
+	chown -R rssh:rssh /home/rssh
+	chmod 755 /home/rssh
+	chmod -R 700 /home/rssh/.ssh
 	# On se prepare a ouvrir apres reboot un session ssh de secours automatiquement
 	PORTMIN=10000
 	PORTMAX=32000
@@ -184,6 +187,16 @@ if grep "1" /root/phasemigrexenedu; then
 	echo -e "$COLINFO"		
 	echo "Au prochain reboot le numero de port pour le ssh secours sera $nombre"
 	echo -e "$COLCMD"	
+
+	echo "#!/bin/sh" > /etc/init.d/sshsecours
+	echo "### BEGIN INIT INFO" >> /etc/init.d/sshsecours
+	echo "# Provides:        sshsecours" >> /etc/init.d/sshsecours
+	echo "# Required-Start:    $remote_fs $syslog" >> /etc/init.d/sshsecours
+	echo "# Required-Stop:    $remote_fs $syslog" >> /etc/init.d/sshsecours
+	echo "# Default-Start:    2 3 4 5" >> /etc/init.d/sshsecours
+	echo "# Default-Stop:0 1 6" >> /etc/init.d/sshsecours
+	echo "# Short-Description: ssh secours rgateway" >> /etc/init.d/sshsecours
+	echo "### END INIT INFO" >> /etc/init.d/sshsecours	
 	echo "su -c \"/usr/bin/ssh -f -N -o 'StrictHostKeyChecking=no' -p22 -R $nombre:127.0.0.1:22 rssh@rgateway.crdp.ac-caen.fr\" rssh" >> /etc/init.d/sshsecours
 	echo "exit 0" >> /etc/init.d/sshsecours
 	chmod +x /etc/init.d/sshsecours
