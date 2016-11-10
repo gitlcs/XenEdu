@@ -252,9 +252,7 @@ EOF
 		# Nous sommes en wheezy, on reboot sur le noyau Wheezy 3.2.0-4-amd64		
 		# second reboot
 		echo -e "$COLINFO"
-		echo "Fin phase 2..."
-		echo "Vous pourrez relancer le script en reouvrant une session ssh de secours"
-		echo "avec le meme numero que precedement..."
+		echo "Fin phase 2... Relancer le script"
 		echo -e "$COLCMD"
 		echo "3" > /root/phasemigrexenedu
 		#wait
@@ -283,9 +281,7 @@ if grep "3" /root/phasemigrexenedu; then
 		update-grub
 		# Troisieme reboot
 		echo -e "$COLINFO"
-		echo "Fin phase 3, on reboot..."
-		echo "Vous pourrez relancer le script en reouvrant une session ssh de secours"
-		echo "avec le meme numero que precedement..."
+		echo "Fin phase 3... Relancer le script"
 		echo -e "$COLCMD"		
 		echo "4" > /root/phasemigrexenedu
 		#wait
@@ -312,7 +308,7 @@ if grep "4" /root/phasemigrexenedu; then
 	# On efface les /sbin/xenedu*
 	rm -f /sbin/xenedu*
 	# On installe les nouvelles Xeneries
-	apt-get install xenedu-base
+	apt-get install xenedu-base -y
 	# Modification networkin/interfaces
 	# A noter que l'on peu rester en peth0 mais dans ce cas, ajouter :
 	# au dessous de :
