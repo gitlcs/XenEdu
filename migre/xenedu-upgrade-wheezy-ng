@@ -1,7 +1,7 @@
 #!/bin/bash
 # Xenedu Squeeze to Wheezy
 # xenedu-upgrade-wheezy-ng 
-# 05/11/2016 jLCF jean-luc.chretien@ac-caen.fr
+# 09/11/2016 jLCF jean-luc.chretien@ac-caen.fr
 # ---------------------------------------------------------------------------
 # Phase 0 : Préparatoire
 # Phase 1 : On vire les xeneries et on passe sur un noyau squeeze 2.6 non Xen
@@ -11,36 +11,60 @@
 # Phase 5 : Finalisation
 # ---------------------------------------------------------------------------
 
+#Couleurs
+
+COLTITRE="\033[1;35m"          # Rose
+COLCMD="\033[1;37m"            # Blanc
+COLQUESTION="\033[1;32m"       # Vert
+COLPARTIE="\033[1;34m"         # Bleu
+COLERR="\033[1;31m"  				# Rouge
+COLTXT="\033[0;37m"     			# Gris
+COLINFO="\033[0;36m"					# Cyan
+
 # Fonctions 
 go()
 {
 # On demande confirmation
+echo -e "$COLQUESTION"
 echo "Faut-il lancer la phase : $1 ? (o/N) "
+echo -e "$COLCMD"
 read STARTUPGRADE
 if [ $STARTUPGRADE != "o" ]; then
+	echo -e "$COLERR"
 	echo "Mise a jour annulee !"
+	echo -e "$COLCMD"
 	exit 1
 else
+	echo -e "$COLINFO"
 	echo "Lancement de la mise a jour..."
+	echo -e "$COLCMD"
 fi
 }
 
 verif()
 {
 # On demande confirmation
+echo -e "$COLQUESTION"
 echo "Cette configuration vous semble bonne ? (o/N)"
+echo -e "$COLCMD"
 read VISU
 if [ $VISU != "o" ]; then
+	echo -e "$COLERR"
 	echo "ERR : Interruption de la phase de mise a jour"
+	echo -e "$COLCMD"	
 	exit 1
 else
+	echo -e "$COLINFO"
 	echo "On continue..."
+	echo -e "$COLCMD"	
 fi
 }
 
 wait()
 {
+echo -e "$COLINFO"
 echo "tapez une touche pour continuer"
+echo -e "$COLCMD"
 read WAIT
 }
 
@@ -77,26 +101,39 @@ if [ ! -f /root/phasemigrexenedu ]; then
 	# On test la version Debian
 	DEBVERSION=`cat /etc/debian_version |cut -f 1 -d .`
 	if [ "$DEBVERSION" != "6" ]; then
-        echo "Err: ce script est prevu pour Debian Squeeze uniquement."
-        exit 1
+		echo -e "$COLERR"
+		echo "Err: ce script est prevu pour Debian Squeeze uniquement."
+		echo -e "$COLCMD"
+      exit 1
+	fi
+	# On install grub-pc, si celui ci n'est pas installé
+	if [ ! -f /etc/default/grub_ ];then
+        echo "install grub-pc" -y
 	fi
 	# On test si il existe un acces ssh rgateway
 	if [ `ps aux | grep StrictHostKeyChecking | wc -l` != "2" ]; then
+		echo -e "$COLINFO"
     	echo "Vous DEVEZ acceder au Dom0 depuis une session ssh secours"
     	echo "Lancez xenedu-secours puis vous connecter via rgateway et relancer le script"
+		echo -e "$COLCMD"
     	exit 1
 	fi
 	# On demande confirmation pour le lancement de la Phase 0
 	go 0
-	# On conserve les scripts ssh secours
+	# On conserve les scripts ssh secours, la conf xen, le dossier rssh...
+	echo -e "$COLINFO"	
 	echo "Migration Squeeze Wheezy XenEdu : Phase 0"
+	echo -e "$COLCMD"
 	mkdir /root/secours
 	cp /sbin/xenedu-secours-ssh /root/secours/
 	cp /sbin/xenedu-stop-secourssh /root/secours/
 	cp /sbin/xenedu-get-TiceKey /root/secours/
+	cp -a /etc/xen /root/secours/xenconf
 	cp -a /home/rssh /root/secours/
 	# On shut les vm pour continuer a travailler depuis rgateway
-	echo "Arret des DomU"
+	echo -e "$COLINFO"	
+	echo "Arret des DomU :"
+	echo -e "$COLCMD"	
 	for vm in `xm list 2>>/dev/null | cut -f 1 -d " "|grep -v "Name"| grep -v "Domain-0"`
 	do
 		echo "Arrêt de $vm"
@@ -104,7 +141,9 @@ if [ ! -f /root/phasemigrexenedu ]; then
     	sleep 60
     	xm dest $vm 2>>/dev/null
 	done
+	echo -e "$COLINFO"		
 	echo "Fin Phase 0"
+	echo -e "$COLCMD"		
 	echo "1" > /root/phasemigrexenedu
 fi
 
@@ -114,7 +153,9 @@ fi
 if grep "1" /root/phasemigrexenedu; then
 	# On demande confirmation
 	go 1
+	echo -e "$COLINFO"	
 	echo "Migration Squeeze Wheezy XenEdu : Phase 1"
+	echo -e "$COLCMD"		
 	# On vire les xeneries
 	apt-get remove xenstore-utils -y
 	apt-get remove xenedu-lindomus -y
@@ -131,7 +172,6 @@ if grep "1" /root/phasemigrexenedu; then
 	cp -a /root/secours/rssh /home/
 	cp /root/secours/xenedu-* /sbin/
 	# On se prepare a ouvrir apres reboot un session ssh de secours automatiquement
-	########
 	PORTMIN=10000
 	PORTMAX=32000
 	nombre=0   #initialise
@@ -140,16 +180,27 @@ if grep "1" /root/phasemigrexenedu; then
   		nombre=$RANDOM
  		let "nombre %= $PORTMAX"  # Ramene $nombre dans $ECHELLE.
 	done
-	cp /etc/rc.local /root/secours/
-	grep -v "exit 0" /root/secours/rc.local > /etc/rc.local
-	echo "Au prochain reboot le numero de port pour le ssh secours sera $nombre"
-	echo "su -c \"/usr/bin/ssh -f -N -o 'StrictHostKeyChecking=no' -p22 -R $nombre:127.0.0.1:22 rssh@rgateway.crdp.ac-caen.fr\" rssh" >> /etc/rc.local
-	echo "exit 0" >> /etc/rc.local
-	########
+	# Preparation demarrage d'un session ssh-secours au reboot
+	echo "su -c \"/usr/bin/ssh -f -N -o 'StrictHostKeyChecking=no' -p22 -R $nombre:127.0.0.1:22 rssh@rgateway.crdp.ac-caen.fr\" rssh" >> /etc/init.d/sshsecours
+	echo "exit 0" >> /etc/init.d/sshsecours
+	chmod +x /etc/init.d/sshsecours
+	update-rc.d sshsecours defaults	
+	#######
+	# Dans certains cas, la methode rc.local, ne fonctionne pas
+	#cp /etc/rc.local /root/secours/
+	#grep -v "exit 0" /root/secours/rc.local > /etc/rc.local
+	#echo -e "$COLINFO"		
+	#echo "Au prochain reboot le numero de port pour le ssh secours sera $nombre"
+	#echo -e "$COLCMD"	
+	#echo "su -c \"/usr/bin/ssh -f -N -o 'StrictHostKeyChecking=no' -p22 -R $nombre:127.0.0.1:22 rssh@rgateway.crdp.ac-caen.fr\" rssh" >> /etc/rc.local
+	#echo "exit 0" >> /etc/rc.local
+	#######
 	echo "2" > /root/phasemigrexenedu
 	# 1er reboot
 	# On reboot sur le noyau 2.6.32-5 pas xen
+	echo -e "$COLINFO"	
 	echo "Fin phase 1, on reboot..."
+	echo -e "$COLCMD"		
 	wait
 	reboot
 	exit 0
@@ -161,16 +212,22 @@ fi
 if grep "2" /root/phasemigrexenedu; then
 	# On demande confirmation
 	go 2
+	echo -e "$COLINFO"		
 	echo "Migration Squeeze Wheezy XenEdu : Phase 2"
 	echo "Mise a jour de la distribution en Wheezy"
+	echo -e "$COLCMD"		
 	# On remet 0 dans grub
 	sed -i s/GRUB_DEFAULT=2/GRUB_DEFAULT=0/g /etc/default/grub
 	update-grub
 	if ! uname -r | grep xen; then
-        echo "Plus de Xeneries, on vire le noyo xen"
-        apt-get remove linux-image-2.6.32-5-xen-amd64 -y
-        # Modif source list
-		echo "changement des sources en wheezy"
+		echo -e "$COLINFO"
+		echo "Plus de Xeneries, on desinstalle le noyau xen"
+		echo -e "$COLCMD"		
+		apt-get remove linux-image-2.6.32-5-xen-amd64 -y
+		# Modif source list
+		echo -e "$COLINFO"		
+		echo "Changement des sources en wheezy"
+		echo -e "$COLCMD"		
 		cat > /etc/apt/sources.list <<EOF
 deb http://ftp.fr.debian.org/debian/ wheezy main non-free contrib
 deb-src http://ftp.fr.debian.org/debian/ wheezy main non-free contrib
@@ -188,15 +245,19 @@ EOF
 		#
 		# Nous sommes en wheezy, on reboot sur le noyau Wheezy 3.2.0-4-amd64		
 		# second reboot
+		echo -e "$COLINFO"
 		echo "Fin phase 2, on reboot..."
 		echo "Vous pourrez relancer le script en reouvrant une session ssh de secours"
 		echo "avec le meme numero que precedement..."
+		echo -e "$COLCMD"
 		echo "3" > /root/phasemigrexenedu
 		wait
 		reboot
 		exit 0		
 	else
+		echo -e "$COLERR"
 		echo "ERR : Veuillez rebooter sur un noyau standard 2.6.32-5"
+		echo -e "$COLCMD"		
 		exit 1		
 	fi
 fi
@@ -207,22 +268,28 @@ fi
 if grep "3" /root/phasemigrexenedu; then
 	# On demande confirmation
 	go 3
+	echo -e "$COLINFO"	
 	echo "Migration Squeeze Wheezy XenEdu : Phase 3"
+	echo -e "$COLCMD"
 	if uname -r | grep 3.2.0-4; then
 		# On vire le noyau 2.6 faillible
 		apt-get remove linux-image-2.6.32-5-amd64 -y
 		update-grub
 		# Troisieme reboot
+		echo -e "$COLINFO"
 		echo "Fin phase 3, on reboot..."
 		echo "Vous pourrez relancer le script en reouvrant une session ssh de secours"
 		echo "avec le meme numero que precedement..."
+		echo -e "$COLCMD"		
 		echo "4" > /root/phasemigrexenedu
 		wait
 		reboot
 		exit 0
 	else
+		echo -e "$COLERR"	
 		echo "Err : Anomalie : nous ne sommes pas sur le noyau 3.2.0-4"
-		echo "Phase 3 interrompu"
+		echo "Phase 3 interrompue."
+		echo -e "$COLCMD"
 		exit 1	
 	fi
 fi
@@ -232,8 +299,10 @@ fi
 if grep "4" /root/phasemigrexenedu; then
 	# On demande confirmation
 	go 4
+	echo -e "$COLINFO"
 	echo "Migration Squeeze Wheezy XenEdu : Phase 4"
 	echo "Installation des Xeneries 4.0 Wheezy..."
+	echo -e "$COLCMD"
 	# On efface les /sbin/xenedu*
 	rm -f /sbin/xenedu*
 	# On installe les nouvelles Xeneries
@@ -245,19 +314,25 @@ if grep "4" /root/phasemigrexenedu; then
 	#   pre-up ip addr del xxx.xxx.xxx.xxx/24 dev eth0 2> /dev/null || true
 	# car sinon, pas de gateway sur l'interface !
 	# On verifie visuellement la config interfaces
+	echo -e "$COLINFO"
 	echo "Voici la configuration reseau initiale :"
+	echo -e "$COLCMD"
 	cat /etc/network/interfaces	
 	#
 	cp -a /etc/network/interfaces /root/secours	
 	netconfig eth0
 	# On verifie visuellement la config interfaces
+	echo -e "$COLINFO"
 	echo "Voici la nouvelle configuration reseau :"
+	echo -e "$COLCMD"
 	cat /etc/network/interfaces
 	verif
 	# Quatrieme reboot
+	echo -e "$COLINFO"
 	echo "Fin phase 4, on reboot..."
 	echo "Vous pourrez relancer le script en reouvrant une session ssh de secours"
 	echo "avec le meme numero que precedement..."
+	echo -e "$COLCMD"
 	echo "5" > /root/phasemigrexenedu
 	wait
 	reboot
@@ -269,20 +344,46 @@ fi
 if grep "5" /root/phasemigrexenedu; then
 	# On demande confirmation
 	go 5
+	echo -e "$COLINFO"
 	echo "Migration Squeeze Wheezy XenEdu : Phase 5"
 	echo "Finalisation et verifications"
+	echo -e "$COLCMD"
 	# On verifie que le xend est up
 	if ! xm list | grep "Domain-0"; then
-        echo "ERR : Pas de daemon xend up"
-        exit 1
-	else
+		echo -e "$COLERR"
+		echo "ERR : Pas de daemon xend up"
+      echo -e "$COLCMD"
+      if [ ! -f /root/grubwarn ]; then
+      	# On corrige et on reboot
+      	mv /etc/grub.d/10_linux /etc/grub.d/20_linux && mv /etc/grub.d/20_linux_xen /etc/grub.d/10_linux_xen
+      	update-grub
+			echo "Vous pourrez relancer le script en reouvrant une session ssh de secours"
+			echo "avec le meme numero que precedement..."
+			echo -e "$COLCMD"
+			echo "warn" > /root/grubwarn
+			wait
+			reboot        
+			exit 0
+		else
+			echo -e "$COLERR"
+			echo "La migration est effective mais le daemon xend ne semble pas fonctionnel..."
+			echo -e "$VCOLCMD"
+			exit 1	
+		fi
+	fi		
+else
+		echo -e "$COLINFO"
 		echo "Xend up :)"
 		echo "Il faut desormais modifier les DomU..."
 		echo "cf script https://svn.tice.ac-caen.fr/svn/XenEdu/branches/wheezy/xenedu-base/sbin/xenedu-upgrade-wheezy-4vms"
 		echo "Ou manuellement"
-		# On remet en place rc.local
-		cp -a /root/secours/rc.local /etc/
+		echo -e "$COLCMD"
+		# On efface la session ssh secours au reboot
+		update-rc.d sshsecours remove
+		rm -f /etc/init.d/sshsecours
+		rm -f /root/grubwarn
 	fi             
 fi
+
 # FIN
 
