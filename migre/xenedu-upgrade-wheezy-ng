@@ -384,8 +384,7 @@ else
 		# On efface la session ssh secours au reboot
 		update-rc.d sshsecours remove
 		rm -f /etc/init.d/sshsecours
-		rm -f /root/grubwarn
-	fi             
+		rm -f /root/grubwarn             
 fi
 
 # FIN
