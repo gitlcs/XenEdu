@@ -228,6 +228,11 @@ if grep "2" /root/phasemigrexenedu; then
 	#if ! uname -r | grep xen; then
 		echo -e "$COLINFO"
 		echo "Plus de Xeneries, on desinstalle le noyau xen"
+		echo "Dans cette phase, vous serez questionne sur la suppression du noyau 2.6.32-5-xen"
+		echo -e "$COLERR"
+		echo "##################################################################"
+		echo "Repondre NON a la question : Abandonner la suppression du noyau!!!"
+		echo "##################################################################"
 		echo -e "$COLCMD"		
 		apt-get remove linux-image-2.6.32-5-xen-amd64 -y
 		# Modif source list
@@ -247,11 +252,6 @@ EOF
 		
 		apt-get update
 		apt-get install debian-archive-keyring
-		echo -e "$COLINFO"
-		echo "Dans cette phase de mise a jour, vous serez questionne sur la suppression du noyau 2.6.32-5-xen"
-		echo -e "$COLERR"
-		echo "Repondre OUI a la question !!!"
-		echo -e "$COLCMD"
 		apt-get -y --force-yes dist-upgrade
 		#
 		# Nous sommes en wheezy, on reboot sur le noyau Wheezy 3.2.0-4-amd64		
