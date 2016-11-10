@@ -107,7 +107,7 @@ if [ ! -f /root/phasemigrexenedu ]; then
       exit 1
 	fi
 	# On install grub-pc, si celui ci n'est pas installé
-	if [ ! -f /etc/default/grub_ ];then
+	if [ ! -f /etc/default/grub ];then
         echo "install grub-pc" -y
 	fi
 	# On test si il existe un acces ssh rgateway
