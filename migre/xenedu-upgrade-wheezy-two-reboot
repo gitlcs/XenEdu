@@ -201,16 +201,6 @@ if grep "1" /root/phasemigrexenedu; then
 	echo "exit 0" >> /etc/init.d/sshsecours
 	chmod +x /etc/init.d/sshsecours
 	update-rc.d sshsecours defaults	
-	#######
-	# Dans certains cas, la methode rc.local, ne fonctionne pas
-	#cp /etc/rc.local /root/secours/
-	#grep -v "exit 0" /root/secours/rc.local > /etc/rc.local
-	#echo -e "$COLINFO"		
-	#echo "Au prochain reboot le numero de port pour le ssh secours sera $nombre"
-	#echo -e "$COLCMD"	
-	#echo "su -c \"/usr/bin/ssh -f -N -o 'StrictHostKeyChecking=no' -p22 -R $nombre:127.0.0.1:22 rssh@rgateway.crdp.ac-caen.fr\" rssh" >> /etc/rc.local
-	#echo "exit 0" >> /etc/rc.local
-	#######
 	echo "2" > /root/phasemigrexenedu
 	# 1er reboot
 	# On reboot sur le noyau 2.6.32-5 pas xen
@@ -235,7 +225,7 @@ if grep "2" /root/phasemigrexenedu; then
 	# On remet 0 dans grub
 	sed -i s/GRUB_DEFAULT=2/GRUB_DEFAULT=0/g /etc/default/grub
 	update-grub
-	if ! uname -r | grep xen; then
+	#if ! uname -r | grep xen; then
 		echo -e "$COLINFO"
 		echo "Plus de Xeneries, on desinstalle le noyau xen"
 		echo -e "$COLCMD"		
@@ -270,12 +260,12 @@ EOF
 		#wait
 		#reboot
 		exit 0		
-	else
-		echo -e "$COLERR"
-		echo "ERR : Veuillez rebooter sur un noyau standard 2.6.32-5"
-		echo -e "$COLCMD"		
-		exit 1		
-	fi
+	#else
+	#	echo -e "$COLERR"
+	#	echo "ERR : Veuillez rebooter sur un noyau standard 2.6.32-5"
+	#	echo -e "$COLCMD"		
+	#	exit 1		
+	#fi
 fi
 
 
@@ -344,10 +334,11 @@ if grep "4" /root/phasemigrexenedu; then
 	cat /etc/network/interfaces
 	verif
 	# Quatrieme reboot
+	nombre=`cat /etc/init.d/sshsecours | grep su | cut -d ' ' -f 10 | cut -d ':' -f 1`
 	echo -e "$COLINFO"
 	echo "Fin phase 4, on reboot..."
 	echo "Vous pourrez relancer le script en reouvrant une session ssh de secours"
-	echo "avec le meme numero que precedement..."
+	echo "depuis rgateway sur le port $nombre."
 	echo -e "$COLCMD"
 	echo "5" > /root/phasemigrexenedu
 	wait
