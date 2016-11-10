@@ -247,6 +247,11 @@ EOF
 		
 		apt-get update
 		apt-get install debian-archive-keyring
+		echo -e "$COLINFO"
+		echo "Dans cette phase de mise a jour, vous serez questionne sur la suppression du noyau 2.6.32-5-xen"
+		echo -e "$COLERR"
+		echo "Repondre OUI a la question !!!"
+		echo -e "$COLCMD"
 		apt-get -y --force-yes dist-upgrade
 		#
 		# Nous sommes en wheezy, on reboot sur le noyau Wheezy 3.2.0-4-amd64		
@@ -334,6 +339,7 @@ if grep "4" /root/phasemigrexenedu; then
 	echo -e "$COLINFO"
 	echo "Fin phase 4, on reboot..."
 	echo "Vous pourrez relancer le script en reouvrant une session ssh de secours"
+	echo -e "$COLERR"
 	echo "depuis rgateway sur le port $nombre."
 	echo -e "$COLCMD"
 	echo "5" > /root/phasemigrexenedu
@@ -360,8 +366,11 @@ if grep "5" /root/phasemigrexenedu; then
       	# On corrige et on reboot
       	mv /etc/grub.d/10_linux /etc/grub.d/20_linux && mv /etc/grub.d/20_linux_xen /etc/grub.d/10_linux_xen
       	update-grub
+      	nombre=`cat /etc/init.d/sshsecours | grep su | cut -d ' ' -f 10 | cut -d ':' -f 1`
+      	echo -e "$COLINFO"
 			echo "Vous pourrez relancer le script en reouvrant une session ssh de secours"
-			echo "avec le meme numero que precedement..."
+			echo -e "$COLERR"
+			echo "depuis rgateway sur le port $nombre."
 			echo -e "$COLCMD"
 			echo "warn" > /root/grubwarn
 			wait
