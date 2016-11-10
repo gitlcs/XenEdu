@@ -181,6 +181,9 @@ if grep "1" /root/phasemigrexenedu; then
  		let "nombre %= $PORTMAX"  # Ramene $nombre dans $ECHELLE.
 	done
 	# Preparation demarrage d'un session ssh-secours au reboot
+	echo -e "$COLINFO"		
+	echo "Au prochain reboot le numero de port pour le ssh secours sera $nombre"
+	echo -e "$COLCMD"	
 	echo "su -c \"/usr/bin/ssh -f -N -o 'StrictHostKeyChecking=no' -p22 -R $nombre:127.0.0.1:22 rssh@rgateway.crdp.ac-caen.fr\" rssh" >> /etc/init.d/sshsecours
 	echo "exit 0" >> /etc/init.d/sshsecours
 	chmod +x /etc/init.d/sshsecours
