@@ -1,12 +1,12 @@
 #!/bin/bash
 # Xenedu Squeeze to Wheezy
-# xenedu-upgrade-wheezy-noreboot 
-# 10/11/2016 jLCF jean-luc.chretien@ac-caen.fr
+# xenedu-upgrade-wheezy-tworeboot 
+# 11/11/2016 jLCF jean-luc.chretien@ac-caen.fr
 # ---------------------------------------------------------------------------
 # Phase 0 : Préparatoire
-# Phase 1 : On vire les xeneries et on passe sur un noyau squeeze 2.6 non Xen
+# Phase 1 : On vire les xeneries
 # Phase 2 : Upgrade Wheezy
-# Phase 3 : On vire le vieux noyau 2.6 de old squeeze
+# Phase 3 : On desinstalle le vieux noyau 2.6 de old squeeze
 # Phase 4 : Install Xenneries Wheezy et modif network/interfaces
 # Phase 5 : Finalisation
 # ---------------------------------------------------------------------------
@@ -174,7 +174,7 @@ if grep "1" /root/phasemigrexenedu; then
 	chown -R rssh:rssh /home/rssh
 	chmod 755 /home/rssh
 	chmod -R 700 /home/rssh/.ssh
-	# On se prepare a ouvrir apres reboot un session ssh de secours automatiquement
+	# On se prepare a ouvrir une session ssh de secours automatiquement
 	PORTMIN=10000
 	PORTMAX=32000
 	nombre=0   #initialise
@@ -183,32 +183,26 @@ if grep "1" /root/phasemigrexenedu; then
   		nombre=$RANDOM
  		let "nombre %= $PORTMAX"  # Ramene $nombre dans $ECHELLE.
 	done
-	# Preparation demarrage d'un session ssh-secours au reboot
+	# Preparation demarrage d'un session ssh secours
 	echo -e "$COLINFO"		
-	echo "Au prochain reboot le numero de port pour le ssh secours sera $nombre"
+	echo "Vous pouvez desormais joindre ce Dom0 via une session ssh rgateway sur le port : $nombre"
 	echo -e "$COLCMD"	
-
-	echo "#!/bin/sh" > /etc/init.d/sshsecours
-	echo "### BEGIN INIT INFO" >> /etc/init.d/sshsecours
-	echo "# Provides:        sshsecours" >> /etc/init.d/sshsecours
-	echo "# Required-Start:    $remote_fs $syslog" >> /etc/init.d/sshsecours
-	echo "# Required-Stop:    $remote_fs $syslog" >> /etc/init.d/sshsecours
-	echo "# Default-Start:    2 3 4 5" >> /etc/init.d/sshsecours
-	echo "# Default-Stop:0 1 6" >> /etc/init.d/sshsecours
-	echo "# Short-Description: ssh secours rgateway" >> /etc/init.d/sshsecours
-	echo "### END INIT INFO" >> /etc/init.d/sshsecours	
-	echo "su -c \"/usr/bin/ssh -f -N -o 'StrictHostKeyChecking=no' -p22 -R $nombre:127.0.0.1:22 rssh@rgateway.crdp.ac-caen.fr\" rssh" >> /etc/init.d/sshsecours
-	echo "exit 0" >> /etc/init.d/sshsecours
-	chmod +x /etc/init.d/sshsecours
-	update-rc.d sshsecours defaults	
+	# Creation /sbin/crontab-ssh-secours
+	echo "#!/bin/bash" > /sbin/crontab-ssh-secours
+	echo "if ! ps aux | grep 'StrictHostKeyChecking' | grep rssh; then" >> /sbin/crontab-ssh-secours
+	echo "	su -c \"/usr/bin/ssh -f -N -o 'StrictHostKeyChecking=no' -p22 -R $nombre:127.0.0.1:22 rssh@rgateway.crdp.ac-caen.fr\" rssh" >> /sbin/crontab-ssh-secours
+	echo "fi" >> /sbin/crontab-ssh-secours
+	chmod +x /sbin/crontab-ssh-secours
+	# Creation entree crontab 
+	cp -a /etc/crontab /root/secours/
+	echo "*/1 *	* * *	root	/sbin/crontab-ssh-secours" >> /etc/crontab
+	#	
 	echo "2" > /root/phasemigrexenedu
-	# 1er reboot
-	# On reboot sur le noyau 2.6.32-5 pas xen
+	# Fin Phase 1
 	echo -e "$COLINFO"	
 	echo "Fin phase 1... Relancer le script"
 	echo -e "$COLCMD"		
 	wait
-	#reboot
 	exit 0
 	# Fin Phase 1
 fi
@@ -233,7 +227,8 @@ if grep "2" /root/phasemigrexenedu; then
 		echo "##################################################################"
 		echo "Repondre NON a la question : Abandonner la suppression du noyau!!!"
 		echo "##################################################################"
-		echo -e "$COLCMD"		
+		echo -e "$COLCMD"
+		wait	
 		apt-get remove linux-image-2.6.32-5-xen-amd64 -y
 		# Modif source list
 		echo -e "$COLINFO"		
@@ -253,22 +248,12 @@ EOF
 		apt-get update
 		apt-get install debian-archive-keyring
 		apt-get -y --force-yes dist-upgrade
-		#
-		# Nous sommes en wheezy, on reboot sur le noyau Wheezy 3.2.0-4-amd64		
-		# second reboot
+		# Nous sommes en wheezy	
 		echo -e "$COLINFO"
 		echo "Fin phase 2... Relancer le script"
 		echo -e "$COLCMD"
 		echo "3" > /root/phasemigrexenedu
-		#wait
-		#reboot
 		exit 0		
-	#else
-	#	echo -e "$COLERR"
-	#	echo "ERR : Veuillez rebooter sur un noyau standard 2.6.32-5"
-	#	echo -e "$COLCMD"		
-	#	exit 1		
-	#fi
 fi
 
 
@@ -280,25 +265,15 @@ if grep "3" /root/phasemigrexenedu; then
 	echo -e "$COLINFO"	
 	echo "Migration Squeeze Wheezy XenEdu : Phase 3"
 	echo -e "$COLCMD"
-#	if uname -r | grep 3.2.0-4; then
-		# On vire le noyau 2.6 faillible
-		apt-get remove linux-image-2.6.32-5-amd64 -y
-		update-grub
-		# Troisieme reboot
-		echo -e "$COLINFO"
-		echo "Fin phase 3... Relancer le script"
-		echo -e "$COLCMD"		
-		echo "4" > /root/phasemigrexenedu
-		#wait
-		#reboot
-		exit 0
-#	else
-#		echo -e "$COLERR"	
-#		echo "Err : Anomalie : nous ne sommes pas sur le noyau 3.2.0-4"
-#		echo "Phase 3 interrompue."
-#		echo -e "$COLCMD"
-#		exit 1	
-#	fi
+	# On vire le noyau 2.6 faillible
+	apt-get remove linux-image-2.6.32-5-amd64 -y
+	update-grub
+	#
+	echo -e "$COLINFO"
+	echo "Fin phase 3... Relancer le script"
+	echo -e "$COLCMD"		
+	echo "4" > /root/phasemigrexenedu
+	exit 0
 fi
 
 # Phase 4
@@ -334,8 +309,8 @@ if grep "4" /root/phasemigrexenedu; then
 	echo -e "$COLCMD"
 	cat /etc/network/interfaces
 	verif
-	# Quatrieme reboot
-	nombre=`cat /etc/init.d/sshsecours | grep su | cut -d ' ' -f 10 | cut -d ':' -f 1`
+	#
+	nombre=`cat /sbin/crontab-ssh-secours | grep su | cut -d ' ' -f 10 | cut -d ':' -f 1`
 	echo -e "$COLINFO"
 	echo "Fin phase 4, on reboot..."
 	echo "Vous pourrez relancer le script en reouvrant une session ssh de secours"
@@ -366,7 +341,7 @@ if grep "5" /root/phasemigrexenedu; then
       	# On corrige et on reboot
       	mv /etc/grub.d/10_linux /etc/grub.d/20_linux && mv /etc/grub.d/20_linux_xen /etc/grub.d/10_linux_xen
       	update-grub
-      	nombre=`cat /etc/init.d/sshsecours | grep su | cut -d ' ' -f 10 | cut -d ':' -f 1`
+      	nombre=`cat /sbin/crontab-ssh-secours | grep su | cut -d ' ' -f 10 | cut -d ':' -f 1`
       	echo -e "$COLINFO"
 			echo "Vous pourrez relancer le script en reouvrant une session ssh de secours"
 			echo -e "$COLERR"
@@ -382,8 +357,7 @@ if grep "5" /root/phasemigrexenedu; then
 			echo -e "$VCOLCMD"
 			exit 1	
 		fi
-	fi		
-else
+	else
 		echo -e "$COLINFO"
 		echo "Xend up :)"
 		echo "Il faut desormais modifier les DomU..."
@@ -391,9 +365,10 @@ else
 		echo "Ou manuellement"
 		echo -e "$COLCMD"
 		# On efface la session ssh secours au reboot
-		update-rc.d sshsecours remove
-		rm -f /etc/init.d/sshsecours
-		rm -f /root/grubwarn             
+		cp -a /root/secours/crontab /etc/crontab
+		rm -f /sbin/crontab-ssh-secours
+		rm -f /root/grubwarn  		
+	fi		
 fi
 
 # FIN
