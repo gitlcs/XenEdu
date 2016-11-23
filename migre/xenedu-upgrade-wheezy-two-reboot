@@ -318,7 +318,7 @@ if grep "4" /root/phasemigrexenedu; then
 	echo "Voulez vous mettre en place une configuration Xen 4 ? (O/n)"
 	echo -e "$COLCMD"
 	read CONFIRM
-	if [ $CONFIRM != "n" ]; then
+	if [ "$CONFIRM" != "n" ]; then
 		echo -e "$COLINFO"
 		echo "Mise en place configuration reseau xen 4 (xenbrethx)"
 		echo -e "$COLCMD"
