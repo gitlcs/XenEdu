@@ -1,7 +1,7 @@
 #!/bin/bash
 # Xenedu Squeeze to Wheezy
 # xenedu-upgrade-wheezy-tworeboot 
-# 17/11/2016 jLCF jean-luc.chretien@ac-caen.fr
+# 08/12/2016 jLCF jean-luc.chretien@ac-caen.fr
 # ---------------------------------------------------------------------------
 # Phase 0 : Préparatoire
 # Phase 1 : On vire les xeneries
@@ -311,6 +311,7 @@ if grep "4" /root/phasemigrexenedu; then
 	# On installe les nouvelles Xeneries
 	apt-get install xenedu-base -y
 	# Modification networking/interfaces
+	cp -a /etc/network/interfaces /root/secours
 	echo -e "$COLTITRE"
 	echo "Reconfiguration du reseau Dom0"
 	echo -e "$COLCMD"
@@ -337,8 +338,7 @@ if grep "4" /root/phasemigrexenedu; then
 		echo "Voici la configuration reseau initiale :"
 		echo -e "$COLCMD"
 		cat /etc/network/interfaces	
-		#
-		cp -a /etc/network/interfaces /root/secours	
+		#	
 		netconfig eth0
 		# On verifie visuellement la config interfaces
 		echo -e "$COLINFO"
