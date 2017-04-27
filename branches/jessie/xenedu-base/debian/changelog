@@ -1,10 +1,10 @@
-xenedu-base (x.x.x)
-  * add xenedu-upgrade-wheezy
-  * add xenedu-upgrade-wheezy-4vms
- -- Mikael Bailleul <MikaelBailleul@gmail.com>
- -- David Gloux <david.gloux@tice.ac-caen.fr>  Wed, 23 Apr 2014 11:40:00 +0100
- 
-xenedu-base (1.0.0~1) stable; urgency=low
+xenedu-base (2.0.0~1) stable; urgency=low
+
+  * Initial release for debian Jessie
+
+ -- jlcf <jean-luc.chretien@ac-caen.f>  Thu, 27 Apr 2017 13:47:16 +0200
+
+xenedu-base (1.0.0) stable; urgency=low
 
   * fix XenEdu install
 
@@ -13,20 +13,10 @@ xenedu-base (1.0.0~1) stable; urgency=low
 xenedu-base (0.9.0) stable; urgency=low
 
   * remove tilde for release
+  * add network reconfig script 
+  * XenEdu adaptation for Debian Wheezy   
 
  -- Simon Cavey <simon.cavey@crdp.ac-caen.fr>  Fri, 31 May 2013 10:17:42 +0200
-
-xenedu-base (0.9.0~3) unstable; urgency=low
-
-  * add network reconfig script
-
- -- Simon Cavey <simon.cavey@crdp.ac-caen.fr>  Wed, 06 Mar 2013 12:35:40 +0100
-
-xenedu-base (0.9.0~2) unstable; urgency=low
-
-  * XenEdu adaptation for Debian Wheezy
-
- -- Simon Cavey <simon.cavey@crdp.ac-caen.fr>  Thu, 21 Feb 2013 11:24:11 +0100
 
 xenedu-base (0.8.6) stable; urgency=low
 
