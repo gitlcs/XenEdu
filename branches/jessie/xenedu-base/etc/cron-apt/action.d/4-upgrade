@@ -1,0 +1,2 @@
+autoclean -y
+dist-upgrade -y

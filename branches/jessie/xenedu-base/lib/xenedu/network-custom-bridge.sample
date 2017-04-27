@@ -1,0 +1,4 @@
+#!/bin/sh
+/etc/xen/scripts/network-bridge "$@" netdev=eth0
+/etc/xen/scripts/network-bridge "$@" netdev=eth1
+

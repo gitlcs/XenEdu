@@ -1,0 +1,163 @@
+xenedu-base (x.x.x)
+  * add xenedu-upgrade-wheezy
+  * add xenedu-upgrade-wheezy-4vms
+ -- Mikael Bailleul <MikaelBailleul@gmail.com>
+ -- David Gloux <david.gloux@tice.ac-caen.fr>  Wed, 23 Apr 2014 11:40:00 +0100
+ 
+xenedu-base (1.0.0~1) stable; urgency=low
+
+  * fix XenEdu install
+
+ -- Simon Cavey <simon.cavey@crdp.ac-caen.fr>  Tue, 09 Jul 2013 15:32:46 +0200
+
+xenedu-base (0.9.0) stable; urgency=low
+
+  * remove tilde for release
+
+ -- Simon Cavey <simon.cavey@crdp.ac-caen.fr>  Fri, 31 May 2013 10:17:42 +0200
+
+xenedu-base (0.9.0~3) unstable; urgency=low
+
+  * add network reconfig script
+
+ -- Simon Cavey <simon.cavey@crdp.ac-caen.fr>  Wed, 06 Mar 2013 12:35:40 +0100
+
+xenedu-base (0.9.0~2) unstable; urgency=low
+
+  * XenEdu adaptation for Debian Wheezy
+
+ -- Simon Cavey <simon.cavey@crdp.ac-caen.fr>  Thu, 21 Feb 2013 11:24:11 +0100
+
+xenedu-base (0.8.6) stable; urgency=low
+
+  * change upgrade condition test
+
+ -- Simon Cavey <simon.cavey@crdp.ac-caen.fr>  Sat, 01 Dec 2012 17:46:19 +0100
+
+xenedu-base (0.8.5) stable; urgency=low
+
+  * upgrade fix
+
+ -- Simon Cavey <simon.cavey@crdp.ac-caen.fr>  Fri, 30 Nov 2012 17:26:17 +0100
+
+xenedu-base (0.8.4) stable; urgency=low
+
+  * fix upgrade bugs
+  * add check
+  
+ -- Simon Cavey <simon.cavey@crdp.ac-caen.fr>  Tue, 20 Nov 2012 11:00:33 +0100
+
+xenedu-base (0.8.3) stable; urgency=low
+
+  * update squeeze migration script
+
+ -- Simon Cavey <simon.cavey@crdp.ac-caen.fr>  Wed, 31 Oct 2012 09:11:26 +0100
+
+xenedu-base (0.8.2) stable; urgency=low
+
+  * fix XenEdu hostname
+
+ -- Simon Cavey <simon.cavey@crdp.ac-caen.fr>  Wed, 11 Jul 2012 13:18:34 +0200
+
+xenedu-base (0.8.1.1) stable; urgency=low
+
+  * fix mail system and update source list if XE run on lenny
+
+ -- Simon Cavey <simon.cavey@crdp.ac-caen.fr>  Fri, 15 Jun 2012 10:29:38 +0200
+
+xenedu-base (0.8.0.6) stable; urgency=low
+
+  * fix dummy conflict
+
+ -- Simon Cavey <simon.cavey@crdp.ac-caen.fr>  Thu, 05 Jan 2012 11:43:46 +0100
+
+xenedu-base (0.8.0.5) stable; urgency=low
+
+  * fix upgrade
+
+ -- Simon Cavey <simon.cavey@crdp.ac-caen.fr>  Mon, 19 Dec 2011 14:46:06 +0100
+
+xenedu-base (0.8.0.4) stable; urgency=low
+
+  * fix ballonnig options
+  * fix bridge script
+
+ -- Simon Cavey <simon.cavey@crdp.ac-caen.fr>  Mon, 12 Dec 2011 09:23:25 +0100
+
+xenedu-base (0.8.0.2) stable; urgency=low
+
+  * update migration scripts
+
+ -- Simon Cavey <simon.cavey@crdp.ac-caen.fr>  Tue, 29 Nov 2011 15:17:59 +0100
+
+xenedu-base (0.8.0.1) stable; urgency=low
+
+  * pre-upgrade for xen 4.1
+  * fix minor bugs
+  * add automatic upgrade
+
+ -- Simon Cavey <simon.cavey@crdp.ac-caen.fr>  Fri, 18 Nov 2011 14:31:42 +0100
+
+xenedu-base (0.8.0.0) stable; urgency=low
+
+  * Change grub2 setup for debian squeeze
+  * Added Squeeze upgrade script
+ 
+ -- Simon Cavey <simon.cavey@crdp.ac-caen.fr>  Tue, 19 Apr 2011 13:34:03 +0200
+
+xenedu-base (0.6.3.1) stable; urgency=low
+
+  * add ethernet management scripts
+
+ -- Simon Cavey <simon.cavey@crdp.ac-caen.fr>  Tue, 01 Feb 2011 11:51:45 +0100
+
+xenedu-base (0.6.2) stable; urgency=low
+
+  * Add remote SSH feature
+  * Stop RSSH after 1 day
+
+ -- Simon Cavey <simon.cavey@crdp.ac-caen.fr>  Mon, 04 Oct 2010 00:39:53 +0200
+
+xenedu-base (0.5.6) stable; urgency=low
+
+  * Non-maintainer upload.
+  * add mac adresse generator
+
+ -- Simon Cavey <simon.cavey@crdp.ac-caen.fr>  Wed, 29 Sep 2010 16:31:49 +0200
+
+xenedu-base (0.5.5) stable; urgency=low
+
+  * fix postinst
+
+ -- simon cavey <simon.cavey@crdp.ac-caen.fr>  Thu, 16 Sep 2010 08:07:50 +0200
+
+xenedu-base (0.5.1) stable; urgency=low
+
+  * Correct xendomains for halting VM's
+  * don't run config when upgrade
+  
+ -- simon cavey <simon.cavey@crdp.ac-caen.fr>  Wed, 08 Sep 2010 10:48:47 +0200
+
+xenedu-base (0.4~2) stable; urgency=low
+
+  * add update script
+
+ -- simon cavey <simon.cavey@crdp.ac-caen.fr>  Fri, 18 Jun 2010 00:01:52 +0200
+
+xenedu-base (0.3) stable; urgency=low
+
+  * add update script
+
+ -- simon cavey <simon.cavey@crdp.ac-caen.fr>  Thu, 17 Jun 2010 23:59:28 +0200
+
+xenedu-base (0.2) stable; urgency=low
+
+  * initial bugfix
+
+ -- simon cavey <simon.cavey@crdp.ac-caen.fr>  Tue, 23 Mar 2010 23:18:25 +0100
+
+xenedu-base (0.1) stable; urgency=low
+
+  * Initial release
+
+ -- simon cavey <simon.cavey@crdp.ac-caen.fr>  Tue, 23 Mar 2010 21:29:23 +0100
