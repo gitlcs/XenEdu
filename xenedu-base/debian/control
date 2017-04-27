@@ -1,0 +1,15 @@
+Source: xenedu-base
+Section: misc
+Priority: extra
+Maintainer: Simon Cavey <simon.cavey@crdp.ac-caen.fr>
+Build-Depends: debhelper (>= 6)
+Standards-Version: 3.8.4
+Homepage: http://xenedu.crdp.ac-caen.fr
+
+Package: xenedu-base
+Architecture: all
+Depends: ${misc:Depends}, xen-tools, bridge-utils, debootstrap, lvm2, ssh, screen, cron-apt, curl, ipcalc
+Description: xenedu-base update post installation xen config
+ post installation xen config with harward spécification
+ xenedu-base configure xen with bridged network on all interfaces
+ and in allow to bridge on diffrent vlan

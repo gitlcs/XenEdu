@@ -1,0 +1,12 @@
+#!/bin/bash
+#
+# Arret du SSH de secours
+#
+
+# On Arrete toutes les instances de RSSH
+
+for RSSHPID in `ps aux | grep rssh | awk {'print $2'}`
+do
+	kill -9 $RSSHPID
+done
+

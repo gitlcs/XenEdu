@@ -1,0 +1,131 @@
+#!/bin/bash
+#
+# Script de migration en Squeeze
+# 08/02/2011
+#
+#
+#
+
+echo "Faut-il mettre a jour maintenant ? (o/N) "
+read STARTUPGRADE
+
+if [ $STARTUPGRADE != "o" ]; then
+	echo "mise a jour annulee"
+	exit 1
+else
+	echo "debut de la mise a jour"
+fi
+
+### Check de la version du script : 
+XENEDUVERSION=`dpkg -l xenedu-base | grep ^ii | awk '{print $3}'`
+NEEDVERSION="`curl http://xenedu.crdp.ac-caen.fr/xenedu-ugrade-squeeze-needed`"
+if [ "$XENEDUVERSION" -le "$NEEDVERSION" ]; then
+	echo "erreur de version : veuillez mettre à jour la version lenny avant de poursuivre."
+       	exit 1
+else
+               echo "Bonne version du script trouvée :-)" 
+fi
+###
+DEBVERSION=`cat /etc/debian_version |cut -f 1 -d .`
+if [ "$DEBVERSION" != "5" ]; then
+        echo "erreur de version : ce script est prevu pour lenny uniquement"
+        exit 1
+else
+        echo "Bonne version de Debian trouvée :-)" 
+fi
+
+
+##
+BOOTDISK=`cat /boot/grub/device.map|awk {'print $2'}`
+
+echo mise a jour des sources.
+cat > /etc/apt/sources.list <<EOF 
+
+deb http://ftp.fr.debian.org/debian/ squeeze main non-free contrib
+deb-src http://ftp.fr.debian.org/debian/ squeeze main non-free contrib
+
+deb http://security.debian.org/ squeeze/updates main contrib non-free
+deb-src http://security.debian.org/ squeeze/updates main contrib non-free
+
+## XenEdu
+deb http://xenedu.crdp.ac-caen.fr/squeeze xenedu main
+EOF
+
+
+### On repond aux questions avant qu'elles n'arrivent.
+cat > /tmp/preseed-squeeze <<EOF
+# Dash
+# GRUB
+#libc6
+# libpamg
+# sysv-rc
+# UUID
+grub   grub/migrate_from_legacy        note
+grub-pc        grub2/device_map_regenerated    note
+grub   grub/migrate_from_legacy        note
+grub-pc        grub2/device_map_regenerated    note
+grub-pc        grub2/linux_cmdline     string  pci=nomsi
+grub-pc        grub-pc/install_devices_empty   boolean false
+grub-pc        grub-pc/chainload_from_menu.lst boolean true
+grub-pc        grub-pc/install_devices multiselect
+linux-base     linux-base/disk-id-convert-plan-no-relabel      boolean true
+libpam-runtime libpam-runtime/conflicts        error
+libpam-runtime libpam-runtime/override boolean false
+libpam0g       libpam0g/restart-services       string  exim4 cron atd
+libpam-runtime libpam-runtime/profiles multiselect     unix
+libc6  glibc/restart-services  string  ssh openbsd-inetd cron
+linux-base     linux-base/disk-id-convert-auto boolean true
+linux-base     linux-base/disk-id-convert-plan boolean true
+sysv-rc        sysv-rc/unable-to-convert       note
+sysv-rc        sysv-rc/convert-legacy  boolean true
+sysv-rc        sysv-rc/unable-to-convert       note
+util-linux     util-linux/noauto-with-nonzero-passnum  note
+openssh-server ssh/vulnerable_host_keys        note
+dash   dash/sh boolean true
+
+EOF
+
+debconf-set-selections < /tmp/preseed-squeeze   
+#######
+
+DEBIAN_PRIORITY="critical"
+DEBIAN_FRONTEND="noninteractive"
+export  DEBIAN_FRONTEND
+export  DEBIAN_PRIORITY
+
+
+apt-get	update
+#apt-get dist-upgrade
+apt-get -y --force-yes dist-upgrade
+
+apt-get -y --force-yes install linux-image-2.6-xen-amd64 xen-tools xen-utils xen-qemu-dm-4.0 xen-hypervisor-4.0
+
+upgrade-from-grub-legacy
+grub-install $BOOTDISK
+
+rm -f /boot/grub/menu.lst*
+mv /etc/grub.d/20_linux_xen /etc/grub.d/09_linux_xen
+update-grub
+
+## On fait le ménage.
+apt-get	clean
+
+## On propose la maj de VM.
+clean
+echo "La mise a jour de XenEdu vers Squeeze est terminee."
+echo "Vos machines virtuelles doivent être modifiées pour fonctionner a nouveau."
+echo "Les machines virtuelles doivent être arrêtées."
+echo "Ensuite un rédemarrage du serveur physique est nécessaire."
+echo "En cas d'erreur il se peut que vos machines ne fonctionnent plus"
+echo "Si vous ne maitrisez pas le fonctionnement de Xen assurez-vous"
+echo "que les personnes de l assistance sont disponibles."
+
+echo "Faut-il mettre a jour les VM automatiquement ? (o/N) "
+
+read UPGRADEVM 
+
+if [ $UPGRADEVM = "o" ]; then
+	/sbin/xenedu-upgrade-squeeze-4vms
+fi
+
+
