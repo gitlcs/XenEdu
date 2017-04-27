@@ -1,0 +1,26 @@
+#!/bin/bash
+
+        # Bridge a la mode xen 4 squeeze 
+        cp /etc/network/interfaces /etc/network/interfaces.noxen4
+        # modification de eth0
+        # 
+        # on remplace eth0 par xbeth0
+        #
+        sed -i'' 's/iface\ eth0/iface\ xbeth0/g' /etc/network/interfaces
+        #
+        # On remet eth0
+        #
+        sed -i'' '/allow-hotplug\ eth0/a\iface\ eth0\ inet\ manual\nauto xbeth0' /etc/network/interfaces
+        # On ajout le bridge sur eth0
+        sed -i'' '/address/i\\tbridge_port eth0 \n\tbridge_maxwait 5\n\tbridge_fd 0' /etc/network/interfaces
+        sed -i'' '/dhcp/a\\tbridge_port eth0 \n\tbridge_maxwait 5\n\tbridge_fd 0' /etc/network/interfaces
+        
+        echo "### Bridge reseau Xen" >> /etc/network/interfaces
+        for i in `ifconfig -a |grep eth |grep -v eth0 |grep -v peth | cut -f 1 -d " "`
+        do 
+               echo "auto xb$i" >> /etc/network/interfaces
+               echo "iface xb$i inet manual" >> /etc/network/interfaces
+               echo "   bridge_ports $i" >> /etc/network/interfaces
+               echo "   bridge_maxwait 5" >> /etc/network/interfaces
+               echo "   bridge_fd 0" >> /etc/network/interfaces
+        done

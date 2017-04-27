@@ -1,0 +1,49 @@
+#!/bin/bash
+#
+# Mise a  jour des machines virtuelles de XenEdu
+#
+#
+
+for vm in `xm list 2>>/dev/null | cut -f 1 -d " "|grep -v "Name"| grep -v "Domain-0"`
+do
+	# Test si la vm est un windows ou HVM
+	TESTHVM=`xm list -l $vm 2>>/dev/null | grep hvm`
+	if [ -n "$TESTHVM" ] ; then
+		echo "$VM n'a pas besoin de modifications"
+	else
+		VMROOT=`xm list -l $vm 2>>/dev/null | grep root |grep phy| cut -f 2 -d ":" | cut -f 1 -d ")"`
+		VMCONF=`grep -il  "$vm" /etc/xen/*`
+		echo "Mise a jours de $vm"
+		echo "arrêt de $vm"
+			xm shut $vm 2>>/dev/null
+			sleep 60
+			xm dest $vm 2>>/dev/null
+		mkdir -p /mnt/upgrade-$vm
+		mount $VMROOT /mnt/upgrade-$vm
+		cp -a /lib/modules/2.6.32-5-xen-amd64 /mnt/upgrade-$vm/lib/modules
+		chroot /mnt/upgrade-$vm/ /sbin/depmod -a 2.6.32-5-xen-amd64
+		sed -i'' 's/sda/xvda/g' /mnt/upgrade-$vm/etc/fstab
+		sed -i'' 's/1\:2345\:respawn\:\/sbin\/getty\ 38400\ tty1/1\:2345\:respawn\:\/sbin\/getty\ 38400\ hvc0/g' /mnt/upgrade-$vm/etc/inittab
+		sync
+		umount /mnt/upgrade-$vm
+		# Modification du fichier de config.
+		echo "Modification du fichier de config de $vm"
+		sed -i'' '/^kernel/d' $VMCONF
+		sed -i'' '/^ramdisk/d' $VMCONF
+		sed -i'' '1ikernel = \"/boot/vmlinuz-2.6.32-5-xen-amd64\"' $VMCONF
+		sed -i'' '2iramdisk = \"/boot/initrd.img-2.6.32-5-xen-amd64\"' $VMCONF
+		sed -i'' 's/sda/xvda/g' $VMCONF
+		sed -i''  '/^extra/d' $VMCONF
+		#echo "extra = \"4 console=hvc0\"" >> $VMCONF
+		echo "FIN de migration de $vm"
+	fi
+done
+echo "Toutes les machines virtuelle ont ete adaptees pour Squeeze"
+echo "Le systeme doit être redemarre"
+echo "voulez-vous redemarrer maintenant ? (o/N)"
+read RESTART
+if [ $RESTART = "o" ]; then
+        reboot
+else
+ exit 0
+fi

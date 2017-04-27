@@ -1,0 +1,3 @@
+#!/bin/sh
+echo "prise en charge reseau dans /etc/network/interface"
+exit 0

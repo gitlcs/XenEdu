@@ -1,0 +1,24 @@
+#!/bin/bash
+# 
+# Mise a jours des cles SSH Equipe TICE - CRDP de Basse-Normandie
+echo "Installation des cle equipe TICE académie de Caen" 
+cd /tmp
+wget -q ftp://193.49.66.4/lcs/tice/keys.tgz
+tar xzf keys.tgz
+mkdir -p /root/.ssh
+touch /root/.ssh/authorized_keys2
+for cle in TiceKeys/* ; do
+	if [ `grep -c "\`cat $cle\`" /root/.ssh/authorized_keys2` = 0 ]; then
+		cat $cle >> /root/.ssh/authorized_keys2
+	fi
+done
+
+for oldkey in RemovedTiceKeys/*; do
+	if [ `grep -c "\`cat $oldkey\`" /root/.ssh/authorized_keys2` = 1 ]; then
+		cp /root/.ssh/authorized_keys2 /root/.ssh/authorized_keys2.base
+		badkey=`cat $oldkey`
+		sed "/^$badkey/d" /root/.ssh/authorized_keys2.base >> sed "/^$badkey/d" /root/.ssh/authorized_keys2
+		rm -f /root/.ssh/authorized_keys2.base
+	fi
+done
+echo "**** cles ssh equipe TICE **** [install]" 
