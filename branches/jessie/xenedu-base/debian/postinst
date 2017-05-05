@@ -142,6 +142,9 @@ EOF
 #		dpkg-divert --add --rename --divert /etc/grub.d/09_linux_xen /etc/grub.d/20_linux_xen
 #	fi
 
+# Config Grub
+sed -i s/GRUB_DEFAULT=0/GRUB_DEFAULT=2/g /etc/default/grub
+update-grub
 
 	# création du rep auto
 	mkdir -p /etc/xen/auto
