@@ -112,33 +112,36 @@ auto xenbrdummy0
                  bridge_fd 0
 EOF
 
-	# ecriture du fichier de config xen
-	if [ ! -e /etc/xen/xend-config.sxp.noxenedu ] ; then 
-	    mv /etc/xen/xend-config.sxp /etc/xen/xend-config.sxp.noxenedu
-	fi
-	cat > /etc/xen/xend-config.sxp <<EOF
+#	# ecriture du fichier de config xen
+#	if [ ! -e /etc/xen/xend-config.sxp.noxenedu ] ; then 
+#	    mv /etc/xen/xend-config.sxp /etc/xen/xend-config.sxp.noxenedu
+#	fi
+#	cat > /etc/xen/xend-config.sxp <<EOF
 # Xen config for XenEdu
-(xend-http-server yes)
-(xend-unix-server yes)
-(xend-tcp-xmlrpc-server yes)
-(xend-unix-xmlrpc-server yes)
-(xend-tcp-xmlrpc-server-address 'localhost')
-(xend-tcp-xmlrpc-server-port 8006)
-(xend-port            8000)
-(network-script 'network-custom-bridge')
-(vif-script vif-bridge)
-(dom0-min-mem 196)
-(dom0-cpus 0)
+#(xend-http-server yes)
+#(xend-unix-server yes)
+#(xend-tcp-xmlrpc-server yes)
+#(xend-unix-xmlrpc-server yes)
+#(xend-tcp-xmlrpc-server-address 'localhost')
+#(xend-tcp-xmlrpc-server-port 8006)
+#(xend-port            8000)
+#(network-script 'network-custom-bridge')
+#(vif-script vif-bridge)
+#(dom0-min-mem 196)
+#(dom0-cpus 0)
 #(enable-dom0-ballooning no)
-(vncpasswd '')
-(keymap 'fr')
-EOF
+#(vncpasswd '')
+#(keymap 'fr')
+#EOF
 
-	# Config pour grub 2 squeeze
-	if [ -e /etc/grub.d/20_linux_xen ] ; then
-		#mv /etc/grub.d/20_linux_xen /etc/grub.d/09_linux_xen
-		dpkg-divert --add --rename --divert /etc/grub.d/09_linux_xen /etc/grub.d/20_linux_xen
-	fi
+
+
+#	# Config pour grub 2 squeeze
+#	if [ -e /etc/grub.d/20_linux_xen ] ; then
+#		#mv /etc/grub.d/20_linux_xen /etc/grub.d/09_linux_xen
+#		dpkg-divert --add --rename --divert /etc/grub.d/09_linux_xen /etc/grub.d/20_linux_xen
+#	fi
+
 
 	# création du rep auto
 	mkdir -p /etc/xen/auto

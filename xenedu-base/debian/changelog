@@ -1,8 +1,10 @@
-xenedu-base (2.0.0~1) stable; urgency=low
+xenedu-base (2.0.0~2) stable; urgency=low
 
   * Initial release for debian Jessie
+  * Modify control compat...
+  * Modify postinst
 
- -- jlcf <jean-luc.chretien@ac-caen.f>  Thu, 27 Apr 2017 13:47:16 +0200
+ -- jlcf <jean-luc.chretien@ac-caen.f>  Fri, 05 May 2017 12:51:59 +0200
 
 xenedu-base (1.0.0) stable; urgency=low
 
