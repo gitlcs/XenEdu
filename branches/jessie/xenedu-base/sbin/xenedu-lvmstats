@@ -1,13 +1,8 @@
 #!/bin/bash
 source /etc/xenedu/xenedu.conf
 
-VERBOSEFREE=`vgdisplay $XENEDUDISK | grep Free| awk {'print $7 " " $8'}`
-DISKSIZEV=`vgdisplay $XENEDUDISK | grep "VG Size"| awk {'print $3 " " $4'}`
-DISKFREEV=`vgdisplay $XENEDUDISK | grep Free| awk {'print $3 " " $4 '}`
-DISKSIZE=`vgdisplay $XENEDUDISK | grep "VG Size"| awk {'print $3'}`
-DISKFREE=`vgdisplay $XENEDUDISK | grep Free| awk {'print $7 '}`
-DOTDISKFREE=`echo $DISKFREE | sed 's/,/./g'`
-DOTDISKSIZE=`echo $DISKSIZE | sed 's/,/./g'`
-FREERATIO=`scale=4;$DOTDISKSIZE/$DOTDISKFREE*100 | bc`
+DISKSIZE=`vgdisplay $XENEDUDISK | grep "VG Size"| awk {'print $3'} | cut -d, -f1`
+DISKFREE=`vgdisplay $XENEDUDISK | grep Free| awk {'print $7 '} | cut -d, -f1`
+FREERATIO=`echo $(($DOTDISKFREE*100/$DOTDISKSIZE))`
 
-echo "Vous diposez de $DISKFREEV d'espace disque pour les machines virtuel soit $FREERATIO % de l'espace de stokage"
+echo "Vous disposez de $DISKFREE Go d'espace disque pour les machines virtuel soit $FREERATIO % de l'espace de stockage"
