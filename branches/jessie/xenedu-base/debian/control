@@ -8,7 +8,7 @@ Homepage: http://xenedu.crdp.ac-caen.fr
 
 Package: xenedu-base
 Architecture: all
-Depends: ${misc:Depends}, xen-linux-system, xen-tools, bridge-utils, debootstrap, lvm2, ssh, screen, cron-apt, curl, ipcalc
+Depends: ${misc:Depends}, xen-linux-system, xen-tools, bridge-utils, debootstrap, lvm2, ssh, screen, cron-apt, curl, ipcalc, xfsprogs
 Description: xenedu-base update post installation xen config
  post installation xen config with harward spécification
  xenedu-base configure xen with bridged network on all interfaces
