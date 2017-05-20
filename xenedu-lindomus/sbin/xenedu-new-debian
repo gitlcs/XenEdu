@@ -1,0 +1,304 @@
+#!/bin/bash
+# XenEdu Jean-Luc Chretien <jean-luc.chretien@ac-caen.fr>
+# 18/05/2017
+# Create a new Linux Debian host 
+
+source /etc/xenedu/xenedu.conf
+
+#Couleurs
+COLTITRE="\033[1;35m"          # Rose
+COLCMD="\033[1;37m"            # Blanc
+COLQUESTION="\033[1;32m"       # Vert
+COLPARTIE="\033[1;34m"         # Bleu
+COLERR="\033[1;31m"            # Rouge
+COLTXT="\033[0;37m"            # Gris
+COLINFO="\033[0;36m"           # Cyan
+
+UNITG=G
+UNITM=M
+UNITMEM=mb
+echo -e "$COLCMD"
+
+function fschoice {
+	echo "Choix du systeme de fichier ? (1:ext3, 2:ext4, 3:xfs)"
+	read FSSELECT
+
+	if [ $FSSELECT = 1 ]; then
+        	FS="ext3"
+	elif [ $FSSELECT = 2 ]; then
+        	FS="ext4"
+	elif [ $FSSELECT = 3 ]; then
+        	FS="xfs"
+	else
+        	echo "ERREUR de selection du systeme de fichier, la selection sera : ext4"
+        	FS="ext4"
+	fi
+}
+
+function rootpart {
+	echo "Taille de la partition root en Go ?"
+	read  ROOTSIZE
+	fschoice
+	ROOTFS=$FS
+}	
+
+function swappart {
+	echo "Taille de la partition swap en Mo ?"
+	read  SWAPSIZE	
+}	
+
+
+echo "Quelle distribution Linux Debian ? (1:Wheezy, 2:Jessie, 3:Stretch)"
+echo "Entrez le chiffre correspondant a votre choix)."
+read SELECT
+
+if [ $SELECT = 1 ]; then 
+	DISTRO="wheezy" 
+elif [ $SELECT = 2 ]; then
+	DISTRO="jessie"
+elif [ $SELECT = 3 ]; then
+	DISTRO="stretch"
+else
+	echo "ERREUR de selection du nom de la distribution"
+	exit 1
+fi
+
+# Nbr CPU : NBRCPU
+echo "Nombre de CPU a allouer a la machine ?"
+read NBRCPU
+
+# pygrub ?
+echo "Voulez vous utiliser pygrub ? (O/n)"
+read PYGRUB
+if [ -z "$PYGRUB" ] || [ "$PYGRUB" = O ] || [ "$PYGRUB" = o ]; then
+	PYGRUB="oui"
+else
+	PYGRUB="non"
+fi
+
+# Taille memoire  en Mo : MEMORY
+echo "Indiquez en Mo la taille de la memoire a allouer ?"
+read MEMORYSIZE
+
+# Mot de passe
+echo "Indiquez le mot de passe de l'utilisateur root"
+read PASSWD
+
+# Nom d'hote
+echo "Indiquez le nom d'hote"
+read VMNAME
+
+# Nom domaine
+echo "Indiquez le nom de domaine"
+read DOMAINENAME
+
+# Network
+
+# Adresse IP
+echo "Indiquez 	l'adresse IP"
+read IP
+
+# Masque d'adresse
+echo "Indiquez le masque de sous reseau"
+read MASK
+
+# Adresse reseau
+echo "Indiquez l'adresse reseau"
+read NETWORK
+
+# Adresse de diffusuion
+echo "Indiquez l'adresse de diffusion"
+read BROADCAST
+
+# Gateway
+echo "Indiquez la gateway"
+read GW
+
+# Server de Nom
+echo "Indiquez l'adresse du serveur de nom primaire"
+read DNS1
+echo "Indiquez l'adresse du serveur de nom secondaire"
+read DNS2
+
+echo -e "$COLINFO"
+xenedu-freespace
+echo -e "$COLCMD"
+
+echo "Partition unique ou multiple ? (1:Une/2:Plusieurs)"
+read SELECT
+
+if [ $SELECT = 2 ]; then
+	echo "Vous avez choisi un partitionement multiple :"
+	# Taille partition root
+	rootpart
+	# Taille partition swap
+	swappart
+	# Taille partition home
+	echo "Taille de la partition home en Go ?"
+	read  HOMESIZE
+	fschoice
+	HOMEFS=$FS
+	# Taille partition usr
+	echo "Taille de la partition usr en Go ?  (pas de partition si 0 ou vide)"
+	read  USRSIZE
+	if [ -n "$USRSIZE" ] && [ "$USRSIZE" != "0" ]; then
+		fschoice
+		USRFS=$FS
+	else
+		USRSIZE=0	
+	fi	
+	# Taille partition var
+	echo "Taille de la partition var en Go ? (pas de partition si 0 ou vide)"
+	read  VARSIZE
+	if [ -n "$VARSIZE" ] && [ "$VARSIZE" != "0" ]; then
+		fschoice
+		VARFS=$FS
+	else
+		VARSIZE=0		
+	fi
+	# Taille partition tmp 
+	echo "Taille de la partition tmp en Go ? (pas de partition si 0 ou vide)"
+	read  TMPSIZE
+	if [ -n "$TMPSIZE" ] && [ "$TMPSIZE" != "0" ]; then
+		fschoice
+		TMPFS=$FS
+	else
+		TMPSIZE=0	
+	fi		
+else
+	echo "Vous avez choisi une partition systeme unique :"
+	# Taille partition root
+	rootpart
+	# Taille partition swap
+	swappart
+	HOMESIZE=0
+	USRSIZE=0
+	VARSIZE=0
+	TMPSIZE=0
+fi
+
+# Verification de l'espace libre
+FREE=`vgs --noheadings -o vg_free $XENEDUVOL | cut -dg -f 1 | sed s/','/'.'/g`
+FREEM=`echo "(1000*$FREE/1)" | bc`
+TOTAL=$(($ROOTSIZE+$HOMESIZE+$VARSIZE+$USRSIZE+$TMPSIZE))
+TOTALM=`echo "(1000*$TOTAL/1)" | bc`
+
+if (( "$TOTALM" > "$FREEM" )); then
+	echo -e "$COLERR"
+	echo "ERR : Vous ne disposez pas d'assez d'espace sur votre volume."
+	echo "Abandon de la creation de la machine virtuelle !"
+    echo -e "$COLCMD"    
+    exit 1
+else
+	echo "Vous utilisez $TOTAL Go sur $FREE Go de disponible."
+fi
+
+# Resume
+echo "Resume :"
+echo "--------"
+echo "Distribution : $DISTRO"
+echo "Nombre de CPU : $NBRCPU"
+echo "Utilisation de pygrub : $PYGRUB"
+echo "Taille memoire $MEMORYSIZE Mo"
+echo "Nom d'hote : $VMNAME"
+echo "Nom de domaine : $DOMAINENAME"
+echo "Adresse IP : $IP"
+echo "Adresse reseau : $NETWORK"
+echo "Masque de sous reseau : $MASK"
+echo "Adresse de diffusion : $BROADCAST"
+echo "Porte de sortie : $GW"
+echo "DNS primaire : $DNS1"
+echo "DNS secondaire : $DNS2"
+echo "Mote de passe root : $PASSWD"
+
+echo "+--------------------+"
+echo "| Systeme de fichier |"
+echo "+--------------------+"
+
+echo "Partition root $ROOTSIZE Go / system de fichiers $ROOTFS"
+echo "Partition swap $SWAPSIZE Go"
+if [ -n "$HOMESIZE" ] && [ "$HOMESIZE" != "0" ]; then
+	echo "Partition home $HOMESIZE Go / system de fichiers $HOMEFS"
+fi
+if [ -n "$USRSIZE" ] && [ "$USRSIZE" != "0" ]; then
+	echo "Partition usr $USRSIZE Go / system de fichiers $USRFS"
+fi
+if [ -n "$VARSIZE" ] && [ "$VARSIZE" != "0" ]; then	
+	echo "Partition var $VARSIZE Go / system de fichiers $VARFS"
+fi
+if [ -n "$TMPSIZE" ] && [ "$TMPSIZE" != "0" ]; then
+	echo "Partition tmp $TMPSIZE Go / system de fichiers $TMPFS"
+fi
+
+# Continuez ?
+echo "Voulez vous continuez ? (N/o)"
+read REP
+if [ -z "$REP" ] || [ "$REP" = n ] || [ "$REP" = N ]; then
+	echo "Abandon de la creation de la machine virtuelle !"
+	exit 1
+fi
+
+# Configuration fichiers xen-tools partitions
+# Partitions root et swap
+echo "[root]
+size=$ROOTSIZE$UNITG
+type=$ROOTFS
+mountpoint=/
+options=sync,errors=remount-ro
+
+[swap]
+size=$SWAPSIZE$UNITM
+type=swap" > /etc/xen-tools/partitions.d/xenedu-debian
+
+# Partitions home
+if [ "$HOMESIZE" != "0" ]; then
+echo "
+[home]
+size=$HOMESIZE$UNITG
+type=$HOMEFS
+mountpoint=/home
+options=nodev,nosuid" >> /etc/xen-tools/partitions.d/xenedu-debian
+fi
+# Partitions usr
+if [ "$USRSIZE" != "0" ]; then
+echo "
+[usr]
+size=$USRSIZE$UNITG
+type=$USRFS
+mountpoint=/usr
+options=nodev" >> /etc/xen-tools/partitions.d/xenedu-debian
+fi
+# Partitions var
+if [ "$USRSIZE" != "0" ]; then
+echo "
+[var]
+size=$VARSIZE$UNITG
+type=$VARFS
+mountpoint=/var
+options=nodev,nosuid" >> /etc/xen-tools/partitions.d/xenedu-debian
+fi
+# Partitions tmp
+if [ "$USRSIZE" != "0" ]; then
+echo "
+[tmp]
+size=$TMPSIZE$UNITG
+type=$TMPFS
+mountpoint=/tmp
+options=nodev,nosuid" >> /etc/xen-tools/partitions.d/xenedu-debian
+fi
+
+# Creation VM
+xen-create-image --config=/etc/xen-tools/xenedu-debian.conf \
+  --memory=$MEMORYSIZE$UNITMEM \
+  --vcpus=$NBRCPU \
+  --lvm=$XENEDUVOL \
+  --partitions=xenedu-debian \
+  --hostname=$VMNAME.$DOMAINENAME \
+  --ip=$IP \
+  --gateway=$GW \
+  --broadcast=$BROADCAST \
+  --netmask=$MASK \
+  --pygrub \
+  --dist=$DISTRO \
+  --password=$PASSWD \
+  --bridge=xenbreth0
