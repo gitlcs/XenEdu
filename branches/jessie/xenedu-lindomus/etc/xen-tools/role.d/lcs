@@ -1,4 +1,5 @@
-onfigure the new image to be a minimal image, by removing
+#!/bin/bash
+# configure the new image to be a minimal image, by removing
 # packages I don't care about - and installing new ones I prefer.
 #
 # Steve
@@ -14,14 +15,11 @@ prefix=$1
 #
 #  Source our common functions - this will let us install a Debian package.
 #
-if [ -e /usr/lib/xen-tools/common.sh ]; then
-    . /usr/lib/xen-tools/common.sh
+if [ -e /usr/share/xen-tools/common.sh ]; then
+    . /usr/share/xen-tools/common.sh
 else
     echo "Installation problem"
 fi
-
-
-
 
 #
 #  Install some new packages - do this first to avoid dependency errors.
@@ -57,7 +55,7 @@ removeDebianPackage ${prefix} libpcap0.7
 #removeDebianPackage ${prefix} ed
 #removeDebianPackage ${prefix} nvi
 
-# Syslog
+# Sys
 #removeDebianPackage ${prefix} klogd
 #removeDebianPackage ${prefix} sysklogd
 
@@ -83,8 +81,6 @@ echo "APT::Get::AllowUnauthenticated 1;" >> ${prefix}/etc/apt/apt.conf.d/00insta
 chroot ${prefix} /usr/bin/apt-get update
 chroot ${prefix} /usr/bin/apt-get upgrade -y
 chroot ${prefix} /usr/bin/apt-get clean
-#chroot ${prefix} /usr/bin/apt-get install debian-lcs-keyring lcs-preinstall
-
 #
 # Copy skel
 #
@@ -107,4 +103,4 @@ chroot ${prefix} debconf-set-selections < /root/lcs.preseed
 # 
 # Ajout de paquets LCS
 #
-installDebianPackage ${prefix} debian-lcs-keyring lcs-preinstall lcs-dns lcs-web lcs-smtp lcs-imap lcs-squirrelmail lcs-sysinfo lcs-security
+installDebianPackage ${prefix} debian-lcs-keyring lcs-preinstall lcs-dns lcs-web lcs-smtp lcs-imap lcs-roundcube lcs-sysinfo lcs-security

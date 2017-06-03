@@ -55,7 +55,9 @@ xen-create-image --config=/etc/xen-tools/xenedu-lcs.conf \
 	--force --ip=$IPADDR0 \
 	--gateway=$GATEWAY \
 	--netmask=$NETMASK0 \
-	--vcpus=$VCPUNUM
+	--vcpus=$VCPUNUM \
+	--lvm=$XENEDUVOL \
+	--dist=wheezy
 
 mv /etc/xen/lcs.$DOMAIN.cfg  /etc/xen/xenedu-lcs.cfg
 #ln -snf /etc/xen/xenedu-lcs.cfg /etc/xen/auto/01-xenedu-lcs.cfg
