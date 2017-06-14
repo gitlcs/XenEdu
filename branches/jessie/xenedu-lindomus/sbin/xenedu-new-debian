@@ -269,7 +269,7 @@ mountpoint=/usr
 options=nodev" >> /etc/xen-tools/partitions.d/xenedu-debian
 fi
 # Partitions var
-if [ "$USRSIZE" != "0" ]; then
+if [ "$VARSIZE" != "0" ]; then
 echo "
 [var]
 size=$VARSIZE$UNITG
@@ -300,5 +300,6 @@ xen-create-image --config=/etc/xen-tools/xenedu-debian.conf \
   --netmask=$MASK \
   --pygrub \
   --dist=$DISTRO \
+  --genpass=0 \
   --password=$PASSWD \
   --bridge=xenbreth0
