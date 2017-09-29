@@ -133,7 +133,10 @@ memory = 512M     # Suffix (G, M, k) required
 fs     = ext3     # Default file system for any disk
 #dist   = `xt-guess-suite-and-mirror --suite`
                   # Default distribution is determined by Dom0's distribution
-dist = jessie
+#dist = jessie
+
+##DISTRO##
+
 image  = sparse   # Specify sparse vs. full disk images (file based images only)
 
 #
@@ -244,6 +247,8 @@ initrd = /boot/initrd.img-`uname -r`
 #
 # pygrub = 1
 #
+
+##MODINSTALL##
 
 #
 #  The architecture to use when using debootstrap, rinse, or rpmstrap.
