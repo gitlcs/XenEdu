@@ -16,7 +16,7 @@ COLINFO="\033[0;36m"           # Cyan
 
 UNITG=G
 UNITM=M
-UNITMEM=mb
+UNITMEM=M
 echo -e "$COLCMD"
 
 function fschoice {
@@ -72,8 +72,10 @@ echo "Voulez vous utiliser pygrub ? (O/n)"
 read PYGRUB
 if [ -z "$PYGRUB" ] || [ "$PYGRUB" = O ] || [ "$PYGRUB" = o ]; then
 	PYGRUB="oui"
+	MODINSTALL="pygrub = 1"
 else
 	PYGRUB="non"
+		MODINSTALL="pygrub = 0"
 fi
 
 # Taille memoire  en Mo : MEMORY
@@ -134,7 +136,7 @@ if [ $SELECT = 2 ]; then
 	# Taille partition swap
 	swappart
 	# Taille partition home
-	echo "Taille de la partition home en Go ?"
+	echo "Taille de la partition home en Gfo ?"
 	read  HOMESIZE
 	fschoice
 	HOMEFS=$FS
@@ -287,6 +289,9 @@ mountpoint=/tmp
 options=nodev,nosuid" >> /etc/xen-tools/partitions.d/xenedu-debian
 fi
 
+# Selection du mode d'installation
+sed -e  "s/##MODINSTALL##/$MODINSTALL/g" /etc/xen-tools/xenedu-debian.in > /etc/xen-tools/xenedu-debian.conf
+
 # Creation VM
 xen-create-image --config=/etc/xen-tools/xenedu-debian.conf \
   --memory=$MEMORYSIZE$UNITMEM \
@@ -298,7 +303,6 @@ xen-create-image --config=/etc/xen-tools/xenedu-debian.conf \
   --gateway=$GW \
   --broadcast=$BROADCAST \
   --netmask=$MASK \
-  --pygrub \
   --dist=$DISTRO \
   --genpass=0 \
   --password=$PASSWD \
