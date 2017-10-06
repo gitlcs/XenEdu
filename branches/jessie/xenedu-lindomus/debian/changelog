@@ -13,21 +13,13 @@ xenedu-lindomus (0.9.1) stable; urgency=low
   * update xenedu-migre-se3 (Testing)
   * add xenedu-new-wheezy (unstable)
   * add xenedu-new-wheezy.pl (unstable)
+  
+  [Simon Cavey]
+  * XenEdu adaptation for Debian Wheezy
+  * update new-se3
 		
  -- Mikael Bailleul <MikaelBailleul@gmail.com>
  -- David Gloux <david.gloux@tice.ac-caen.fr>  Wed, 23 Apr 2014 11:50:00 +0100
- 
-xenedu-lindomus (0.9.0~3) unstable; urgency=low
-
-  * update new-se3
-
- -- Simon Cavey <simon.cavey@crdp.ac-caen.fr>  Tue, 04 Jun 2013 18:03:44 +0200
-
-xenedu-lindomus (0.9.0~1) unstable; urgency=low
-
-  * XenEdu adaptation for Debian Wheezy
-
- -- Simon Cavey <simon.cavey@crdp.ac-caen.fr>  Thu, 21 Feb 2013 13:15:04 +0100
 
 xenedu-lindomus (0.8.0.16) stable; urgency=low
 
