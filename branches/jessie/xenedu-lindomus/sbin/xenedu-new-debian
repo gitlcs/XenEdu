@@ -295,6 +295,25 @@ cp /etc/xen-tools/xenedu-debian.conf /etc/xen-tools/xenedu-debian.in.1
 DISTRODISTRO= "dist = $DISTRO"
 sed -e "s/##DISTRO##/$DISTRODISTRO/g" /etc/xen-tools/xenedu-debian.in.1 > /etc/xen-tools/xenedu-debian.conf
 
+
+if [ "$PYGRUB" = "oui" ]; then
+# Creation VM
+xen-create-image --config=/etc/xen-tools/xenedu-debian.conf \
+  --memory=$MEMORYSIZE$UNITMEM \
+  --vcpus=$NBRCPU \
+  --lvm=$XENEDUVOL \
+  --partitions=xenedu-debian \
+  --hostname=$VMNAME.$DOMAINENAME \
+  --ip=$IP \
+  --gateway=$GW \
+  --broadcast=$BROADCAST \
+  --netmask=$MASK \
+  --dist=$DISTRO \
+  --genpass=0 \
+  --password=$PASSWD \
+  --bridge=xenbreth0 \
+  --pygrub
+else
 # Creation VM
 xen-create-image --config=/etc/xen-tools/xenedu-debian.conf \
   --memory=$MEMORYSIZE$UNITMEM \
@@ -310,3 +329,6 @@ xen-create-image --config=/etc/xen-tools/xenedu-debian.conf \
   --genpass=0 \
   --password=$PASSWD \
   --bridge=xenbreth0
+fi
+
+
