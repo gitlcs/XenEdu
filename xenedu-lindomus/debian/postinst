@@ -24,7 +24,10 @@ case "$1" in
       	echo "Pas de ssh configure, generation des cles"
   			ssh-keygen -t rsa -f  /root/.ssh/id_rsa -P "" -q
     fi
-
+	 cd /usr/share/xen-tools
+	 if [ ! -d stretch.d ]; then
+	 	ln -s debian.d strecth.d
+	 fi
     ;;
 
     abort-upgrade|abort-remove|abort-deconfigure)

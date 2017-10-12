@@ -1,9 +1,9 @@
-xenedu-lindomus (2.0.0~2) stable; urgency=medium
+xenedu-lindomus (2.0.0~3) stable; urgency=medium
 
   * Update for Jessie
   * Make new xenedu-new-debian script
 
- -- jlcf <jean-luc.chretien@ac-caen.f>  Fri, 29 Sep 2017 14:49:31 +0200
+ -- jlcf <jean-luc.chretien@ac-caen.f>  Thu, 12 Oct 2017 11:49:51 +0200
 
 xenedu-lindomus (0.9.1) stable; urgency=low
 

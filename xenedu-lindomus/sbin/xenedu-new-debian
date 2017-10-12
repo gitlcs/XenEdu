@@ -292,7 +292,7 @@ fi
 # Selection du mode d'installation
 sed -e "s/##MODINSTALL##/$MODINSTALL/g" /etc/xen-tools/xenedu-debian.in > /etc/xen-tools/xenedu-debian.conf
 cp /etc/xen-tools/xenedu-debian.conf /etc/xen-tools/xenedu-debian.in.1
-DISTRODISTRO= "dist = $DISTRO"
+DISTRODISTRO="dist = $DISTRO"
 sed -e "s/##DISTRO##/$DISTRODISTRO/g" /etc/xen-tools/xenedu-debian.in.1 > /etc/xen-tools/xenedu-debian.conf
 
 
