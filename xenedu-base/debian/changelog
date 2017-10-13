@@ -1,12 +1,13 @@
-xenedu-base (2.0.0~3) stable; urgency=low
+xenedu-base (2.0.0~4) stable; urgency=low
 
   * Initial release for debian Jessie
   * Modify control compat...
   * Modify postinst
   * Remove useless scripts in sbin
   * Add xfsprogs in depends
+  * Add XENEDUVOL in :etc/xenedu/xenedu.conf
 
- -- jlcf <jean-luc.chretien@ac-caen.f>  Fri, 12 May 2017 13:45:09 +0200
+ -- jlcf <jean-luc.chretien@ac-caen.f>  Fri, 13 Oct 2017 15:11:43 +0200
 
 xenedu-base (1.0.0) stable; urgency=low
 
