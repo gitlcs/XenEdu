@@ -3,7 +3,7 @@
 # Script d'installation auto lcs
 # Simon Cavey
 # Release XenEdu Jessie by jLCF <jean-luc.chretien@ac-caen.fr>
-# 02/06/2017
+# 13/10/2017
 
 
 source /etc/xenedu/xenedu.conf
@@ -57,7 +57,8 @@ xen-create-image --config=/etc/xen-tools/xenedu-lcs.conf \
 	--netmask=$NETMASK0 \
 	--vcpus=$VCPUNUM \
 	--lvm=$XENEDUVOL \
-	--dist=wheezy
+	--bridge=xenbreth0 \
+	--dist=jessie
 
 mv /etc/xen/lcs.$DOMAIN.cfg  /etc/xen/xenedu-lcs.cfg
 #ln -snf /etc/xen/xenedu-lcs.cfg /etc/xen/auto/01-xenedu-lcs.cfg
