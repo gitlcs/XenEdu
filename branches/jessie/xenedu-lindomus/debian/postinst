@@ -26,8 +26,10 @@ case "$1" in
     fi
 	 cd /usr/share/xen-tools
 	 if [ ! -d stretch.d ]; then
-	 	ln -s debian.d strecth.d
+	 	ln -s debian.d stretch.d
 	 fi
+	 cd $OLDPWD
+	 chmod 755 /etc/xen-tools/role.d/lcs
     ;;
 
     abort-upgrade|abort-remove|abort-deconfigure)

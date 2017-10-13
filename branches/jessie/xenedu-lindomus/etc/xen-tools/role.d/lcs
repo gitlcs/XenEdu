@@ -72,7 +72,7 @@ removeDebianPackage ${prefix} info
 #
 # Ajout du dépot lcs
 #
-echo "deb http://lcs.crdp.ac-caen.fr/wheezy Lcs main" >> ${prefix}/etc/apt/sources.list
+echo "deb http://lcs.crdp.ac-caen.fr/jessie LcsXP main" >> ${prefix}/etc/apt/sources.list
 echo "APT::Get::AllowUnauthenticated 1;" >> ${prefix}/etc/apt/apt.conf.d/00install-lcs
 
 #
