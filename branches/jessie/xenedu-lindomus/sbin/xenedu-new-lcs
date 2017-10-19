@@ -51,6 +51,7 @@ source /etc/xen-tools/skel/lcs/etc/lcs/lcs.conf
 xen-create-image --config=/etc/xen-tools/xenedu-lcs.conf \
 	--hostname=lcs.$DOMAIN \
 	--role=lcs \
+   --lvm=$XENEDUVOL \	
 	--partitions=lcs-custom \
 	--force --ip=$IPADDR0 \
 	--gateway=$GATEWAY \
