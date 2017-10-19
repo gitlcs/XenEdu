@@ -24,7 +24,7 @@ options=nodev,nosuid
 size=@@VARSE3SIZE@@G
 type=xfs
 mountpoint=/var/se3
-options=options=sync,errors=remount-ro
+options=nodev,nosuid
 
 [home]
 size=@@HOMESE3SIZE@@G
