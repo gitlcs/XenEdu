@@ -3,6 +3,7 @@ xenedu-lindomus (2.0.0~4) stable; urgency=medium
   * Update for Jessie
   * Make new xenedu-new-debian script
   * Fix xenedu-new-lcs for Jessie
+  * Add xenedu-new-se3-wheezy
 
  -- jlcf <jean-luc.chretien@ac-caen.f>  Fri, 13 Oct 2017 12:58:00 +0200
 
