@@ -1,0 +1,70 @@
+#!/bin/bash
+#
+# Script d'installation auto SE3
+# Simon Cavey
+# Release XenEdu Jessie by jLCF <jean-luc.chretien@ac-caen.fr>
+# 19/10/2017
+
+
+source /etc/xenedu/xenedu.conf
+
+xenedu-freespace
+
+echo "indiquez l'espace pour /home les donnees utilisateurs"
+echo "entrez simplement le nombre de Go souhaite"
+read SE3HOMESIZE
+
+xenedu-freespace
+echo "indiquez l'espace pour /var/se3 les donnees communes"
+echo "entrez simplement le nombre de Go souhaite"
+read SE3VARSE3SIZE
+
+DOMAIN=`hostname -d`
+
+echo "indiquez l'ip pour le SE3 :"
+read SE3IP
+
+echo "indiquez le masque de sous-reseau pour le SE3 :"
+read NETMASK0
+
+GATEWAY=`route -n | grep ^0.0.0.0 | awk '{print $2}'`
+
+echo "indiquez le nombre de CPU a allouer"
+read VCPUNUM
+
+
+echo "indiquez en Mo la memoire a allouer au SE3 :"
+read SE3MEMORY
+
+echo "indiquez votre n° de preseed"
+read PRESEEDNUM
+
+cp /etc/xen-tools/partitions.d/xenedu-se3.in  /etc/xen-tools/partitions.d/xenedu-se3
+
+sed -i'' "s/@@HOMESE3SIZE@@/$SE3HOMESIZE/g"  /etc/xen-tools/partitions.d/xenedu-se3
+sed -i'' "s/@@VARSE3SIZE@@/$SE3VARSE3SIZE/g"  /etc/xen-tools/partitions.d/xenedu-se3
+
+
+
+mkdir -p /etc/xen-tools/skel/se3/root
+mkdir -p /etc/xen-tools/skel/se3/etc/se3
+wget "http://dimaker.tice.ac-caen.fr/dise3wheezy/$PRESEEDNUM/se3.preseed"  -O /etc/xen-tools/skel/se3/root/se3.preseed
+wget "http://dimaker.tice.ac-caen.fr/dise3wheezy/$PRESEEDNUM/setup_se3.data" -O /etc/xen-tools/skel/se3/etc/se3/setup_se3.data
+
+
+xen-create-image --config=/etc/xen-tools/xenedu-se3.conf \ 
+	--hostname=se3pdc.$DOMAIN \
+	--role=se3 \
+	--partitions=xenedu-se3 \
+	--force --ip=$SE3IP \
+	--gateway=$GATEWAY \  
+	--netmask=$NETMASK0 \
+	--vcpus=$VCPUNUM \
+	--memory=$SE3MEMORY \  
+	--bridge=xenbreth0 \
+	--dist=wheezy
+	
+#ln -snf  /etc/xen/se3pdc.$DOMAIN.cfg /etc/xen/01-se3.cfg
+echo "pour lancer le SE3 taper la commande : "
+echo "xl create /etc/xen/xenedu-se3.cfg -c"
+
