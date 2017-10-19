@@ -48,16 +48,21 @@ sed -i'' "s/@@VARSE3SIZE@@/$SE3VARSE3SIZE/g"  /etc/xen-tools/partitions.d/xenedu
 
 mkdir -p /etc/xen-tools/skel/se3/root
 mkdir -p /etc/xen-tools/skel/se3/etc/se3
+
 wget "http://dimaker.tice.ac-caen.fr/dise3wheezy/$PRESEEDNUM/se3.preseed"  -O /etc/xen-tools/skel/se3/root/se3.preseed
 wget "http://dimaker.tice.ac-caen.fr/dise3wheezy/$PRESEEDNUM/setup_se3.data" -O /etc/xen-tools/skel/se3/etc/se3/setup_se3.data
+wget "http://dimaker.tice.ac-caen.fr/dise3wheezy/se3scripts/install_phase2.sh" -O /etc/xen-tools/skel/se3/root/install_phase2.sh
+wget "http://dimaker.tice.ac-caen.fr/dise3wheezy/se3scripts/profile" -O /etc/xen-tools/skel/se3/root/.profile
+wget "http://dimaker.tice.ac-caen.fr/dise3wheezy/se3scripts/bashrc" -O /etc/xen-tools/skel/se3/root/.bashrc
 
 
 xen-create-image --config=/etc/xen-tools/xenedu-se3.conf \ 
 	--hostname=se3pdc.$DOMAIN \
 	--role=se3 \
+	--lvm=$XENEDUVOL \
 	--partitions=xenedu-se3 \
 	--force --ip=$SE3IP \
-	--gateway=$GATEWAY \  
+	--gateway=$GATEWAY \
 	--netmask=$NETMASK0 \
 	--vcpus=$VCPUNUM \
 	--memory=$SE3MEMORY \  
@@ -65,6 +70,7 @@ xen-create-image --config=/etc/xen-tools/xenedu-se3.conf \
 	--dist=wheezy
 	
 #ln -snf  /etc/xen/se3pdc.$DOMAIN.cfg /etc/xen/01-se3.cfg
+mv /etc/xen/se3pdc.$DOMAIN.cfg  /etc/xen/xenedu-se3.cfg
 echo "pour lancer le SE3 taper la commande : "
 echo "xl create /etc/xen/xenedu-se3.cfg -c"
 
