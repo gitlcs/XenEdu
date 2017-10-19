@@ -63,4 +63,4 @@ xen-create-image --config=/etc/xen-tools/xenedu-lcs.conf \
 mv /etc/xen/lcs.$DOMAIN.cfg  /etc/xen/xenedu-lcs.cfg
 #ln -snf /etc/xen/xenedu-lcs.cfg /etc/xen/auto/01-xenedu-lcs.cfg
 echo "pour lancer le LCS taper la commande : "
-echo "xl create -c xenedu-lcs.cfg"
+echo "xl create /etc/xen/xenedu-lcs.cfg -c"

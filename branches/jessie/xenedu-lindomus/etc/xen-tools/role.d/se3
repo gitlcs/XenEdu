@@ -1,12 +1,11 @@
-#!/bin/bash
-# configure the new image to be a minimal image, by removing
+#!/bin/sh
+#
+#  Configure the new image to be a minimal image, by removing
 # packages I don't care about - and installing new ones I prefer.
 #
-# Steve
-# --
-# http://www.steve.org.uk/
 #
-
+# Simon Cavey
+# 24/11/2011
 
 prefix=$1
 
@@ -15,11 +14,14 @@ prefix=$1
 #
 #  Source our common functions - this will let us install a Debian package.
 #
-if [ -e /usr/share/xen-tools/common.sh ]; then
-    . /usr/share/xen-tools/common.sh
+if [ -e /usr/lib/xen-tools/common.sh ]; then
+    . /usr/lib/xen-tools/common.sh
 else
     echo "Installation problem"
 fi
+
+
+
 
 #
 #  Install some new packages - do this first to avoid dependency errors.
@@ -31,12 +33,12 @@ installDebianPackage ${prefix} screen
 installDebianPackage ${prefix} sudo
 installDebianPackage ${prefix} vim
 installDebianPackage ${prefix} udev
-#installDebianPackage ${prefix} openssh-server
+installDebianPackage ${prefix} openssh-server
 installDebianPackage ${prefix} postfix
 installDebianPackage ${prefix} mailx
 installDebianPackage ${prefix} ntp
 installDebianPackage ${prefix} bzip2
-#installDebianPackage ${prefix} yafc
+installDebianPackage ${prefix} yafc
 installDebianPackage ${prefix} tree
 
 #
@@ -52,10 +54,10 @@ removeDebianPackage ${prefix} libpcap0.7
 
 # Editors
 #removeDebianPackage ${prefix} nano
-#removeDebianPackage ${prefix} ed
-#removeDebianPackage ${prefix} nvi
+removeDebianPackage ${prefix} ed
+removeDebianPackage ${prefix} nvi
 
-# Sys
+# Syslog
 #removeDebianPackage ${prefix} klogd
 #removeDebianPackage ${prefix} sysklogd
 
@@ -65,42 +67,42 @@ removeDebianPackage ${prefix} man-db
 removeDebianPackage ${prefix} info
 
 # misc
-#removeDebianPackage ${prefix} tasksel tasksel-data
-#removeDebianPackage ${prefix} pciutils
-#removeDebianPackage ${prefix} fdutils
+removeDebianPackage ${prefix} tasksel tasksel-data
+removeDebianPackage ${prefix} pciutils
+removeDebianPackage ${prefix} fdutils
 #removeDebianPackage ${prefix} cpio
-#
-# Ajout du dépot lcs
-#
-echo "deb http://lcs.crdp.ac-caen.fr/jessie LcsXP main" >> ${prefix}/etc/apt/sources.list
-echo "APT::Get::AllowUnauthenticated 1;" >> ${prefix}/etc/apt/apt.conf.d/00install-lcs
-
 #
 # Upgrade packages
 #
 chroot ${prefix} /usr/bin/apt-get update
+chroot ${prefix} /usr/bin/apt-get update
 chroot ${prefix} /usr/bin/apt-get upgrade -y
 chroot ${prefix} /usr/bin/apt-get clean
+
 #
 # Copy skel
 #
-cp -a /etc/xen-tools/skel/lcs/* ${prefix}
+cp -a /etc/xen-tools/skel/se3/* ${prefix}
+chroot ${prefix} debconf-set-selections < /root/se3/se3.preseed
+chroot ${prefix} mkdir -p /etc/se3
+chroot ${prefix} mv  /root/se3/setup_se3.data /etc/se3/
+
 
 #
 # Copie des modules :
 #
 #cp -a /lib/modules/`uname -r` ${prefix}/lib/modules
 #chroot ${prefix}  /sbin/depmod -a
-#
-#
-chroot ${prefix} debconf-set-selections < /root/lcs/lcs.preseed
 
 #
-# Modif de /etc/hosts
+# install ssh
 #
-/bin/sed -i 's/minimal/'${hostname}'/g' ${prefix}/etc/hosts
+DEBIAN_FRONTEND=noninteractive chroot ${prefix} /usr/bin/apt-get --yes --force-yes install ssh`;
+chroot ${prefix} /etc/init.d/ssh stop
 
-# 
-# Ajout de paquets LCS
 #
-installDebianPackage ${prefix} debian-lcs-keyring lcs-preinstall lcs-dns lcs-web lcs-smtp lcs-imap lcs-roundcube lcs-sysinfo lcs-security
+# Pre-install SE3
+#
+echo "deb http://wawadeb.crdp.ac-caen.fr/debian wheezy se3" >>  ${prefix}/etc/apt/sources.list
+chroot ${prefix} /usr/bin/apt-get update
+DEBIAN_FRONTEND=noninteractive chroot ${prefix} /usr/bin/apt-get --yes --force-yes --download-only install se3 se3-domain
