@@ -3,10 +3,12 @@
 # Script d'installation auto SE3
 # Simon Cavey
 # Release XenEdu Jessie by jLCF <jean-luc.chretien@ac-caen.fr>
-# 19/10/2017
+# 20/10/2017
 
 
 source /etc/xenedu/xenedu.conf
+
+UNITMEM=M
 
 xenedu-freespace
 
@@ -21,14 +23,6 @@ read SE3VARSE3SIZE
 
 DOMAIN=`hostname -d`
 
-echo "indiquez l'ip pour le SE3 :"
-read SE3IP
-
-echo "indiquez le masque de sous-reseau pour le SE3 :"
-read NETMASK0
-
-GATEWAY=`route -n | grep ^0.0.0.0 | awk '{print $2}'`
-
 echo "indiquez le nombre de CPU a allouer"
 read VCPUNUM
 
@@ -39,10 +33,10 @@ read SE3MEMORY
 echo "indiquez votre n° de preseed"
 read PRESEEDNUM
 
-cp /etc/xen-tools/partitions.d/xenedu-se3.in  /etc/xen-tools/partitions.d/xenedu-se3
+cp /etc/xen-tools/partitions.d/se3-custom.in  /etc/xen-tools/partitions.d/se3-custom
 
-sed -i'' "s/@@HOMESE3SIZE@@/$SE3HOMESIZE/g"  /etc/xen-tools/partitions.d/xenedu-se3
-sed -i'' "s/@@VARSE3SIZE@@/$SE3VARSE3SIZE/g"  /etc/xen-tools/partitions.d/xenedu-se3
+sed -i'' "s/@@HOMESE3SIZE@@/$SE3HOMESIZE/g"  /etc/xen-tools/partitions.d/se3-custom
+sed -i'' "s/@@VARSE3SIZE@@/$SE3VARSE3SIZE/g"  /etc/xen-tools/partitions.d/se3-custom
 
 
 
@@ -55,22 +49,21 @@ wget "http://dimaker.tice.ac-caen.fr/dise3wheezy/se3scripts/install_phase2.sh" -
 wget "http://dimaker.tice.ac-caen.fr/dise3wheezy/se3scripts/profile" -O /etc/xen-tools/skel/se3/root/.profile
 wget "http://dimaker.tice.ac-caen.fr/dise3wheezy/se3scripts/bashrc" -O /etc/xen-tools/skel/se3/root/.bashrc
 
-
-xen-create-image --config=/etc/xen-tools/xenedu-se3.conf \ 
-	--hostname=se3pdc.$DOMAIN \
+source /etc/xen-tools/skel/se3/etc/se3/setup_se3.data
+xen-create-image --config=/etc/xen-tools/xenedu-se3.conf \
+	--hostname=$SERVNAME.$DOMNAME \
 	--role=se3 \
 	--lvm=$XENEDUVOL \
-	--partitions=xenedu-se3 \
+	--partitions=se3-custom \
 	--force --ip=$SE3IP \
 	--gateway=$GATEWAY \
-	--netmask=$NETMASK0 \
+	--netmask=$NETMASK \
 	--vcpus=$VCPUNUM \
-	--memory=$SE3MEMORY \  
+	--memory=$SE3MEMORY$UNITMEM \
 	--bridge=xenbreth0 \
 	--dist=wheezy
-	
+
 #ln -snf  /etc/xen/se3pdc.$DOMAIN.cfg /etc/xen/01-se3.cfg
-mv /etc/xen/se3pdc.$DOMAIN.cfg  /etc/xen/xenedu-se3.cfg
+mv /etc/xen/$SERVNAME.$DOMNAME.cfg  /etc/xen/xenedu-se3.cfg
 echo "pour lancer le SE3 taper la commande : "
 echo "xl create /etc/xen/xenedu-se3.cfg -c"
-
