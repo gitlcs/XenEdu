@@ -30,6 +30,7 @@ case "$1" in
 	 fi
 	 cd $OLDPWD
 	 chmod 755 /etc/xen-tools/role.d/lcs
+	 chmod 755 /etc/xen-tools/role.d/se3
     ;;
 
     abort-upgrade|abort-remove|abort-deconfigure)
