@@ -1,13 +1,13 @@
 #!/bin/bash
-# Xenedu Squeeze to Wheezy
-# xenedu-upgrade-wheezy-ng 
+# Xenedu Wheezy to Jessie
+# xenedu-upgrade-jessie 
 # 10/11/2016 jLCF jean-luc.chretien@ac-caen.fr
 # ---------------------------------------------------------------------------
-# Phase 0 : Préparatoire
+# Phase 0 : Preparatoire
 # Phase 1 : On vire les xeneries et on passe sur un noyau squeeze 2.6 non Xen
-# Phase 2 : Upgrade Wheezy
-# Phase 3 : On vire le vieux noyau 2.6 de old squeeze
-# Phase 4 : Install Xenneries Wheezy et modif network/interfaces
+# Phase 2 : Upgrade Jessie
+# Phase 3 : On vire le vieux noyau de old Wheezy
+# Phase 4 : Install Xenneries Jessie et modif network/interfaces
 # Phase 5 : Finalisation
 # ---------------------------------------------------------------------------
 
@@ -17,9 +17,9 @@ COLTITRE="\033[1;35m"          # Rose
 COLCMD="\033[1;37m"            # Blanc
 COLQUESTION="\033[1;32m"       # Vert
 COLPARTIE="\033[1;34m"         # Bleu
-COLERR="\033[1;31m"  				# Rouge
-COLTXT="\033[0;37m"     			# Gris
-COLINFO="\033[0;36m"					# Cyan
+COLERR="\033[1;31m"  	       # Rouge
+COLTXT="\033[0;37m"            # Gris
+COLINFO="\033[0;36m"	       # Cyan
 
 # Fonctions 
 go()
