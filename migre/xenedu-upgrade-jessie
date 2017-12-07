@@ -4,10 +4,8 @@
 # 07/12/2017 jLCF jean-luc.chretien@ac-caen.fr
 # ---------------------------------------------------------------------------
 # Phase 0 : Preparatoire
-# Phase 1 : On vire les xeneries et on passe sur un noyau squeeze 3.2 non Xen
-# Phase 2 : Upgrade Jessie
-# Phase 3 : Install Xenneries Jessie
-# Phase 4 : Finalisation
+# Phase 1 : On vire les xeneries et on passe sur un noyau squeeze 3.2 non Xen Upgrade Jessie Installation XenEdu
+# Phase 2 : Finalisation
 # ---------------------------------------------------------------------------
 
 #Couleurs
@@ -143,42 +141,51 @@ if [ ! -f /root/phasemigrexenedu ]; then
 	# On sauvegarde le xen auto
 	mkdir -p /root/xenautosav
 	mv /etc/xen/auto/* /root/xenautosav/
-	# On reconfigure le reseau
-	netconfig
-	echo -e "$COLINFO"		
-	echo "Fin Phase 0"
-	echo -e "$COLCMD"		
-	echo "1" > /root/phasemigrexenedu
-fi
-
-
-# Phase 1
-#--------
-if grep "1" /root/phasemigrexenedu; then
-	# On demande confirmation
-	go 1
+	# Reconfiguration network standard
+	netconfig eth0
+	# Desintallation de XenEdu et Xen
 	echo -e "$COLINFO"	
-	echo "Migration Wheezy Jessie XenEdu : Phase 1"
+	echo "Migration Wheezy Jessie XenEdu : Desintallation de XenEdu et Xen"
 	echo -e "$COLCMD"
-	# On remet une configuration standard pour network	
 	# On vire les xeneries
 	apt-get remove xenstore-utils -y
 	apt-get remove xenedu-lindomus -y
 	apt-get remove xenedu-base -y
 	apt-get remove xen-tools -y
 	apt-get remove xen-hypervisor-4.1-amd64 -y
-	# On change le noyau par defaut en 2.6.32-5
-	#sed -i s/GRUB_DEFAULT=0/GRUB_DEFAULT=2/g /etc/default/grub
-	#update-grub
 	# On remet en place les elements pour le ssh secours
 	cp -a /root/secours/rssh /home/
 	cp /root/secours/xenedu-* /sbin/
 	chown -R rssh:rssh /home/rssh
 	chmod 755 /home/rssh
 	chmod -R 700 /home/rssh/.ssh
+	#
+	# Modif source list
+	echo -e "$COLINFO"		
+	echo "Changement des sources en wheezy"
+	echo -e "$COLCMD"		
+	cat > /etc/apt/sources.list <<EOF
+deb http://ftp.fr.debian.org/debian/ jessie main non-free contrib
+deb-src http://ftp.fr.debian.org/debian/ jessie main non-free contrib
+
+deb http://security.debian.org/ jessie/updates main contrib non-free
+deb-src http://security.debian.org/ jessie/updates main contrib non-free
+
+## XenEdu
+deb http://xenedu.crdp.ac-caen.fr/jessie xeneduXP main
+EOF
+
+	echo -e "$COLINFO"		
+	echo "Migration Wheezy Jessie XenEdu : Phase 0"
+	echo "Mise a jour de la distribution en Jessie"
+	echo -e "$COLCMD"	
+	apt-get update
+	apt-get install debian-archive-keyring
+	apt-get -y --force-yes dist-upgrade	
+	
 	# On se prepare a ouvrir apres reboot un session ssh de secours automatiquement
 	PORTMIN=10000
-	PORTMAX=32000
+	PORTMAX=20000
 	nombre=0   #initialise
 	while [ "$nombre" -le $PORTMIN ]
 	do
@@ -203,69 +210,25 @@ if grep "1" /root/phasemigrexenedu; then
 	echo "exit 0" >> /etc/init.d/sshsecours
 	chmod +x /etc/init.d/sshsecours
 	update-rc.d sshsecours defaults	
-	echo "2" > /root/phasemigrexenedu
+	echo "1" > /root/phasemigrexenedu
 	# 1er reboot
-	# On reboot sur le noyau 2.6.32-5 pas xen
+	# On reboot sur le noyau 3.16.0-4 pas xen
 	echo -e "$COLINFO"	
 	echo "Fin phase 1, on reboot..."
 	echo -e "$COLCMD"		
 	wait
 	reboot
 	exit 0
-	# Fin Phase 1
+	# Fin Phase 0
 fi
 
-# Phase 2
+# Phase 1
 # -------
-if grep "2" /root/phasemigrexenedu; then
+if grep "1" /root/phasemigrexenedu; then
 	# On demande confirmation
-	go 2
-	echo -e "$COLINFO"		
-	echo "Migration Wheezy Jessie XenEdu : Phase 2"
-	echo "Mise a jour de la distribution en Jessie"
-	echo -e "$COLCMD"		
-	# On remet 0 dans grub
-	#sed -i s/GRUB_DEFAULT=2/GRUB_DEFAULT=0/g /etc/default/grub
-	#update-grub
-	# Modif source list
-	echo -e "$COLINFO"		
-	echo "Changement des sources en wheezy"
-	echo -e "$COLCMD"		
-	cat > /etc/apt/sources.list <<EOF
-deb http://ftp.fr.debian.org/debian/ jessie main non-free contrib
-deb-src http://ftp.fr.debian.org/debian/ jessie main non-free contrib
-
-deb http://security.debian.org/ jessie/updates main contrib non-free
-deb-src http://security.debian.org/ jessie/updates main contrib non-free
-
-## XenEdu
-deb http://xenedu.crdp.ac-caen.fr/jessie xeneduXP main
-EOF
-		
-		apt-get update
-		apt-get install debian-archive-keyring
-		apt-get -y --force-yes dist-upgrade
-		#
-		# Nous sommes en Jessie, on reboot sur le noyau Wheezy 3.16.0-4-amd64		
-		# second reboot
-		echo -e "$COLINFO"
-		echo "Fin phase 2, on reboot..."
-		echo "Vous pourrez relancer le script en reouvrant une session ssh de secours"
-		echo "avec le meme numero que precedement..."
-		echo -e "$COLCMD"
-		echo "3" > /root/phasemigrexenedu
-		wait
-		reboot
-		exit 0
-fi
-
-# Phase 3
-# -------
-if grep "3" /root/phasemigrexenedu; then
-	# On demande confirmation
-	go 3
+	go 1
 	echo -e "$COLINFO"
-	echo "Migration Wheezy Jessie XenEdu : Phase 4"
+	echo "Migration Wheezy Jessie XenEdu : Phase 1"
 	echo "Installation des Xeneries Jessie..."
 	echo -e "$COLCMD"
 	# On efface les /sbin/xenedu*
@@ -273,25 +236,27 @@ if grep "3" /root/phasemigrexenedu; then
 	# On installe les nouvelles Xeneries
 	apt-get install xenedu-base -y
 	apt-get install xenedu-lindomus -y
+	# reconfiguration network a la mode Xen
+	xenedu-network-reconfig eth0
 	# Quatrieme reboot
 	echo -e "$COLINFO"
 	echo "Fin phase 3, on reboot..."
 	echo "Vous pourrez relancer le script en reouvrant une session ssh de secours"
 	echo "avec le meme numero que precedement..."
 	echo -e "$COLCMD"
-	echo "4" > /root/phasemigrexenedu
+	echo "2" > /root/phasemigrexenedu
 	wait
 	reboot
 	exit 0
 fi
 
-# Phase 4
+# Phase 2
 #---------
-if grep "4" /root/phasemigrexenedu; then
+if grep "2" /root/phasemigrexenedu; then
 	# On demande confirmation
-	go 4
+	go 2
 	echo -e "$COLINFO"
-	echo "Migration Wheezy Jessie XenEdu : Phase 4"
+	echo "Migration Wheezy Jessie XenEdu : Phase 2"
 	echo "Finalisation et verifications"
 	echo -e "$COLCMD"
 	# On verifie que le xend est up
