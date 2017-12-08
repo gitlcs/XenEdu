@@ -1,7 +1,7 @@
 #!/bin/bash
 # Xenedu Wheezy to Jessie
 # xenedu-upgrade-jessie 
-# 07/12/2017 jLCF jean-luc.chretien@ac-caen.fr
+# 08/12/2017 jLCF jean-luc.chretien@ac-caen.fr
 # ---------------------------------------------------------------------------
 # Phase 0 : Preparatoire
 # Phase 1 : On vire les xeneries et on passe sur un noyau squeeze 3.2 non Xen Upgrade Jessie Installation XenEdu
@@ -91,8 +91,13 @@ if [ ! -f /usr/bin/at ]; then
 	apt-get install at -y
 fi
 
+if [ -f /root/phasemigrexenedu ]; then 
+	echo "On efface les traces de la migration Squeeze Wheezy"
+	rm -f /root/phasemigrexenedu
+	rm -rf /root/secours
+fi
 
-if [ ! -f /root/phasemigrexenedu ]; then
+if [ ! -f /root/phasemigrexenedug6 ]; then
 # Phase 0
 #--------
 	# On test la version Debian
@@ -210,7 +215,7 @@ EOF
 	echo "exit 0" >> /etc/init.d/sshsecours
 	chmod +x /etc/init.d/sshsecours
 	update-rc.d sshsecours defaults	
-	echo "1" > /root/phasemigrexenedu
+	echo "1" > /root/phasemigrexenedug6
 	# 1er reboot
 	# On reboot sur le noyau 3.16.0-4 pas xen
 	echo -e "$COLINFO"	
@@ -224,7 +229,7 @@ fi
 
 # Phase 1
 # -------
-if grep "1" /root/phasemigrexenedu; then
+if grep "1" /root/phasemigrexenedug6; then
 	# On demande confirmation
 	go 1
 	echo -e "$COLINFO"
@@ -244,7 +249,7 @@ if grep "1" /root/phasemigrexenedu; then
 	echo "Vous pourrez relancer le script en reouvrant une session ssh de secours"
 	echo "avec le meme numero que precedement..."
 	echo -e "$COLCMD"
-	echo "2" > /root/phasemigrexenedu
+	echo "2" > /root/phasemigrexenedug6
 	wait
 	reboot
 	exit 0
@@ -252,7 +257,7 @@ fi
 
 # Phase 2
 #---------
-if grep "2" /root/phasemigrexenedu; then
+if grep "2" /root/phasemigrexenedug6; then
 	# On demande confirmation
 	go 2
 	echo -e "$COLINFO"
